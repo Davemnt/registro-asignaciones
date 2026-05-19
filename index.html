@@ -6,6 +6,10 @@
 <title>Minutas – Estaca Aldo Bonzi</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
 /* reset */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -239,6 +243,25 @@ details[open].horarios-cfg summary::before { transform:rotate(90deg); }
 </style>
 </head>
 <body>
+<!-- Login overlay -->
+<div id="login-overlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#0a8c9e 0%,#064e5a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:24px;">
+  <div style="text-align:center;color:#fff;">
+    <div style="font-size:52px;margin-bottom:10px;">📋</div>
+    <h1 style="font-size:22px;font-weight:800;margin-bottom:6px;">Asignaciones</h1>
+    <p style="font-size:14px;opacity:.75;">Conferencia de Estaca Aldo Bonzi</p>
+  </div>
+  <button onclick="loginGoogle()" style="background:#fff;color:#0a8c9e;border:none;padding:13px 30px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,0.25);">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="G">
+    Iniciar sesión con Google
+  </button>
+  <p id="login-error" style="color:#ffaaaa;font-size:12px;min-height:16px;"></p>
+</div>
+<!-- Barra de usuario -->
+<div id="user-bar" style="display:none;background:#0a8c9e;color:#fff;padding:6px 16px;font-size:12px;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:100;">
+  <span style="opacity:.7;font-size:11px;">📋 Conferencia de Estaca Aldo Bonzi</span>
+  <span id="user-name" style="font-weight:700;"></span>
+  <button onclick="logout()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;padding:3px 11px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;">Cerrar sesión</button>
+</div>
 <div class="app">
 
   <!-- ====== PANEL ====== -->
@@ -703,6 +726,69 @@ details[open].horarios-cfg summary::before { transform:rotate(90deg); }
 </div><!-- /app -->
 
 <script>
+// ===== FIREBASE =====
+const _fbConfig = {
+  apiKey: "AIzaSyASRegVlET3dcqe16k2gF12EW7tOOgC7eY",
+  authDomain: "registro-asignaciones-conf.firebaseapp.com",
+  projectId: "registro-asignaciones-conf",
+  storageBucket: "registro-asignaciones-conf.firebasestorage.app",
+  messagingSenderId: "829597625110",
+  appId: "1:829597625110:web:76ba78f57f837c75b03e37"
+};
+firebase.initializeApp(_fbConfig);
+const _auth = firebase.auth();
+const _db   = firebase.firestore();
+let _regCache      = null;
+let _horariosCache = null;
+let _currentUser   = null;
+
+_auth.onAuthStateChanged(async function(user){
+  _currentUser = user;
+  if(user){
+    document.getElementById('login-overlay').style.display = 'none';
+    const bar = document.getElementById('user-bar');
+    bar.style.display = 'flex';
+    document.getElementById('user-name').textContent = user.displayName || user.email || 'Usuario';
+    await _loadFromFirestore();
+    loadHorariosUI();
+    autoHoraSesion();
+    renderRegistro();
+  } else {
+    document.getElementById('login-overlay').style.display = 'flex';
+    document.getElementById('user-bar').style.display = 'none';
+  }
+});
+
+function loginGoogle(){
+  document.getElementById('login-error').textContent = '';
+  _auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){
+    document.getElementById('login-error').textContent = 'Error al iniciar sesión: ' + e.message;
+  });
+}
+function logout(){
+  if(confirm('¿Cerrar sesión?')) _auth.signOut();
+}
+async function _loadFromFirestore(){
+  try {
+    const doc = await _db.collection('datos').doc('registro').get();
+    if(doc.exists){
+      _regCache = migrateRegistro(doc.data().items || []);
+    } else {
+      _regCache = buildDefaultRegistro();
+      _db.collection('datos').doc('registro').set({ items: _regCache });
+    }
+  } catch(e){ console.error('Firestore registro:', e); _regCache = buildDefaultRegistro(); }
+  try {
+    const doc = await _db.collection('datos').doc('horarios').get();
+    _horariosCache = doc.exists ? doc.data() : { lideres:'16:00', adultos:'18:30', general:'10:00' };
+  } catch(e){ console.error('Firestore horarios:', e); _horariosCache = { lideres:'16:00', adultos:'18:30', general:'10:00' }; }
+}
+function _saveFs(docId, data){
+  if(!_currentUser) return;
+  _db.collection('datos').doc(docId).set(data).catch(function(e){ console.error('Firestore save:', e); });
+}
+// ====================
+
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const DIAS  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const ORDINAL = ['primer','segundo','tercer','cuarto','quinto','sexto','séptimo','octavo','noveno','décimo','undécimo','duodécimo'];
@@ -766,7 +852,7 @@ function autoHoraSesion(){
 }
 
 function getHorarios(){
-  try { const s = localStorage.getItem('estaca_horarios'); if(s) return JSON.parse(s); } catch(e){}
+  if(_horariosCache) return _horariosCache;
   return { lideres:'16:00', adultos:'18:30', general:'10:00' };
 }
 function saveHorarios(){
@@ -775,7 +861,8 @@ function saveHorarios(){
     adultos: document.getElementById('cfg-hora-adultos')?.value || '18:30',
     general: document.getElementById('cfg-hora-general')?.value || '10:00'
   };
-  localStorage.setItem('estaca_horarios', JSON.stringify(h));
+  _horariosCache = h;
+  _saveFs('horarios', h);
 }
 function loadHorariosUI(){
   const h = getHorarios();
@@ -1158,32 +1245,14 @@ function migrateRegistro(reg){
 }
 
 function getRegistro(){
-  try{ 
-    let str = localStorage.getItem('estaca_minutas');
-    // Sanitize any stuck HTML entities from previous saves
-    if(str) {
-      str = str.replace(/M&amp;#250;sica/g, 'Música')
-               .replace(/M\u00fasica/g, 'Música')
-               .replace(/Director de M[^\\"]*sica/gi, 'Director\/a de Música')
-               .replace(/Oraci\u00f3n/g, 'Oración')
-               .replace(/Canci\u00f3n/g, 'Canción');
-    }
-    let regs = JSON.parse(str);
-    if(!regs || !regs.length || !regs.some(r=>String(r.id).startsWith('slot_'))){
-      const def = buildDefaultRegistro();
-      if(regs && regs.length){
-        for(const old of regs){
-          const idx = def.findIndex(x => x.sesion===old.sesion && x.asig===old.asig && !x.nombre);
-          if(idx>=0) def[idx] = { ...def[idx], ...old, id: def[idx].id };
-          else { old.id = 'extra_'+Date.now()+Math.random(); def.push(old); }
-        }
-      }
-      saveRegistro(def); return migrateRegistro(def);
-    }
-    return migrateRegistro(regs);
-  } catch{ return buildDefaultRegistro(); }
+  if(_regCache !== null) return _regCache;
+  _regCache = buildDefaultRegistro();
+  return _regCache;
 }
-function saveRegistro(d){ localStorage.setItem('estaca_minutas',JSON.stringify(d)); }
+function saveRegistro(d){
+  _regCache = d;
+  _saveFs('registro', { items: d });
+}
 
 function addToRegistro({nombre,asig,asigLabel,sesion,fechaEvento,genero,tema,duracion,himnoInicial,himnoIntermedio,himnoFinal,acompanante,acompananteGenero}){
   if(!nombre||nombre==='[Nombre]') return;
@@ -1718,9 +1787,7 @@ document.addEventListener('dragend', function(){
   _dragId = null;
 });
 
-// Inicializar horarios al cargar la página
-loadHorariosUI();
-autoHoraSesion();
+// Inicialización manejada por Firebase Auth (onAuthStateChanged)
 </script>
 </body>
 </html>
