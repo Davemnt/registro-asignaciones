@@ -1396,9 +1396,9 @@ function toggleField(id, field){
 function eliminarEntrada(id){
   if(!confirm('¿Limpiar los datos de esta fila?')) return;
   const r = getRegistro(); const x = r.find(e=>e.id===id); if(!x) return;
-  x.nombre=''; x.genero=undefined; x.fechaEvento=''; x.tema='';
+  x.nombre=''; delete x.genero; x.fechaEvento=''; x.tema='';
   x.himnoInicial=''; x.himnoIntermedio=''; x.himnoFinal='';
-  x.acompanante=''; x.acompananteGenero=undefined;
+  x.acompanante=''; delete x.acompananteGenero;
   x.cartaAviso=null; x.cartaEnviada=null; x.confirmado=null; x.reconfirmado=null;
   delete x.cartaAvisoDate; delete x.confirmadoDate; delete x.reconfirmadoDate; delete x.fechaGenerada;
   saveRegistro(r); renderRegistro();
