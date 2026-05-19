@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Minutas – Estaca Aldo Bonzi</title>
+<title>Asignaciones Conferencias – Estaca Aldo Bonzi</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <!-- Firebase SDKs -->
@@ -91,7 +91,7 @@ textarea { resize: vertical; min-height: 48px; }
 .carta-himnos-list { margin: 4px 0 0 16px; padding: 0; font-size: 11px; }
 .carta-himnos-list li { margin-bottom: 2px; }
 .carta-testimonio-list { margin: 6px 0 8px 24px; font-size: 11.5px; }
-.carta-testimonio-list li { margin-bottom: 4px; font-style: italic; }
+.carta-testimonio-list li { margin-bottom: 4px; }
 .carta-titulo { text-align: center; font-weight: 700; font-size: 12px; letter-spacing: 1px; margin-bottom: 14px; line-height: 1.6; }
 .carta-cierre { margin-top: 16px; }
 .carta-firma { margin-top: 38px; }
@@ -120,7 +120,7 @@ textarea { resize: vertical; min-height: 48px; }
 .reg-table td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; background: #fff; }
 .reg-table tbody tr:last-child td { border-bottom: none; }
 /* Session group header row */
-.ses-header-td { background: #f8fcfe !important; padding: 18px 14px 5px !important; border-bottom: none !important; }
+.ses-header-td { background: #f8fcfe; padding: 20px 14px 8px !important; border-bottom: none !important; border-top: 3px solid #e5e7eb; }
 .ses-hdr-name { font-weight: 800; font-size: 13px; letter-spacing: .5px; padding: 3px 10px; border-left: 4px solid currentColor; border-radius: 0 4px 4px 0; }
 /* Name cell */
 .name-assign { display:flex; align-items:center; gap:6px; background:#f0f9fb; border:1.5px dashed #b2dde6; border-radius:8px; padding:5px 6px 5px 8px; transition:border-color .15s; }
@@ -161,6 +161,27 @@ details[open].horarios-cfg summary::before { transform:rotate(90deg); }
 .drag-handle-cell:active { cursor:grabbing; }
 .reg-table tr.reg-dragging > td { background:#e8f6f8 !important; opacity:.45; }
 .reg-table tr.reg-drag-over > td { border-top:3px solid #0a8c9e !important; }
+/* ---- Evolución de estado por fila ---- */
+tr.row-pendiente  { background: #fffbeb; }
+tr.row-avisado    { background: #eff6ff; }
+tr.row-confirmado { background: #f0fdf4; }
+tr.row-reconf     { background: #faf5ff; }
+tr.row-pendiente  td:not(.td-toggle):not(.ses-header-td) { background: #fffbeb !important; }
+tr.row-avisado    td:not(.td-toggle):not(.ses-header-td) { background: #eff6ff !important; }
+tr.row-confirmado td:not(.td-toggle):not(.ses-header-td) { background: #f0fdf4 !important; }
+tr.row-reconf     td:not(.td-toggle):not(.ses-header-td) { background: #faf5ff !important; }
+tr.row-pendiente  > td:first-child { box-shadow: inset 3px 0 0 #f59e0b; }
+tr.row-avisado    > td:first-child { box-shadow: inset 3px 0 0 #3b82f6; }
+tr.row-confirmado > td:first-child { box-shadow: inset 3px 0 0 #22c55e; }
+tr.row-reconf     > td:first-child { box-shadow: inset 3px 0 0 #7c3aed; }
+/* ---- Nombre sin avisar: alerta visual ---- */
+.td-sin-avisar { box-shadow: inset 0 0 0 2px #fbbf24 !important; border-radius: 6px; }
+.td-sin-avisar .name-filled-input { color: #92400e !important; font-weight: 900 !important; }
+/* ---- Diferenciación por sesión (columna drag-handle) ---- */
+tr.ses-lideres .drag-handle-cell { background: rgba(21,101,192,0.13) !important; color: #1565c0 !important; }
+tr.ses-adultos .drag-handle-cell { background: rgba(10,140,158,0.13) !important; color: #0a8c9e !important; }
+tr.ses-general .drag-handle-cell { background: rgba(106,27,154,0.13) !important; color: #6a1b9a !important; }
+tr.ses-jovenes .drag-handle-cell { background: rgba(46,125,50,0.13) !important; color: #2e7d32 !important; }
 .btn-del  { background:#fff0f0; color:#e0a0a0; border:1px solid #f5c6c6; border-radius:6px; padding:5px 8px; cursor:pointer; font-size:15px; transition:all .15s; line-height:1; }
 .btn-del:hover  { background:#fde8e8; color:#e74c3c; border-color:#e74c3c; }
 .btn-edit { background:#f0f8ff; color:#a0c8e0; border:1px solid #c0ddf0; border-radius:6px; padding:5px 7px; cursor:pointer; font-size:15px; transition:all .15s; line-height:1; }
@@ -937,14 +958,13 @@ function buildAsig(asig, genero, himnos, sesLbl, msgNum, msgDur){
     const n  = parseInt(msgNum)  || 1;
     const ord= ORDINAL[n-1] || `${n}°`;
     return `<p>En esta oportunidad queremos extenderles la invitación para compartir el <strong>${ord} testimonio de 3 minutos</strong>.</p>
-<p>Recuerde que el testimonio se debe centrar en:</p>
-<ol class="carta-testimonio-list">
+<div class="carta-asig-box"><p style="font-size:11.5px;margin-bottom:6px">Recuerde que el testimonio se debe centrar en:</p><ol class="carta-testimonio-list">
   <li>Dios es Nuestro Padre Celestial y nos ama</li>
   <li>Jesucristo, su hijo, es nuestro salvador y redentor</li>
   <li>José Smith es un profeta de Dios y restauró el Evangelio de Jesucristo</li>
   <li>La Iglesia de Jesucristo de los Santos de los Últimos Días es la iglesia del Señor en la tierra en la actualidad</li>
   <li>La iglesia es guiada por un profeta viviente</li>
-</ol>
+</ol></div>
 <p>Le invitamos a <strong>estar sentad${suf}</strong> en el estrado con nosotros <strong>15 minutos </strong>antes del comienzo.</p>`;
   }
 
@@ -1059,7 +1079,7 @@ function generarCarta(){
     ? `ESTACA ${estacaUpper.substring(0, splitAt).trim()}<br>${estacaUpper.substring(splitAt).trim()}`
     : `ESTACA ${estacaUpper}`;
 
-  document.getElementById('carta-contenido').innerHTML=`
+  const _cartaHTML = `
     <div class="carta-titulo">${tituloHTML}</div>
     <div class="carta-fecha">${fmtCarta(fechaCarta,ciudad)}</div>
     <div class="carta-saludo">Estimad${suf} ${trat} ${esc(nombre)},</div>
@@ -1072,6 +1092,7 @@ function generarCarta(){
     </div>
     <div class="carta-cierre"><p>Esperamos que el Señor ${genero==='a'?'la':'lo'} bendiga,</p></div>
     <div class="carta-firma"><p>Con amor</p><br><p><strong>${esc(firmante)}</strong></p></div>`;
+  document.getElementById('carta-contenido').innerHTML = _cartaHTML;
 
   cartaLista = true;
   document.getElementById('btn-pdf').disabled = false;
@@ -1089,7 +1110,8 @@ function generarCarta(){
     himnoIntermedio: himnos.intermedio,
     himnoFinal:      himnos.final,
     acompanante:     himnos.acompanante,
-    acompananteGenero: himnos.acompananteGenero
+    acompananteGenero: himnos.acompananteGenero,
+    cartaHTML: _cartaHTML
   });
 }
 
@@ -1124,39 +1146,28 @@ function generarEspecial(){
     dur2 = document.getElementById('esp-duracion2').value || '6';
   }
 
-  // Párrafo apertura: fechas de la conferencia
-  let fechasConf;
-  if(tieneSegunda && fev2 && fev2 !== fechaEv){
-    fechasConf = `los días <strong>${fmtFecha(fechaEv)} y ${fmtFecha(fev2)}</strong>`;
-  } else {
-    fechasConf = `el día <strong>${fmtFecha(fechaEv)}</strong>`;
-  }
-
-  let cuerpo = `<p>Es un gusto saludarlos. Por medio de la presente, tenemos el agrado de invitarlos a participar como oradores en nuestra próxima <strong>Conferencia de Estaca</strong>, que se llevará a cabo ${fechasConf}.</p>`;
-
-  // Párrafo invitación + lista de sesiones
+  let cuerpo;
   if(tieneSegunda){
-    cuerpo += `<p>En esta oportunidad queremos extenderles la invitación para participar compartiendo un mensaje de aproximadamente <strong>${dur} minutos cada uno,</strong> en cada una de las siguientes sesiones:</p>
-<ul style="margin:6px 0 10px 20px;font-size:11.5px">
-  <li><strong>${esc(sesion)}:</strong> ${fmtDiaCap(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} hs.</li>
-  <li><strong>${esc(ses2)}:</strong> ${fmtDiaCap(fev2)} ${fmtFecha(fev2)} a las ${hr2} hs.</li>
-</ul>`;
+    cuerpo = `<p>El <strong>${fmtDiaCap(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
+<p>El <strong>${fmtDiaCap(fev2)} ${fmtFecha(fev2)} a las ${hr2} Hs</strong> se llevará a cabo la <strong>${esc(ses2)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
+<p>En esta oportunidad queremos extenderles la invitación para participar compartiendo un mensaje de <strong>aproximadamente ${dur} minutos</strong> cada uno, en cada una de las sesiones mencionadas.</p>`;
   } else {
-    cuerpo += `<p>En esta oportunidad queremos extenderles la invitación para participar compartiendo un mensaje de aproximadamente <strong>${dur} minutos</strong>, en la <strong>${esc(sesion)}</strong> del ${fmtDia(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} hs.</p>`;
+    cuerpo = `<p>El <strong>${fmtDiaCap(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
+<p>En esta oportunidad queremos extenderles la invitación para participar compartiendo un mensaje de <strong>aproximadamente ${dur} minutos</strong> cada uno, en la ${esc(sesion).toLowerCase()}.</p>`;
   }
-
   cuerpo += `<p><strong>El tema será a su elección</strong>. Los invitamos a que se pueda preparar el mensaje utilizando las escrituras, las palabras de los profetas modernos y ejemplos de la vida del salvador.</p>
 <p>Les invitamos a <strong>estar sentada/o</strong> en el estrado con nosotros <strong>15 minutos antes</strong> del comienzo.</p>
 <p>Favor de confirmar su presencia. De no poder asistir por algún motivo, avísenos con anticipación.</p>
 <p>¡Muchas gracias!</p>`;
 
-  document.getElementById('carta-contenido').innerHTML=`
+  const _cartaHTML = `
     <div class="carta-titulo">ESTACA BUENOS AIRES<br>ARGENTINA ALDO BONZI</div>
     <div class="carta-fecha">${fmtCarta(fechaCarta, ciudad)}</div>
-    <div class="carta-saludo">Estimados Presidente y Hna.${nombre ? ' ' + esc(nombre) : ''},</div>
+    <div class="carta-saludo">Estimados <strong><u>Presidente</u></strong> y Hna.${nombre ? ' ' + esc(nombre) : ''},</div>
     <div class="carta-texto">${cuerpo}</div>
     <div class="carta-cierre"><p>Esperamos que el Señor los bendiga,</p></div>
     <div class="carta-firma"><p>Con amor</p><br><p><strong>${esc(firmante)}</strong></p></div>`;
+  document.getElementById('carta-contenido').innerHTML = _cartaHTML;
 
   cartaLista = true;
   const fn = nombre ? nombre.replace(/\s+/g,'_') : 'Especial';
@@ -1173,20 +1184,20 @@ function generarEspecial(){
   const _dur2Num = parseInt(dur2) || 0;
   addToRegistro({
     nombre: tipoLabel, asig: 'mensaje', asigLabel: 'Mensaje Especial – ' + tipoLabel,
-    sesion: _sesMap[sesion] || 'general', fechaEvento: fechaEv, genero: 'o', duracion: _durNum
+    sesion: _sesMap[sesion] || 'general', fechaEvento: fechaEv, genero: 'o', duracion: _durNum, cartaHTML: _cartaHTML
   });
   addToRegistro({
     nombre: 'Esposa ' + tipoLabel, asig: 'mensaje', asigLabel: 'Mensaje Especial – Esposa ' + tipoLabel,
-    sesion: _sesMap[sesion] || 'general', fechaEvento: fechaEv, genero: 'a', duracion: _durNum
+    sesion: _sesMap[sesion] || 'general', fechaEvento: fechaEv, genero: 'a', duracion: _durNum, cartaHTML: _cartaHTML
   });
   if(tieneSegunda && fev2){
     addToRegistro({
       nombre: tipoLabel, asig: 'mensaje', asigLabel: 'Mensaje Especial – ' + tipoLabel,
-      sesion: _sesMap[ses2] || 'general', fechaEvento: fev2, genero: 'o', duracion: _dur2Num
+      sesion: _sesMap[ses2] || 'general', fechaEvento: fev2, genero: 'o', duracion: _dur2Num, cartaHTML: _cartaHTML
     });
     addToRegistro({
       nombre: 'Esposa ' + tipoLabel, asig: 'mensaje', asigLabel: 'Mensaje Especial – Esposa ' + tipoLabel,
-      sesion: _sesMap[ses2] || 'general', fechaEvento: fev2, genero: 'a', duracion: _dur2Num
+      sesion: _sesMap[ses2] || 'general', fechaEvento: fev2, genero: 'a', duracion: _dur2Num, cartaHTML: _cartaHTML
     });
   }
 }
@@ -1266,10 +1277,17 @@ function buildDefaultRegistro(){
 
 function migrateRegistro(reg){
   let changed = false;
-  // Normalizar etiqueta Director/a ? Director/a de Música
+  // Normalizar etiqueta Director/a → Director/a de Música
   for(const r of reg){
     if(r.asig==='director' && r.asigLabel==='Director/a'){
       r.asigLabel = 'Director/a de Música'; changed = true;
+    }
+  }
+  // Corregir asigLabel para entradas de Mensaje Especial (datos guardados sin la etiqueta correcta)
+  const _ESP = ['Pte. del Templo','Pte. de Misión','Esposa Pte. del Templo','Esposa Pte. de Misión'];
+  for(const r of reg){
+    if(r.asig==='mensaje' && r.nombre && _ESP.includes(r.nombre) && !(r.asigLabel||'').includes('Especial')){
+      r.asigLabel = 'Mensaje Especial – ' + r.nombre; changed = true;
     }
   }
   if(changed) saveRegistro(reg);
@@ -1286,14 +1304,14 @@ function saveRegistro(d){
   _saveFs('registro', { items: d });
 }
 
-function addToRegistro({nombre,asig,asigLabel,sesion,fechaEvento,genero,tema,duracion,himnoInicial,himnoIntermedio,himnoFinal,acompanante,acompananteGenero}){
+function addToRegistro({nombre,asig,asigLabel,sesion,fechaEvento,genero,tema,duracion,himnoInicial,himnoIntermedio,himnoFinal,acompanante,acompananteGenero,cartaHTML}){
   if(!nombre||nombre==='[Nombre]') return;
   const reg=getRegistro();
   const now=new Date().toISOString();
   let idx = reg.findIndex(r=>r.nombre===nombre && r.asig===asig && r.sesion===sesion);
   if (idx < 0) idx = reg.findIndex(r=>!r.nombre && r.asig===asig && r.sesion===sesion);
 
-  const extra = {genero,tema,duracion,himnoInicial,himnoIntermedio,himnoFinal,acompanante,acompananteGenero};
+  const extra = {genero,tema,duracion,himnoInicial,himnoIntermedio,himnoFinal,acompanante,acompananteGenero,cartaHTML};
   const clean = Object.fromEntries(Object.entries(extra).filter(([,v])=>v!=null&&v!==undefined));
 
   if(idx>=0){
@@ -1335,6 +1353,20 @@ function updateFecha(id, val){
 function irACarta(id){
   const r=getRegistro(); const x=r.find(e=>e.id===id); if(!x) return;
   if(!['director','pianista','mensaje','testimonio','capacitacion'].includes(x.asig)) return;
+  // Si tiene carta especial almacenada, mostrarla directamente
+  if(x.cartaHTML){
+    showTab('carta');
+    document.getElementById('carta-contenido').innerHTML = x.cartaHTML;
+    cartaLista = true;
+    document.getElementById('btn-pdf').disabled = false;
+    document.getElementById('btn-img').disabled = false;
+    document.getElementById('status-msg').textContent = 'Carta guardada. Podés descargar PDF o imagen.';
+    const _fn = (x.nombre||'carta').replace(/\s+/g,'_');
+    document.getElementById('btn-pdf').onclick = ()=>descargar('pdf','btn-pdf','btn-img','status-msg',_fn);
+    document.getElementById('btn-img').onclick = ()=>descargar('img','btn-pdf','btn-img','status-msg',_fn);
+    window.scrollTo({top:0,behavior:'smooth'});
+    return;
+  }
   showTab('carta');
   document.getElementById('nombre').value = x.nombre||'';
   const sesMap={adultos:'adultos',lideres:'lideres',general:'general'};
@@ -1467,38 +1499,44 @@ function renderRegistro(){
     const items = groups[ses];
     const sesMin = items.reduce((a,r)=>a+_parseDur(r),0);
     const timeBadge = sesMin>0 ? `<span style="font-size:10px;color:#c2410c;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:2px 8px;margin-left:8px;font-weight:700">⏱ ${sesMin} min</span>` : '';
-    html += `<tr><td colspan="10" class="ses-header-td"><span class="ses-hdr-name" style="color:${col};border-left-color:${col}">🎙️ ${(SLBL[ses]||ses).toUpperCase()}</span>${timeBadge}</td></tr>`;
+    html += `<tr><td colspan="10" class="ses-header-td" style="background:${col}18;border-top-color:${col};"><span class="ses-hdr-name" style="color:${col};border-left-color:${col}">🎙️ ${(SLBL[ses]||ses).toUpperCase()}</span>${timeBadge}</td></tr>`;
     items.forEach((r, idx) => {
       const aLbl = (() => {
+        const _lbl = ((r.asigLabel || '').replace(/\s*\(\d+\s*min\)/gi,'')).trim();
+        const _GENERICOS = ['Mensaje','Testimonio','Capacitación',''];
         const _ORD_ASIGS = ['mensaje','testimonio','capacitacion'];
-        if(_ORD_ASIGS.includes(r.asig) && !(r.asigLabel||'').includes('Especial')){
+        // Etiqueta ordinal sólo cuando el label es genérico o está vacío
+        if(_ORD_ASIGS.includes(r.asig) && _GENERICOS.includes(_lbl)){
           const _same = reg.filter(x => x.asig === r.asig && x.sesion === r.sesion);
           const _pos  = _same.findIndex(x => x.id === r.id) + 1;
           const _w    = ORDINAL[_pos-1] || `${_pos}°`;
           const _cap  = _w.charAt(0).toUpperCase() + _w.slice(1);
           const _base = r.asig==='mensaje' ? 'Mensaje' : r.asig==='testimonio' ? 'Testimonio' : 'Capacitación';
-          const _dm   = (r.asigLabel||'').match(/\(\d+\s*min\)/i)?.[0] || '';
-          return esc(`${_cap} ${_base}${_dm ? ' '+_dm : ''}`);
+          return esc(`${_cap} ${_base}`);
         }
-        return esc(r.asigLabel || r.asig);
+        return esc(_lbl || r.asig || '');
       })();
       const isFilled = !!(r.nombre && r.nombre.trim());
       const canGen = isFilled;
       const isLast = idx === items.length - 1;
       const rowStyle = isLast ? 'border-bottom:2px solid '+col+'40;' : '';
       const canIrCarta = ['director','pianista','mensaje','testimonio','capacitacion'].includes(r.asig);
+      const rowStatus = r.reconfirmado===true ? 'row-reconf'
+        : r.confirmado===true ? 'row-confirmado'
+        : r.cartaAviso===true ? 'row-avisado'
+        : isFilled ? 'row-pendiente'
+        : '';
       const _rDur = _parseDur(r);
       const _isSpeaking = ['mensaje','testimonio','capacitacion','extra'].includes(r.asig);
-      const _labelHasDur = /\(\d+\s*min\)/i.test(r.asigLabel||'');
-      const durBadge = (_rDur > 0 && _isSpeaking && !_labelHasDur)
+      const durBadge = (_rDur > 0 && _isSpeaking)
         ? `<span style="font-size:11px;color:#c2410c;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:1px 6px;margin-left:4px;font-weight:700">⏱ ${_rDur} min</span>`
         : '';
-      html += `<tr draggable="true" data-id="${r.id}">
+      html += `<tr draggable="true" data-id="${r.id}" class="${rowStatus} ses-${r.sesion}">
         <td style="text-align:center;padding:5px 4px;${rowStyle}"><input type="checkbox" class="reg-sel" data-id="${r.id}" onchange="_cntSel()"></td>
         <td class="drag-handle-cell" style="${rowStyle}" title="Arrastrar">⠿</td>
         <td style="font-size:13px;font-weight:600;${rowStyle}${canIrCarta?' color:#2563eb; cursor:pointer;':' color:#444;'}" ${canIrCarta?`onclick="irACarta('${r.id}')" title="Abrir en Generar carta"`:''}>${
 aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</span>':''}</td>
-        <td style="padding:6px 8px;${rowStyle}${isFilled?'background:#eafaf1;':''}">
+        <td style="padding:6px 8px;${rowStyle}" class="${isFilled && !r.cartaAviso ? 'td-sin-avisar' : ''}">
           ${isFilled
             ? `<input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">`
             : `<label class="name-assign"><span style="font-size:13px;flex-shrink:0">👤</span><input type="text" value="" onchange="updateNombre('${r.id}',this.value)" class="name-assign-input" placeholder="Asignar encargado..."><span class="name-assign-plus">+</span></label>`
@@ -1780,6 +1818,18 @@ async function descargarRegistro(tipo, sesionesFiltro){
     }
   }
 
+  // Ocultar columna Acciones para la captura
+  const _tbl = el.querySelector('.reg-table');
+  const _expHide = [];
+  if(_tbl){
+    const _ths = _tbl.querySelectorAll('thead th');
+    if(_ths.length) _expHide.push(_ths[_ths.length-1]);
+    _tbl.querySelectorAll('tbody tr').forEach(tr => {
+      if(!tr.querySelector('.ses-header-td') && tr.cells.length) _expHide.push(tr.cells[tr.cells.length-1]);
+    });
+  }
+  _expHide.forEach(c => { c.style.display='none'; });
+
   const SNAME = { lideres:'Lideres', adultos:'Adultos', general:'General' };
   const sfx = (sesionesFiltro && sesionesFiltro.length < 3)
     ? sesionesFiltro.map(s=>SNAME[s]||s).join('_')
@@ -1809,6 +1859,7 @@ async function descargarRegistro(tipo, sesionesFiltro){
   finally{
     window.getComputedStyle=_origGCS;
     hiddenRows.forEach(r=>{ r.style.display=''; });
+    _expHide.forEach(c=>{ c.style.display=''; });
   }
 }
 
