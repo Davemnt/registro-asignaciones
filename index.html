@@ -243,25 +243,7 @@ details[open].horarios-cfg summary::before { transform:rotate(90deg); }
 </style>
 </head>
 <body>
-<!-- Login overlay -->
-<div id="login-overlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#0a8c9e 0%,#064e5a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:24px;">
-  <div style="text-align:center;color:#fff;">
-    <div style="font-size:52px;margin-bottom:10px;">📋</div>
-    <h1 style="font-size:22px;font-weight:800;margin-bottom:6px;">Asignaciones</h1>
-    <p style="font-size:14px;opacity:.75;">Conferencia de Estaca Aldo Bonzi</p>
-  </div>
-  <button onclick="loginGoogle()" style="background:#fff;color:#0a8c9e;border:none;padding:13px 30px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,0.25);">
-    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="G">
-    Iniciar sesión con Google
-  </button>
-  <p id="login-error" style="color:#ffaaaa;font-size:12px;min-height:16px;"></p>
-</div>
-<!-- Barra de usuario -->
-<div id="user-bar" style="display:none;background:#0a8c9e;color:#fff;padding:6px 16px;font-size:12px;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:100;">
-  <span style="opacity:.7;font-size:11px;">📋 Conferencia de Estaca Aldo Bonzi</span>
-  <span id="user-name" style="font-weight:700;"></span>
-  <button onclick="logout()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;padding:3px 11px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;">Cerrar sesión</button>
-</div>
+
 <div class="app">
 
   <!-- ====== PANEL ====== -->
@@ -553,8 +535,8 @@ details[open].horarios-cfg summary::before { transform:rotate(90deg); }
         <div class="reg-header-btns">
           <button class="btn-reg-exp" style="background:#0a8c9e" onclick="abrirAddModal()">➕ Agregar fila</button>
           <button id="btn-del-sel" class="btn-reg-exp" style="display:none;background:#dc2626" onclick="eliminarSeleccionados()">🗑️ Eliminar (0)</button>
-          <button class="btn-reg-exp pdf" onclick="descargarRegistro('pdf')">⬇️ PDF</button>
-          <button class="btn-reg-exp img" onclick="descargarRegistro('img')">🖼️ PNG</button>
+          <button class="btn-reg-exp pdf" onclick="abrirExportModal('pdf')">⬇️ PDF</button>
+          <button class="btn-reg-exp img" onclick="abrirExportModal('img')">🖼️ PNG</button>
           <button class="btn-clr" onclick="limpiarRegistro()">🧹 Limpiar</button>
         </div>
       </div>
@@ -681,6 +663,32 @@ details[open].horarios-cfg summary::before { transform:rotate(90deg); }
       </div>
     </div>
 
+    <!-- Export session selection modal -->
+    <div class="reg-modal-overlay hidden" id="reg-export-modal">
+      <div class="reg-modal">
+        <h3>📸 Exportar Registro</h3>
+        <p style="font-size:12px;color:#666;margin-bottom:14px;">Seleccioná las sesiones a incluir en la captura:</p>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+          <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:#1565c0;cursor:pointer;padding:8px 10px;border-radius:7px;border:1.5px solid #bfdbfe;background:#eff6ff;">
+            <input type="checkbox" id="exp-sel-lideres" checked style="width:auto;accent-color:#1565c0;transform:scale(1.2);">
+            🎙️ Sesión de Líderes
+          </label>
+          <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:#0a8c9e;cursor:pointer;padding:8px 10px;border-radius:7px;border:1.5px solid #a5f3fc;background:#f0fbfc;">
+            <input type="checkbox" id="exp-sel-adultos" checked style="width:auto;accent-color:#0a8c9e;transform:scale(1.2);">
+            🎙️ Sesión de Adultos
+          </label>
+          <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:#6a1b9a;cursor:pointer;padding:8px 10px;border-radius:7px;border:1.5px solid #e9d5ff;background:#faf5ff;">
+            <input type="checkbox" id="exp-sel-general" checked style="width:auto;accent-color:#6a1b9a;transform:scale(1.2);">
+            🎙️ Sesión General
+          </label>
+        </div>
+        <div class="reg-modal-btns">
+          <button class="reg-modal-cancel" onclick="cerrarExportModal()">Cancelar</button>
+          <button class="reg-modal-save" id="exp-confirm-btn" onclick="confirmarExport()">⬇️ Descargar</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Mobile: link to preview -->
     <div class="panel-footer-mobile">
       <a href="#preview-area">👁️ Ver Vista Previa</a>
@@ -745,29 +753,13 @@ let _currentUser   = null;
 _auth.onAuthStateChanged(async function(user){
   _currentUser = user;
   if(user){
-    document.getElementById('login-overlay').style.display = 'none';
-    const bar = document.getElementById('user-bar');
-    bar.style.display = 'flex';
-    document.getElementById('user-name').textContent = user.displayName || user.email || 'Usuario';
     await _loadFromFirestore();
     loadHorariosUI();
     autoHoraSesion();
     renderRegistro();
-  } else {
-    document.getElementById('login-overlay').style.display = 'flex';
-    document.getElementById('user-bar').style.display = 'none';
   }
 });
-
-function loginGoogle(){
-  document.getElementById('login-error').textContent = '';
-  _auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){
-    document.getElementById('login-error').textContent = 'Error al iniciar sesión: ' + e.message;
-  });
-}
-function logout(){
-  if(confirm('¿Cerrar sesión?')) _auth.signOut();
-}
+_auth.signInAnonymously().catch(function(e){ console.error('Firebase Auth:', e); });
 async function _loadFromFirestore(){
   try {
     const doc = await _db.collection('datos').doc('registro').get();
@@ -927,7 +919,7 @@ function buildAsig(asig, genero, himnos, sesLbl, msgNum, msgDur){
   const d=D[asig]; if(!d) return '';
   let extra='';
   if(d.mus && (himnos.inicial || himnos.intermedio || himnos.final)){
-    const lbl = asig==='pianista' ? 'Los himnos a ejecutar son los siguientes' : 'Los himnos seleccionados son los siguientes';
+    const lbl = asig==='pianista' ? 'Los himnos seleccionados son los siguientes' : 'Los himnos seleccionados son los siguientes';
     const items = [
       himnos.inicial    ? `<li><strong>Himno inicial:</strong> ${himnos.inicial}</li>` : '',
       himnos.intermedio ? `<li><strong>Himno intermedio:</strong> ${himnos.intermedio}</li>` : '',
@@ -1703,9 +1695,56 @@ async function generarDesdeRegistro(id, tipo){
 }
 
 /* ---- Export registry ---- */
-async function descargarRegistro(tipo){
+let _exportTipo = 'pdf';
+function abrirExportModal(tipo){
+  _exportTipo = tipo;
+  document.getElementById('exp-confirm-btn').textContent = tipo==='pdf' ? '⬇️ Descargar PDF' : '🖼️ Descargar PNG';
+  // Reset checkboxes to all selected
+  ['lideres','adultos','general'].forEach(s=>{ const el=document.getElementById('exp-sel-'+s); if(el) el.checked=true; });
+  document.getElementById('reg-export-modal').classList.remove('hidden');
+}
+function cerrarExportModal(){
+  document.getElementById('reg-export-modal').classList.add('hidden');
+}
+async function confirmarExport(){
+  const ses = [];
+  if(document.getElementById('exp-sel-lideres').checked) ses.push('lideres');
+  if(document.getElementById('exp-sel-adultos').checked) ses.push('adultos');
+  if(document.getElementById('exp-sel-general').checked) ses.push('general');
+  if(!ses.length){ alert('Seleccioná al menos una sesión.'); return; }
+  cerrarExportModal();
+  await descargarRegistro(_exportTipo, ses);
+}
+
+async function descargarRegistro(tipo, sesionesFiltro){
   const el = document.getElementById('reg-tabla-inner');
   if(!el){ alert('No hay tabla para exportar. Abrí el Registro primero.'); return; }
+
+  // Temporarily hide rows from non-selected sessions
+  const hiddenRows = [];
+  if(sesionesFiltro && sesionesFiltro.length < 3){
+    const allSes = ['lideres','adultos','general'];
+    const excluded = allSes.filter(s => !sesionesFiltro.includes(s));
+    const DETECT = { lideres:'LÍDERES', adultos:'ADULTOS', general:'GENERAL' };
+    const tbody = el.querySelector('.reg-table tbody');
+    if(tbody){
+      let skipSes = false;
+      for(const row of Array.from(tbody.rows)){
+        const hdr = row.querySelector('.ses-header-td');
+        if(hdr){
+          const txt = (hdr.querySelector('.ses-hdr-name')?.textContent || '').toUpperCase();
+          skipSes = excluded.some(s => txt.includes(DETECT[s]));
+        }
+        if(skipSes){ row.style.display='none'; hiddenRows.push(row); }
+      }
+    }
+  }
+
+  const SNAME = { lideres:'Lideres', adultos:'Adultos', general:'General' };
+  const sfx = (sesionesFiltro && sesionesFiltro.length < 3)
+    ? sesionesFiltro.map(s=>SNAME[s]||s).join('_')
+    : 'Conferencia';
+
   const _origGCS = window.getComputedStyle;
   window.getComputedStyle = function(...args){
     const style = _origGCS.apply(this, args);
@@ -1721,13 +1760,16 @@ async function descargarRegistro(tipo){
       let w=pW, h=pW/ratio;
       if(h>pH){h=pH; w=pH*ratio;}
       pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,w,h);
-      pdf.save('Registro_Conferencia.pdf');
+      pdf.save(`Registro_${sfx}.pdf`);
     } else {
-      const a=document.createElement('a'); a.download='Registro_Conferencia.png';
+      const a=document.createElement('a'); a.download=`Registro_${sfx}.png`;
       a.href=canvas.toDataURL('image/png'); a.click();
     }
   } catch(e){ alert('Error al exportar.'); console.error(e); }
-  finally{ window.getComputedStyle=_origGCS; }
+  finally{
+    window.getComputedStyle=_origGCS;
+    hiddenRows.forEach(r=>{ r.style.display=''; });
+  }
 }
 
 /* ---- Selección múltiple ---- */
