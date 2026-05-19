@@ -212,9 +212,35 @@ details[open].horarios-cfg summary::before { transform:rotate(90deg); }
   .row2 { grid-template-columns: 1fr; }
   .row3 { grid-template-columns: 1fr 1fr; }
   .btn-group { grid-template-columns: 1fr; }
-  .reg-stats { justify-content: center; gap: 8px; }
-  .panel-tab { font-size: 10.5px; padding: 10px 4px; letter-spacing: 0; }
-  .reg-table th, .reg-table td { padding: 4px 3px; font-size: 10px; }
+
+  /* Stats en 2 columnas, se adaptan al ancho */
+  .reg-stats { flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .stat { flex: 1 1 calc(50% - 5px); min-width: 130px; max-width: calc(50% - 5px); padding: 8px 12px; }
+
+  /* Tabs: altura mínima táctil */
+  .panel-tab { font-size: 10.5px; padding: 0 4px; letter-spacing: 0; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+
+  /* Tabla del registro */
+  .reg-table th, .reg-table td { padding: 5px 4px; font-size: 11px; }
+  .pill-lbl { padding: 5px 8px; font-size: 11px; }
+  .td-toggle { min-width: 66px; padding: 7px 3px !important; }
+  .btn-del, .btn-edit { padding: 8px 10px; font-size: 16px; min-height: 38px; }
+  .btn-dl { padding: 6px 8px; font-size: 11px; }
+  .fecha-input { width: 100%; max-width: 130px; }
+  .name-assign-plus { width: 26px; height: 26px; font-size: 16px; }
+
+  /* Cabecera del registro: apilada */
+  .reg-header { flex-direction: column; align-items: flex-start; }
+  .reg-header h2 { font-size: 16px; }
+  .reg-header-btns { width: 100%; flex-wrap: wrap; }
+  .btn-reg-exp { flex: 1 1 auto; justify-content: center; padding: 9px 10px; }
+  .btn-clr { flex: 1 1 auto; text-align: center; }
+
+  /* Inputs y botones con área táctil cómoda */
+  input:not([type=checkbox]):not([type=date]):not([type=time]):not([type=number]),
+  select, textarea { min-height: 40px; }
+  .btn { min-height: 44px; }
+
   .panel-footer-mobile {
     display: block;
     padding: 10px 16px 14px;
@@ -237,8 +263,22 @@ details[open].horarios-cfg summary::before { transform:rotate(90deg); }
 @media (max-width: 480px) {
   .carta-contenido { padding: 60px 14px 0 14px; }
   .preview-area { padding: 8px 4px; }
-  .panel-tab { font-size: 9.5px; padding: 9px 2px; }
+  .panel-tab { font-size: 9.5px; }
   .row3 { grid-template-columns: 1fr; }
+
+  /* Stats a una sola columna */
+  .stat { flex: 1 1 100%; max-width: 100%; }
+
+  /* Ocultar columna drag (arrastrar no funciona bien en táctil) */
+  .reg-table thead th:nth-child(2),
+  .drag-handle-cell { display: none; }
+
+  /* Ocultar columna "Carta" — menos relevante en móvil */
+  .reg-table thead th:nth-child(6),
+  .reg-table tbody tr[data-id] td:nth-child(6) { display: none; }
+
+  /* Ocultar PDF/PNG por fila — en móvil usar el export general de arriba */
+  .btn-dl { display: none; }
 }
 </style>
 </head>
