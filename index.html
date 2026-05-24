@@ -1447,8 +1447,8 @@ function renderRegistro(){
   const q   = (document.getElementById('reg-buscar')?.value||'').toLowerCase().trim();
   const fil = q ? reg.filter(r=>r.nombre.toLowerCase().includes(q)) : reg;
   const tot=reg.filter(r=>r.nombre).length;
-  const conf=reg.filter(r=>r.confirmado===true).length;
-  const reconf=reg.filter(r=>r.reconfirmado===true).length;
+  const conf=reg.filter(r=>r.nombre && r.confirmado===true).length;
+  const reconf=reg.filter(r=>r.nombre && r.reconfirmado===true).length;
   const _parseDur = r => r.duracion ? Number(r.duracion) : ((r.asigLabel||'').match(/\((\d+)\s*min\)/i)||[])[1]|0;
   const totalMin = reg.reduce((a,r)=>a+_parseDur(r),0);
 
@@ -1474,9 +1474,9 @@ function renderRegistro(){
 
   function tCell(id, field, v, date, label, trueClass, falseClass){
     const cls = v===true?(trueClass||'pill-si'):v===false?(falseClass||'pill-no'):'pill-nd';
-    const ico = v===true?'&#10003; ':v===false?'&#10007; ':'';
+    const txt = v===true?'Sí':v===false?'No':'–';
     return `<td class="td-toggle" onclick="toggleField('${id}','${field}')">
-      <div class="pill"><span class="pill-lbl ${cls}">${ico}${label}</span>${v===true&&date?`<span class="pill-dt">${date}</span>`:''}</div>
+      <div class="pill"><span class="pill-lbl ${cls}">${txt}</span>${v===true&&date?`<span class="pill-dt">${date}</span>`:''}</div>
     </td>`;
   }
 
