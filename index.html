@@ -201,7 +201,9 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
 .btn-clr { background:transparent; color:#DC2626; border:1.5px solid #DC2626; cursor:pointer; border-radius:8px; padding:8px 14px; font-size:13px; font-weight:600; transition:background .15s; font-family:inherit; }
 .btn-clr:hover { background:#fff1f2; }
 .btn-reg-add { background:#0F766E !important; }
-.btn-reg-add:hover { background:#115E59 !important; opacity:1 !important; }
+.btn-matrimonio { background:#f1f5f9; border:1px solid #e2e8f0; border-radius:7px; padding:3px 6px; cursor:pointer; font-size:14px; transition:all .15s; line-height:1; flex-shrink:0; opacity:.4; }
+.btn-matrimonio:hover { opacity:1; background:#f0fdf9; border-color:#0F766E; }
+.btn-matrimonio.active { background:#ccfbf1; border-color:#0F766E; opacity:1; }
 /* Edit modal */
 .reg-modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:1000; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(2px); }
 .reg-modal { background:#fff; border-radius:16px; padding:28px; width:min(420px,95vw); box-shadow:0 20px 60px rgba(0,0,0,.15); border:1px solid #E2E8F0; }
@@ -1413,6 +1415,11 @@ function irACarta(id){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
+function toggleMatrimonio(id){
+  const r=getRegistro(); const x=r.find(e=>e.id===id);
+  if(x){ x.esMatrimonio = x.esMatrimonio ? false : true; }
+  saveRegistro(r); renderRegistro();
+}
 function toggleField(id, field){
   const r=getRegistro(); const x=r.find(e=>e.id===id);
   if(x){
@@ -1446,9 +1453,10 @@ function renderRegistro(){
   const reg = getRegistro();
   const q   = (document.getElementById('reg-buscar')?.value||'').toLowerCase().trim();
   const fil = q ? reg.filter(r=>r.nombre.toLowerCase().includes(q)) : reg;
-  const tot=reg.filter(r=>r.nombre).length;
-  const conf=reg.filter(r=>r.nombre && r.confirmado===true).length;
-  const reconf=reg.filter(r=>r.nombre && r.reconfirmado===true).length;
+  const _pCount = r => r.nombre ? (r.esMatrimonio ? 2 : 1) : 0;
+  const tot=reg.reduce((a,r)=>a+_pCount(r),0);
+  const conf=reg.reduce((a,r)=>a+(r.nombre&&r.confirmado===true?_pCount(r):0),0);
+  const reconf=reg.reduce((a,r)=>a+(r.nombre&&r.reconfirmado===true?_pCount(r):0),0);
   const _parseDur = r => r.duracion ? Number(r.duracion) : ((r.asigLabel||'').match(/\((\d+)\s*min\)/i)||[])[1]|0;
   const totalMin = reg.reduce((a,r)=>a+_parseDur(r),0);
 
@@ -1502,7 +1510,7 @@ function renderRegistro(){
     const sesIcon = SES_ICON[ses]||'🎙️';
     const items = groups[ses];
     const sesMin = items.reduce((a,r)=>a+_parseDur(r),0);
-    const sesPeople = items.filter(r=>r.nombre&&r.nombre.trim()).length;
+    const sesPeople = items.reduce((a,r)=>a+(r.nombre&&r.nombre.trim()?(r.esMatrimonio?2:1):0),0);
     const peopleBadge = `<span style="font-size:10.5px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:2px 9px;margin-left:8px;font-weight:600">👥 ${sesPeople} / ${items.length}</span>`;
     const timeBadge = sesMin>0 ? `<span style="font-size:10.5px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:2px 9px;margin-left:8px;font-weight:600">⏱ ${sesMin} min</span>` : '';
     html += `<tr><td colspan="10" class="ses-header-td"><div class="ses-hdr-inner"><span class="ses-hdr-name">${sesIcon} ${(SLBL[ses]||ses).toUpperCase()}</span>${peopleBadge}${timeBadge}</div></td></tr>`;
@@ -1544,7 +1552,7 @@ function renderRegistro(){
 aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</span>':''}</td>
         <td style="padding:6px 8px;${rowStyle}" class="${isFilled && !r.cartaAviso ? 'td-sin-avisar' : ''}">
           ${isFilled
-            ? `<input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">`
+            ? `<div style="display:flex;align-items:center;gap:4px;"><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input"><button onclick="toggleMatrimonio('${r.id}')" title="${r.esMatrimonio?'Quitar matrimonio':'Marcar como matrimonio'}" class="btn-matrimonio${r.esMatrimonio?' active':''}">👫</button></div>`
             : `<label class="name-assign"><span style="font-size:13px;flex-shrink:0">👤</span><input type="text" value="" onchange="updateNombre('${r.id}',this.value)" class="name-assign-input" placeholder="Asignar encargado..."><span class="name-assign-plus">+</span></label>`
           }
         </td>
