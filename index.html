@@ -201,9 +201,6 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
 .btn-clr { background:transparent; color:#DC2626; border:1.5px solid #DC2626; cursor:pointer; border-radius:8px; padding:8px 14px; font-size:13px; font-weight:600; transition:background .15s; font-family:inherit; }
 .btn-clr:hover { background:#fff1f2; }
 .btn-reg-add { background:#0F766E !important; }
-.btn-matrimonio { background:#f1f5f9; border:1px solid #e2e8f0; border-radius:7px; padding:3px 6px; cursor:pointer; font-size:14px; transition:all .15s; line-height:1; flex-shrink:0; opacity:.4; }
-.btn-matrimonio:hover { opacity:1; background:#f0fdf9; border-color:#0F766E; }
-.btn-matrimonio.active { background:#ccfbf1; border-color:#0F766E; opacity:1; }
 /* Edit modal */
 .reg-modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:1000; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(2px); }
 .reg-modal { background:#fff; border-radius:16px; padding:28px; width:min(420px,95vw); box-shadow:0 20px 60px rgba(0,0,0,.15); border:1px solid #E2E8F0; }
@@ -676,6 +673,12 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
         <div class="form-group">
           <label>Nombre</label>
           <input type="text" id="edit-nombre" placeholder="Nombre del hermano/a">
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="edit-matrimonio" style="width:auto;accent-color:#0F766E;transform:scale(1.2);">
+            Es matrimonio <span style="font-weight:400;color:#64748b">(cuenta como 2 personas)</span>
+          </label>
         </div>
         <div class="form-group">
           <label>Género</label>
@@ -1415,11 +1418,6 @@ function irACarta(id){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function toggleMatrimonio(id){
-  const r=getRegistro(); const x=r.find(e=>e.id===id);
-  if(x){ x.esMatrimonio = x.esMatrimonio ? false : true; }
-  saveRegistro(r); renderRegistro();
-}
 function toggleField(id, field){
   const r=getRegistro(); const x=r.find(e=>e.id===id);
   if(x){
@@ -1552,7 +1550,7 @@ function renderRegistro(){
 aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</span>':''}</td>
         <td style="padding:6px 8px;${rowStyle}" class="${isFilled && !r.cartaAviso ? 'td-sin-avisar' : ''}">
           ${isFilled
-            ? `<div style="display:flex;align-items:center;gap:4px;"><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input"><button onclick="toggleMatrimonio('${r.id}')" title="${r.esMatrimonio?'Quitar matrimonio':'Marcar como matrimonio'}" class="btn-matrimonio${r.esMatrimonio?' active':''}">👫</button></div>`
+            ? `<div style="display:flex;align-items:center;gap:4px;"><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${r.esMatrimonio?'<span title="Matrimonio" style="font-size:12px;flex-shrink:0;opacity:.6">👫</span>':''}</div>`
             : `<label class="name-assign"><span style="font-size:13px;flex-shrink:0">👤</span><input type="text" value="" onchange="updateNombre('${r.id}',this.value)" class="name-assign-input" placeholder="Asignar encargado..."><span class="name-assign-plus">+</span></label>`
           }
         </td>
@@ -1597,6 +1595,7 @@ function abrirEditModal(id){
     const firstName = (x.nombre||'').trim().split(' ')[0];
     document.getElementById('edit-genero').value = /[aá]$/i.test(firstName) ? 'a' : 'o';
   }
+  document.getElementById('edit-matrimonio').checked = x.esMatrimonio || false;
   document.getElementById('edit-fecha').value = x.fechaEvento || '';
   // Show/hide contextual fields
   const esMusica = ['director','pianista'].includes(x.asig);
@@ -1689,6 +1688,7 @@ function guardarEditModal(){
   const r = getRegistro(); const x = r.find(e=>e.id===_editId); if(!x) return;
   x.asigLabel   = document.getElementById('edit-asig-label').value.trim() || x.asigLabel;
   x.nombre      = document.getElementById('edit-nombre').value.trim();
+  x.esMatrimonio = document.getElementById('edit-matrimonio').checked;
   x.genero      = document.getElementById('edit-genero').value;
   x.fechaEvento = document.getElementById('edit-fecha').value;
   if(['mensaje','testimonio','capacitacion'].includes(x.asig)){
