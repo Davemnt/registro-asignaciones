@@ -508,6 +508,12 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
         <label>Apellido</label>
         <input type="text" id="esp-nombre" placeholder="Ej: Pérez">
       </div>
+      <div class="form-group">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="esp-con-esposa" checked style="width:auto;accent-color:#0F766E;transform:scale(1.2);">
+          Viene con su esposa <span style="font-weight:400;color:#64748b">(carta dirigida a ambos)</span>
+        </label>
+      </div>
 
       <div class="sep">Primera Sesión</div>
       <div class="form-group">
@@ -1132,8 +1138,9 @@ function fmtDia(d){ if(!d) return ''; const [y,m,dd]=d.split('-'); return DIAS[n
 function fmtDiaCap(d){ const s=fmtDia(d); return s ? s.charAt(0).toUpperCase()+s.slice(1) : ''; }
 
 function generarEspecial(){
-  const nombre   = document.getElementById('esp-nombre').value.trim();
-  const sesion   = document.getElementById('esp-sesion').value;
+  const nombre    = document.getElementById('esp-nombre').value.trim();
+  const conEsposa = document.getElementById('esp-con-esposa').checked;
+  const sesion    = document.getElementById('esp-sesion').value;
   const fechaEv  = document.getElementById('esp-fechaEvento').value;
   const hora     = document.getElementById('esp-hora').value || '10:00';
   const lugar    = document.getElementById('esp-lugar').value.trim() || 'el centro de estaca';
@@ -1153,26 +1160,31 @@ function generarEspecial(){
     dur2 = document.getElementById('esp-duracion2').value || '6';
   }
 
+  const _ext = conEsposa ? 'extenderles' : 'extenderle';
+  const _cuo = conEsposa ? ' cada uno' : '';
   let cuerpo;
   if(tieneSegunda){
     cuerpo = `<p>El <strong>${fmtDiaCap(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
 <p>El <strong>${fmtDiaCap(fev2)} ${fmtFecha(fev2)} a las ${hr2} Hs</strong> se llevará a cabo la <strong>${esc(ses2)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
-<p>En esta oportunidad queremos extenderles la invitación para participar compartiendo un mensaje de <strong>aproximadamente ${dur} minutos</strong> cada uno, en cada una de las sesiones mencionadas.</p>`;
+<p>En esta oportunidad queremos ${_ext} la invitación para participar compartiendo un mensaje de <strong>aproximadamente ${dur} minutos</strong>${_cuo}, en cada una de las sesiones mencionadas.</p>`;
   } else {
     cuerpo = `<p>El <strong>${fmtDiaCap(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
-<p>En esta oportunidad queremos extenderles la invitación para participar compartiendo un mensaje de <strong>aproximadamente ${dur} minutos</strong> cada uno, en la ${esc(sesion).toLowerCase()}.</p>`;
+<p>En esta oportunidad queremos ${_ext} la invitación para participar compartiendo un mensaje de <strong>aproximadamente ${dur} minutos</strong>${_cuo}, en la ${esc(sesion).toLowerCase()}.</p>`;
   }
   cuerpo += `<p><strong>El tema será a su elección</strong>. Los invitamos a que se pueda preparar el mensaje utilizando las escrituras, las palabras de los profetas modernos y ejemplos de la vida del salvador.</p>
 <p>Les invitamos a <strong>estar sentada/o</strong> en el estrado con nosotros <strong>15 minutos antes</strong> del comienzo.</p>
 <p>Favor de confirmar su presencia. De no poder asistir por algún motivo, avísenos con anticipación.</p>
 <p>¡Muchas gracias!</p>`;
 
+  const _saludo = conEsposa
+    ? `Estimados <strong><u>Presidente</u></strong> y Hna.${nombre ? ' ' + esc(nombre) : ''},`
+    : `Estimado <strong><u>Presidente</u></strong>${nombre ? ' ' + esc(nombre) : ''},`;
   const _cartaHTML = `
     <div class="carta-titulo">ESTACA BUENOS AIRES<br>ARGENTINA ALDO BONZI</div>
     <div class="carta-fecha">${fmtCarta(fechaCarta, ciudad)}</div>
-    <div class="carta-saludo">Estimados <strong><u>Presidente</u></strong> y Hna.${nombre ? ' ' + esc(nombre) : ''},</div>
+    <div class="carta-saludo">${_saludo}</div>
     <div class="carta-texto">${cuerpo}</div>
-    <div class="carta-cierre"><p>Esperamos que el Señor los bendiga,</p></div>
+    <div class="carta-cierre"><p>Esperamos que el Señor ${conEsposa ? 'los' : 'le'} bendiga,</p></div>
     <div class="carta-firma"><p>Con amor</p><br><p><strong>${esc(firmante)}</strong></p></div>`;
   document.getElementById('carta-contenido').innerHTML = _cartaHTML;
 
@@ -1193,7 +1205,7 @@ function generarEspecial(){
     nombre: tipoLabel, asig: 'mensaje', asigLabel: 'Mensaje Especial – ' + tipoLabel,
     sesion: _sesMap[sesion] || 'general', fechaEvento: fechaEv, genero: 'o', duracion: _durNum, cartaHTML: _cartaHTML
   });
-  addToRegistro({
+  if(conEsposa) addToRegistro({
     nombre: 'Esposa ' + tipoLabel, asig: 'mensaje', asigLabel: 'Mensaje Especial – Esposa ' + tipoLabel,
     sesion: _sesMap[sesion] || 'general', fechaEvento: fechaEv, genero: 'a', duracion: _durNum, cartaHTML: _cartaHTML
   });
@@ -1202,7 +1214,7 @@ function generarEspecial(){
       nombre: tipoLabel, asig: 'mensaje', asigLabel: 'Mensaje Especial – ' + tipoLabel,
       sesion: _sesMap[ses2] || 'general', fechaEvento: fev2, genero: 'o', duracion: _dur2Num, cartaHTML: _cartaHTML
     });
-    addToRegistro({
+    if(conEsposa) addToRegistro({
       nombre: 'Esposa ' + tipoLabel, asig: 'mensaje', asigLabel: 'Mensaje Especial – Esposa ' + tipoLabel,
       sesion: _sesMap[ses2] || 'general', fechaEvento: fev2, genero: 'a', duracion: _dur2Num, cartaHTML: _cartaHTML
     });
