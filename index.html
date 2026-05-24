@@ -1502,8 +1502,10 @@ function renderRegistro(){
     const sesIcon = SES_ICON[ses]||'🎙️';
     const items = groups[ses];
     const sesMin = items.reduce((a,r)=>a+_parseDur(r),0);
+    const sesPeople = items.filter(r=>r.nombre&&r.nombre.trim()).length;
+    const peopleBadge = `<span style="font-size:10.5px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:2px 9px;margin-left:8px;font-weight:600">👥 ${sesPeople} / ${items.length}</span>`;
     const timeBadge = sesMin>0 ? `<span style="font-size:10.5px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:2px 9px;margin-left:8px;font-weight:600">⏱ ${sesMin} min</span>` : '';
-    html += `<tr><td colspan="10" class="ses-header-td"><div class="ses-hdr-inner"><span class="ses-hdr-name">${sesIcon} ${(SLBL[ses]||ses).toUpperCase()}</span>${timeBadge}</div></td></tr>`;
+    html += `<tr><td colspan="10" class="ses-header-td"><div class="ses-hdr-inner"><span class="ses-hdr-name">${sesIcon} ${(SLBL[ses]||ses).toUpperCase()}</span>${peopleBadge}${timeBadge}</div></td></tr>`;
     items.forEach((r, idx) => {
       const aLbl = (() => {
         const _lbl = ((r.asigLabel || '').replace(/\s*\(\d+\s*min\)/gi,'')).trim();
