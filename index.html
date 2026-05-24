@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -125,8 +125,8 @@ textarea { resize: vertical; min-height: 52px; }
 .reg-table tbody tr:last-child td { border-bottom: none; }
 /* Session group header row */
 .ses-header-td { background: transparent; padding: 18px 0 0 !important; border-bottom: none !important; border-top: none !important; }
-.ses-hdr-inner { display:flex; align-items:center; gap:10px; padding:10px 16px; }
-.ses-hdr-name { font-weight:700; font-size:12px; letter-spacing:.8px; color:#fff !important; padding:0 14px; border-left:2px solid rgba(255,255,255,.4); }
+.ses-hdr-inner { display:flex; align-items:center; gap:10px; padding:10px 16px; background:#1E293B; border-radius:10px; }
+.ses-hdr-name { font-weight:700; font-size:11.5px; letter-spacing:.9px; color:#fff !important; padding:0 14px; border-left:2px solid rgba(255,255,255,.3); }
 /* Name cell */
 .name-assign { display:flex; align-items:center; gap:6px; background:#f8fafc; border:1.5px dashed #cbd5e1; border-radius:8px; padding:5px 6px 5px 8px; transition:border-color .15s; }
 .name-assign:focus-within { border-color:#0F766E; border-style:solid; background:#f0fdf9; }
@@ -200,6 +200,8 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
 .btn-reg-exp.img { background:#334155; }
 .btn-clr { background:transparent; color:#DC2626; border:1.5px solid #DC2626; cursor:pointer; border-radius:8px; padding:8px 14px; font-size:13px; font-weight:600; transition:background .15s; font-family:inherit; }
 .btn-clr:hover { background:#fff1f2; }
+.btn-reg-add { background:#0F766E !important; }
+.btn-reg-add:hover { background:#115E59 !important; opacity:1 !important; }
 /* Edit modal */
 .reg-modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:1000; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(2px); }
 .reg-modal { background:#fff; border-radius:16px; padding:28px; width:min(420px,95vw); box-shadow:0 20px 60px rgba(0,0,0,.15); border:1px solid #E2E8F0; }
@@ -594,7 +596,7 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
         <h2>📋 Registro de Asignaciones</h2>
         <div id="reg-stats" class="reg-stats"></div>
         <div class="reg-header-btns">
-          <button class="btn-reg-exp" style="background:#0a8c9e" onclick="abrirAddModal()">➕ Agregar fila</button>
+          <button class="btn-reg-exp btn-reg-add" onclick="abrirAddModal()">➕ Agregar fila</button>
           <button id="btn-del-sel" class="btn-reg-exp" style="display:none;background:#dc2626" onclick="eliminarSeleccionados()">🗑️ Eliminar (0)</button>
           <button class="btn-reg-exp pdf" onclick="abrirExportModal('pdf')">⬇️ PDF</button>
           <button class="btn-reg-exp img" onclick="abrirExportModal('img')">🖼️ PNG</button>
@@ -729,18 +731,18 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
       <div class="reg-modal">
         <h3>📸 Exportar Registro</h3>
         <p style="font-size:12px;color:#666;margin-bottom:14px;">Seleccioná las sesiones a incluir en la captura:</p>
-        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
-          <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:#1565c0;cursor:pointer;padding:8px 10px;border-radius:7px;border:1.5px solid #bfdbfe;background:#eff6ff;">
-            <input type="checkbox" id="exp-sel-lideres" checked style="width:auto;accent-color:#1565c0;transform:scale(1.2);">
-            🎙️ Sesión de Líderes
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+          <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;color:#1E293B;cursor:pointer;padding:9px 12px;border-radius:8px;border:1.5px solid #E2E8F0;background:#F8FAFC;transition:border-color .15s;">
+            <input type="checkbox" id="exp-sel-lideres" checked style="width:auto;accent-color:#0F766E;transform:scale(1.2);">
+            🔑 Sesión de Líderes
           </label>
-          <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:#0a8c9e;cursor:pointer;padding:8px 10px;border-radius:7px;border:1.5px solid #a5f3fc;background:#f0fbfc;">
-            <input type="checkbox" id="exp-sel-adultos" checked style="width:auto;accent-color:#0a8c9e;transform:scale(1.2);">
+          <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;color:#1E293B;cursor:pointer;padding:9px 12px;border-radius:8px;border:1.5px solid #E2E8F0;background:#F8FAFC;transition:border-color .15s;">
+            <input type="checkbox" id="exp-sel-adultos" checked style="width:auto;accent-color:#0F766E;transform:scale(1.2);">
             🎙️ Sesión de Adultos
           </label>
-          <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:#6a1b9a;cursor:pointer;padding:8px 10px;border-radius:7px;border:1.5px solid #e9d5ff;background:#faf5ff;">
-            <input type="checkbox" id="exp-sel-general" checked style="width:auto;accent-color:#6a1b9a;transform:scale(1.2);">
-            🎙️ Sesión General
+          <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;color:#1E293B;cursor:pointer;padding:9px 12px;border-radius:8px;border:1.5px solid #E2E8F0;background:#F8FAFC;transition:border-color .15s;">
+            <input type="checkbox" id="exp-sel-general" checked style="width:auto;accent-color:#0F766E;transform:scale(1.2);">
+            ✨ Sesión General
           </label>
         </div>
         <div class="reg-modal-btns">
@@ -1467,7 +1469,8 @@ function renderRegistro(){
 
   const SLBL = { adultos:'Sesión de Adultos', lideres:'Sesión de Líderes', general:'Sesión General', jovenes:'Sesión de Jóvenes' };
   const SES_ORDER = ['lideres','adultos','general','jovenes'];
-  const SES_COLOR = { lideres:'#1565c0', adultos:'#0a8c9e', general:'#6a1b9a', jovenes:'#2e7d32' };
+  const SES_COLOR = { lideres:'#1E293B', adultos:'#1E293B', general:'#1E293B', jovenes:'#1E293B' };
+  const SES_ICON  = { lideres:'🔑', adultos:'🎙️', general:'✨', jovenes:'🌟' };
 
   function tCell(id, field, v, date, label, trueClass, falseClass){
     const cls = v===true?(trueClass||'pill-si'):v===false?(falseClass||'pill-no'):'pill-nd';
@@ -1495,11 +1498,12 @@ function renderRegistro(){
   </tr></thead><tbody>`;
 
   for(const ses of sesKeys){
-    const col = SES_COLOR[ses]||'#555';
+    const col = SES_COLOR[ses]||'#1E293B';
+    const sesIcon = SES_ICON[ses]||'🎙️';
     const items = groups[ses];
     const sesMin = items.reduce((a,r)=>a+_parseDur(r),0);
-    const timeBadge = sesMin>0 ? `<span style="font-size:10px;color:#c2410c;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:2px 8px;margin-left:8px;font-weight:700">⏱ ${sesMin} min</span>` : '';
-    html += `<tr><td colspan="10" class="ses-header-td" style="background:${col}18;border-top-color:${col};"><span class="ses-hdr-name" style="color:${col};border-left-color:${col}">🎙️ ${(SLBL[ses]||ses).toUpperCase()}</span>${timeBadge}</td></tr>`;
+    const timeBadge = sesMin>0 ? `<span style="font-size:10.5px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:2px 9px;margin-left:8px;font-weight:600">⏱ ${sesMin} min</span>` : '';
+    html += `<tr><td colspan="10" class="ses-header-td"><div class="ses-hdr-inner"><span class="ses-hdr-name">${sesIcon} ${(SLBL[ses]||ses).toUpperCase()}</span>${timeBadge}</div></td></tr>`;
     items.forEach((r, idx) => {
       const aLbl = (() => {
         const _lbl = ((r.asigLabel || '').replace(/\s*\(\d+\s*min\)/gi,'')).trim();
@@ -1519,7 +1523,7 @@ function renderRegistro(){
       const isFilled = !!(r.nombre && r.nombre.trim());
       const canGen = isFilled;
       const isLast = idx === items.length - 1;
-      const rowStyle = isLast ? 'border-bottom:2px solid '+col+'40;' : '';
+      const rowStyle = isLast ? 'border-bottom:2px solid #E2E8F0;' : '';
       const canIrCarta = ['director','pianista','mensaje','testimonio','capacitacion'].includes(r.asig);
       const rowStatus = r.reconfirmado===true ? 'row-reconf'
         : r.confirmado===true ? 'row-confirmado'
@@ -1529,12 +1533,12 @@ function renderRegistro(){
       const _rDur = _parseDur(r);
       const _isSpeaking = ['mensaje','testimonio','capacitacion','extra'].includes(r.asig);
       const durBadge = (_rDur > 0 && _isSpeaking)
-        ? `<span style="font-size:11px;color:#c2410c;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:1px 6px;margin-left:4px;font-weight:700">⏱ ${_rDur} min</span>`
+        ? `<span style="font-size:10.5px;color:#64748B;background:#F1F5F9;border:1px solid #E2E8F0;border-radius:6px;padding:1px 6px;margin-left:4px;font-weight:600">${_rDur} min</span>`
         : '';
       html += `<tr draggable="true" data-id="${r.id}" class="${rowStatus} ses-${r.sesion}">
         <td style="text-align:center;padding:5px 4px;${rowStyle}"><input type="checkbox" class="reg-sel" data-id="${r.id}" onchange="_cntSel()"></td>
         <td class="drag-handle-cell" style="${rowStyle}" title="Arrastrar">⠿</td>
-        <td style="font-size:13px;font-weight:600;${rowStyle}${canIrCarta?' color:#2563eb; cursor:pointer;':' color:#444;'}" ${canIrCarta?`onclick="irACarta('${r.id}')" title="Abrir en Generar carta"`:''}>${
+        <td style="font-size:13px;font-weight:600;${rowStyle}${canIrCarta?' color:#0F766E; cursor:pointer;':' color:#334155;'}" ${canIrCarta?`onclick="irACarta('${r.id}')" title="Abrir en Generar carta"`:''}>${
 aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</span>':''}</td>
         <td style="padding:6px 8px;${rowStyle}" class="${isFilled && !r.cartaAviso ? 'td-sin-avisar' : ''}">
           ${isFilled
