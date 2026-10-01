@@ -29,7 +29,7 @@ body { font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif; font-size: 13px; co
 .hidden { display: none !important; }
 
 /* layout */
-.app { display: grid; grid-template-columns: 355px 1fr; min-height: 100vh; }
+.app { display: grid; grid-template-columns: 650px minmax(0,1fr); min-height: 100vh; }
 .app.registro-mode { grid-template-columns: 1fr; }
 .app.registro-mode, .app.registro-mode .panel, .app.registro-mode .panel-body { min-width:0; }
 .app.registro-mode .preview-area { display: none; }
@@ -50,7 +50,9 @@ input, select, textarea { width: 100%; padding: 7px 10px; border: 1px solid #E2E
 input:focus, select:focus, textarea:focus { outline: none; border-color: #0F766E; box-shadow: 0 0 0 3px rgba(15,118,110,.1); background: #fff; }
 textarea { resize: vertical; min-height: 52px; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.row-wide { grid-template-columns:2fr 1fr; }
+.row-wide { grid-template-columns:2fr 1fr; align-items:end; }
+.row-wide .form-group { display:flex; flex-direction:column; }
+.row-wide .form-group label { min-height:26px; display:flex; align-items:flex-end; }
 .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .sep { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: #0F766E; margin: 16px 0 8px; padding: 4px 10px; background: #f0fdf9; border-radius: 6px; border-left: 3px solid #0F766E; }
 
@@ -119,7 +121,7 @@ textarea { resize: vertical; min-height: 52px; }
 .stat-n.pink  { color: #1d4ed8; }
 .stat-l { display:block; font-size:9px; text-transform:uppercase; color:#697586; letter-spacing:.7px; font-weight:600; margin-top:3px; }
 /* Sticky column header wrapper — sits OUTSIDE the overflow-x container so sticky works relative to panel-body */
-.reg-tabla-head-fixed { position: sticky; top: var(--reg-hdr-h, 78px); z-index: 30; overflow: hidden; border: 1px solid #E2E8F0; border-bottom: none; border-radius: 11px 11px 0 0; box-shadow: 0 2px 8px rgba(0,0,0,.08); background:#fff; }
+.reg-tabla-head-fixed { position: sticky; top: calc(var(--reg-hdr-h, 78px) + var(--reg-nav-h, 46px) + 16px); z-index: 28; overflow: hidden; border: 1px solid #E2E8F0; border-bottom: none; border-radius: 11px 11px 0 0; box-shadow: 0 2px 8px rgba(0,0,0,.08); background:#fff; }
 .reg-tabla-head-fixed .reg-table { margin: 0; box-shadow: none; border-radius: 0; }
 .reg-tabla-wrap { overflow-x: auto; border-radius: 0 0 12px 12px; box-shadow: 0 1px 4px rgba(0,0,0,.06); border: 1px solid #E2E8F0; border-top: none; }
 .reg-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
@@ -142,6 +144,19 @@ textarea { resize: vertical; min-height: 52px; }
 .name-assign-plus { background:#0F766E; color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:13px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; }
 .name-filled-input { border:none; background:transparent; font-weight:600; font-size:13.5px; color:#0F172A; outline:none; width:100%; padding:3px 2px; }
 .name-filled-input:focus { background:#f0fdf9; border-radius:5px; padding:3px 6px; }
+.operation-team { display:flex; flex-direction:column; align-items:stretch; width:100%; gap:5px; }
+.operation-principal { display:flex; align-items:center; gap:5px; }
+.operation-helpers { display:flex; align-items:center; flex-wrap:wrap; gap:5px 8px; padding:5px 7px; color:#64748B; background:#F8FAFC; border-left:3px solid #94A3B8; font-size:10.5px; line-height:1.4; }
+.operation-helper-edit { margin-left:auto; padding:3px 7px; border:1px solid #CBD5E1; border-radius:4px; background:#fff; color:#475569; font:600 10px inherit; cursor:pointer; white-space:nowrap; }
+.operation-helper-edit:hover { color:#0F766E; border-color:#0F766E; }
+.helper-list { display:flex; flex-direction:column; gap:7px; }
+.helper-row { display:grid; grid-template-columns:minmax(0,1fr) 34px; gap:7px; align-items:center; }
+.helper-row input { min-width:0; }
+.helper-remove { width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; border:1px solid #E2E8F0; border-radius:4px; background:#fff; color:#B42318; cursor:pointer; }
+.helper-remove:hover { border-color:#FDA29B; background:#FFF1F2; }
+.helper-add { display:inline-flex; align-items:center; gap:6px; margin-top:8px; padding:7px 10px; border:1px solid #CBD5E1; border-radius:4px; background:#fff; color:#334155; font:600 11px inherit; cursor:pointer; }
+.helper-add:hover { color:#0F766E; border-color:#0F766E; background:#F0FDFA; }
+.helper-add svg, .helper-remove svg { width:15px; height:15px; stroke:currentColor; }
 /* Toggle pills */
 .td-toggle { cursor:pointer; user-select:none; padding:5px 7px !important; text-align:center; background:transparent !important; }
 .pill { display:inline-flex; flex-direction:column; align-items:center; gap:2px; }
@@ -178,17 +193,20 @@ details[open].horarios-cfg summary::before { transform:rotate(90deg); }
 .reg-table tr.reg-dragging > td { background:#f0fdf9 !important; opacity:.45; }
 .reg-table tr.reg-drag-over > td { border-top:3px solid #0F766E !important; }
 /* ---- Evolución de estado por fila ---- */
-tr.row-pendiente  td:not(.td-toggle):not(.ses-header-td) { background: #fffbeb !important; }
-tr.row-avisado    td:not(.td-toggle):not(.ses-header-td) { background: #fff7ed !important; }
-tr.row-confirmado td:not(.td-toggle):not(.ses-header-td) { background: #f0fdf4 !important; }
-tr.row-reconf     td:not(.td-toggle):not(.ses-header-td) { background: #dcfce7 !important; }
+tr.row-pendiente  td:not(.ses-header-td) { background: #fffbeb !important; }
+tr.row-avisado    td:not(.ses-header-td) { background: #fff7ed !important; }
+tr.row-confirmado td:not(.ses-header-td) { background: #f0fdf4 !important; }
+tr.row-reconf     td:not(.ses-header-td) { background: #dcfce7 !important; }
 tr.row-pendiente  > td:first-child { box-shadow: inset 4px 0 0 #F59E0B; }
 tr.row-avisado    > td:first-child { box-shadow: inset 4px 0 0 #f97316; }
 tr.row-confirmado > td:first-child { box-shadow: inset 4px 0 0 #16A34A; }
 tr.row-reconf     > td:first-child { box-shadow: inset 4px 0 0 #059669; }
 /* ---- Asistencia ---- */
-tr.row-asistencia td:not(.td-toggle):not(.ses-header-td) { background: #fdf4ff !important; }
+tr.row-asistencia td:not(.ses-header-td) { background: #fdf4ff !important; }
 tr.row-asistencia > td:first-child { box-shadow: inset 4px 0 0 #9333ea !important; }
+.attendance-count { display:flex; align-items:center; gap:6px; flex:0 0 auto; padding-left:8px; border-left:1px solid #E2E8F0; }
+.attendance-count label { margin:0; font-size:9px; white-space:nowrap; }
+.attendance-count input { width:76px; min-height:32px; padding:5px 7px; text-align:center; font-weight:700; }
 /* ---- Matrimonio badge / Nota ---- */
 .badge-matrimonio { display:inline-flex; align-items:center; gap:4px; font-size:11.5px; font-weight:700; background:#fce7f3; color:#be185d; border:1px solid #fbcfe8; border-radius:20px; padding:3px 10px; flex-shrink:0; white-space:nowrap; letter-spacing:.1px; }
 .nota-ico { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:#fef9c3; border:1px solid #fde68a; cursor:help; font-size:13px; flex-shrink:0; transition:background .15s; }
@@ -206,18 +224,29 @@ tr.row-asistencia > td:first-child { box-shadow: inset 4px 0 0 #9333ea !importan
 tr.ses-lideres .drag-handle-cell { background: rgba(30,41,59,0.1) !important; color: #475569 !important; border-right: 1px solid rgba(30,41,59,0.12); }
 tr.ses-adultos .drag-handle-cell { background: rgba(30,41,59,0.1) !important; color: #475569 !important; border-right: 1px solid rgba(30,41,59,0.12); }
 tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; color: #475569 !important; border-right: 1px solid rgba(30,41,59,0.12); }
-.btn-del  { background:#fff1f2; color:#fca5a5; border:1px solid #fecaca; border-radius:7px; padding:5px 8px; cursor:pointer; font-size:15px; transition:all .15s; line-height:1; }
-.btn-del:hover  { background:#fee2e2; color:#DC2626; border-color:#DC2626; }
-.btn-edit { background:#f8fafc; color:#94a3b8; border:1px solid #E2E8F0; border-radius:7px; padding:5px 7px; cursor:pointer; font-size:15px; transition:all .15s; line-height:1; }
+.btn-del, .btn-edit { width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; padding:0; cursor:pointer; transition:all .15s; line-height:1; }
+.btn-del { background:#fff; color:#B42318; border:1px solid #FDA29B; }
+.btn-del:hover  { background:#fee2e2; color:#B42318; border-color:#B42318; }
+.btn-edit { background:#fff; color:#475569; border:1px solid #CBD5E1; }
 .btn-edit:hover { background:#f0fdf9; color:#0F766E; border-color:#0F766E; }
-.btn-dl { border:none; cursor:pointer; border-radius:7px; padding:5px 12px; font-size:11.5px; font-weight:600; transition:opacity .15s; letter-spacing:.3px; font-family:inherit; }
+.btn-edit svg, .btn-del svg, .btn-dl svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.btn-dl { min-height:30px; display:inline-flex; align-items:center; justify-content:center; gap:4px; border:none; cursor:pointer; border-radius:7px; padding:5px 8px; font-size:10.5px; font-weight:700; transition:opacity .15s; letter-spacing:.2px; font-family:inherit; }
 .btn-dl:hover { opacity:.82; }
+.btn-dl:disabled { opacity:.42; cursor:not-allowed; }
 .btn-dl.pdf { background:#DC2626; color:#fff; }
 .btn-dl.img { background:#15803d; color:#fff; }
+.reg-row-actions { display:flex; align-items:center; justify-content:center; gap:6px; max-width:100%; }
+.reg-download-actions, .reg-edit-actions { display:flex; align-items:center; gap:4px; }
 .reg-empty { text-align:center; padding:40px 10px; color:#94a3b8; font-size:13px; }
 .reg-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; position:sticky; top:0; z-index:30; background:rgba(255,255,255,.97); margin:-16px -18px 0; padding:13px 18px; border-bottom:1px solid #D7DEE7; box-shadow:0 3px 12px rgba(15,23,42,.06); backdrop-filter:blur(8px); }
 .reg-header h2 { font-size:18px; font-weight:700; color:#172033; letter-spacing:0; }
 .reg-header-btns { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.reg-view-nav { position:sticky; top:var(--reg-hdr-h,78px); z-index:29; display:flex; gap:6px; margin:14px 0 2px; padding:5px; overflow-x:auto; background:#E9EDF1; border:1px solid #D7DEE7; border-radius:6px; box-shadow:0 3px 8px rgba(15,23,42,.08); scrollbar-width:none; }
+.reg-view-nav::-webkit-scrollbar { display:none; }
+.reg-view-btn { flex:0 0 auto; min-height:34px; padding:7px 12px; border:1px solid transparent; border-radius:4px; color:#475569; background:transparent; font:600 11px inherit; cursor:pointer; white-space:nowrap; }
+.reg-view-btn.active { color:#fff; background:#253349; border-color:#253349; }
+.reg-view-btn.otros.active { background:#7B293F; border-color:#7B293F; }
+.reg-view-count { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; margin-left:4px; padding:0 5px; border-radius:9px; color:inherit; background:rgba(255,255,255,.2); font-size:9px; }
 .btn-reg-exp { color:#334155; background:#fff; border:1px solid #CBD5E1; cursor:pointer; border-radius:6px; padding:8px 12px; font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:background .15s,border-color .15s,color .15s; font-family:inherit; }
 .btn-reg-exp:hover { opacity:1; background:#F8FAFC; border-color:#94A3B8; }
 .btn-reg-exp.pdf, .btn-reg-exp.img { background:#fff; color:#334155; }
@@ -271,7 +300,7 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
 .panel-footer-mobile { display: none; }
 
 @media (min-width: 769px) and (max-width: 1100px) {
-  .app { grid-template-columns: 295px 1fr; }
+  .app { grid-template-columns: 500px minmax(0,1fr); }
 }
 
 @media (max-width: 768px) {
@@ -294,7 +323,8 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
 
   /* Tabla del registro */
   .reg-header { top: 44px; }
-  .reg-tabla-head-fixed { top: calc(44px + var(--reg-hdr-h, 110px)); }
+  .reg-view-nav { position:sticky; top:calc(44px + var(--reg-hdr-h, 110px)); z-index:29; margin:10px -4px 4px; box-shadow:0 3px 8px rgba(15,23,42,.08); }
+  .reg-tabla-head-fixed { top: calc(44px + var(--reg-hdr-h, 110px) + var(--reg-nav-h, 46px) + 14px); }
   .reg-table th, .reg-table td { padding: 5px 4px; font-size: 11px; }
   .pill-lbl { padding: 5px 8px; font-size: 11px; }
   .td-toggle { min-width: 66px; padding: 7px 3px !important; }
@@ -360,19 +390,6 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
   .drag-handle-cell { display: none; }
   #reg-tabla-inner col:nth-child(2) { display: none; }
 
-  /* Ocultar columna "Carta" — menos relevante en móvil */
-  .reg-table thead th:nth-child(6),
-  .reg-table tbody tr[data-id] td:nth-child(6) { display: none; }
-  #reg-tabla-inner col:nth-child(6) { display: none; }
-
-  /* Ocultar PDF/PNG por fila — en móvil usar el export general de arriba */
-  .btn-dl { display: none; }
-
-  /* Acciones (editar/borrar) en columna para que ocupen menos ancho */
-  .reg-table thead th:last-child { width: 60px !important; }
-  #reg-tabla-inner col:last-child { width: 60px !important; }
-  .reg-table tbody tr[data-id] td:last-child > div { display: flex; flex-direction: column; gap: 4px; align-items: center; }
-
   /* Asistencias/checks: apilar etiqueta y selector para que no se corten */
   .pill-lbl { padding: 5px 6px; font-size: 10.5px; }
 }
@@ -394,10 +411,6 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
   .reg-modal-body { padding:16px 18px 18px; }
   .reg-table th, .reg-table td { padding: 4px 3px; font-size: 10.3px; }
 
-  /* Ocultar columna "Reconfirmado" — se ve en el modal de edición si hace falta */
-  .reg-table thead th:nth-child(9),
-  .reg-table tbody tr[data-id] td:nth-child(9) { display: none; }
-  #reg-tabla-inner col:nth-child(9) { display: none; }
 }
 
 /* ---- Pantallas muy grandes: limitar ancho del panel para que no quede demasiado angosto en relación al formulario ---- */
@@ -457,6 +470,8 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
   .reg-table tbody tr[data-id] td:nth-child(4) > * { max-width: 100%; }
   .reg-table tbody tr[data-id] td:nth-child(4) label.name-assign,
   .reg-table tbody tr[data-id] td:nth-child(4) > div { width: 100%; box-sizing: border-box; }
+  .reg-table tbody tr[data-id] .attendance-count { margin-top:7px; padding:8px 0 0; border-left:0; border-top:1px solid #E2E8F0; }
+  .reg-table tbody tr[data-id] .attendance-count input { width:96px; }
 
   /* Fecha / Carta / Avisado / Confirmado / Reconfirmado: chips en fila, ajustables sin desbordar */
   .reg-table tbody tr[data-id] td:nth-child(5),
@@ -470,6 +485,10 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
     padding-top: 10px !important; margin-top: 6px;
   }
   .reg-table tbody tr[data-id] td:last-child > div { width: 100%; justify-content: flex-end; display: flex; flex-wrap: wrap; }
+  .reg-table tbody tr[data-id] .reg-row-actions { align-items:stretch; gap:8px; }
+  .reg-table tbody tr[data-id] .reg-download-actions { display:grid; grid-template-columns:1fr 1fr; flex:1 1 100%; gap:6px; }
+  .reg-table tbody tr[data-id] .reg-download-actions .btn-dl { display:inline-flex !important; align-items:center; justify-content:center; min-height:42px; padding:8px 10px; font-size:11px; }
+  .reg-table tbody tr[data-id] .reg-edit-actions { margin-left:auto; }
 
   /* Encabezado de sesión: separación clara entre tarjetas de distintas sesiones */
   .ses-header-td { margin-top: 18px; }
@@ -498,7 +517,7 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
 }
 
 body { font-family:'DM Sans','Segoe UI',sans-serif; color:var(--ink); background:var(--canvas); }
-.app { grid-template-columns:560px minmax(0,1fr); background:var(--canvas); }
+.app { grid-template-columns:650px minmax(0,1fr); background:var(--canvas); }
 .panel { max-width:none; background:var(--paper); border-right:1px solid #cec9c0; box-shadow:8px 0 30px rgba(32,40,51,.06); }
 .app-brand { flex:0 0 auto; display:flex; align-items:center; gap:18px; padding:20px 30px 17px; background:var(--paper); border-bottom:1px solid #ebe7df; }
 .app-brand-mark { display:grid; place-items:center; width:210px; height:105px; flex:0 0 210px; }
@@ -579,6 +598,41 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 .carta-contenido.carta-discurso-barrio .carta-asig-box { margin:11px 0; padding:9px 13px; }
 .carta-contenido.carta-discurso-barrio .carta-cierre { margin-top:16px; }
 .carta-contenido.carta-discurso-barrio .carta-firma { margin-top:34px; }
+.carta-contenido.carta-especial { line-height:1.7; }
+.carta-contenido.carta-especial .carta-texto p { margin-bottom:13px; }
+.carta-contenido.carta-especial .carta-asig-box { margin:11px 0 13px; padding:9px 13px; }
+.carta-contenido.carta-especial .carta-cierre { margin-top:16px; }
+.carta-contenido.carta-especial .carta-firma { margin-top:34px; }
+.carta-contenido.carta-operacion { line-height:1.62; }
+.carta-contenido.carta-operacion .carta-texto p { margin-bottom:10px; }
+.carta-contenido.carta-relevos-doc { padding-top:180px; }
+.carta-contenido.carta-relevos-doc.carta-compacta { padding-top:165px; }
+.carta-contenido.carta-relevos-doc.carta-densa { padding-top:150px; }
+.otros-documento { margin:14px 0; padding:18px; border:1px solid #d8d4cc; background:var(--paper); }
+.otros-documento-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:14px; }
+.otros-documento h3 { font:600 16px 'Lora',serif; color:var(--ink); }
+.otros-documento-head p { margin-top:4px; color:#697586; font-size:11.5px; line-height:1.45; }
+.rel-bloques { display:flex; flex-direction:column; gap:10px; }
+.rel-bloque { border:1px solid #d8d4cc; background:#faf8f4; padding:12px; }
+.rel-bloque-head { display:grid; grid-template-columns:minmax(150px,220px) 1fr auto; align-items:center; gap:8px; }
+.rel-bloque-head select { min-height:36px; }
+.rel-bloque-actions { display:flex; justify-content:flex-end; gap:5px; }
+.rel-icon-btn { width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; border:1px solid #c9c3ba; background:#fff; color:#475569; cursor:pointer; font-size:15px; }
+.rel-icon-btn:disabled { opacity:.35; cursor:not-allowed; }
+.rel-icon-btn.danger { color:#B42318; }
+.rel-personas { display:flex; flex-direction:column; gap:7px; margin-top:10px; }
+.rel-persona { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) 110px 32px; gap:7px; }
+.rel-add-persona { margin-top:9px; border:0; background:transparent; color:var(--wine); font:600 11px inherit; cursor:pointer; }
+.rel-footer { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.rel-footer .btn-reg-exp { min-height:36px; }
+.carta-relevos { font-size:11.5px; line-height:1.62; }
+.carta-relevos .rel-doc-bloque { margin:24px 0 0; }
+.carta-relevos ul { margin:16px 0 24px 24px; padding-left:10px; }
+.carta-relevos li { margin:7px 0; padding-left:4px; }
+.carta-relevos .rel-doc-respuesta { margin-top:0; }
+.carta-operacion-list { margin:7px 0 12px 22px; padding:0; list-style:none; }
+.carta-operacion-list li { margin-bottom:5px; padding-left:13px; position:relative; }
+.carta-operacion-list li::before { content:'\2022'; position:absolute; left:0; font-weight:700; }
 
 /* Registro */
 .app.registro-mode { background:#f3f1ec; }
@@ -635,7 +689,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 .asig-preset.selected { color:var(--wine); border-color:var(--wine); background:#f5e9ec; }
 
 @media (max-width:1100px) and (min-width:769px) {
-  .app { grid-template-columns:440px minmax(0,1fr); }
+  .app { grid-template-columns:500px minmax(0,1fr); }
   .app-brand { gap:12px; padding:16px 20px 14px; }
   .app-brand-mark { width:155px; height:78px; flex-basis:155px; }
   .panel-body { padding:20px 22px 30px; }
@@ -660,6 +714,15 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
   .reg-header-btns { margin-left:0; }
   .panel-footer-mobile { background:var(--paper); border-color:#d8d4cc; }
   .panel-footer-mobile a { color:var(--wine); border-color:var(--wine); border-radius:3px; }
+  .otros-documento { padding:14px; }
+  .otros-documento-head { flex-direction:column; }
+  .rel-bloque-head { grid-template-columns:1fr auto; }
+  .rel-bloque-head .rel-orden-label { display:none; }
+  .rel-persona { grid-template-columns:minmax(0,1fr) 32px; }
+  .rel-persona-nombre { grid-column:1; grid-row:1; }
+  .rel-persona-llamamiento { grid-column:1 / -1; grid-row:2; }
+  .rel-persona-genero { grid-column:1 / -1; grid-row:3; width:100%; }
+  .rel-persona .rel-icon-btn { grid-column:2; grid-row:1; }
 }
 @media (max-width:380px) {
   .panel-tab { font-size:9px; padding:0 2px; }
@@ -925,8 +988,8 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
           </select>
         </div>
         <div class="form-group">
-          <label>Apellido</label>
-          <input type="text" id="esp-nombre" placeholder="Ej: Pérez">
+          <label>Nombre y apellido</label>
+          <input type="text" id="esp-nombre" placeholder="Ingrese aquí el nombre y apellido">
         </div>
       </div>
       <div class="form-group hidden" id="esp-cargo-grupo">
@@ -936,7 +999,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
       <div class="form-group">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
           <input type="checkbox" id="esp-con-esposa" checked style="width:auto;accent-color:#0F766E;transform:scale(1.2);">
-          Viene con su esposa <span style="font-weight:400;color:#64748b">(carta dirigida a ambos)</span>
+          Invitación para el matrimonio <span style="font-weight:400;color:#64748b">(una carta y un registro para ambos)</span>
         </label>
       </div>
 
@@ -1033,6 +1096,14 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
           <button class="btn-clr" onclick="limpiarRegistro()">Limpiar registro</button>
         </div>
       </div>
+      <nav class="reg-view-nav" id="reg-view-nav" aria-label="Sección del registro">
+        <button class="reg-view-btn active" data-view="conferencia" onclick="setRegVista('conferencia')">Conferencia <span class="reg-view-count" id="reg-count-conferencia">0</span></button>
+        <button class="reg-view-btn" data-view="lideres" onclick="setRegVista('lideres')">Líderes</button>
+        <button class="reg-view-btn" data-view="adultos" onclick="setRegVista('adultos')">Adultos</button>
+        <button class="reg-view-btn" data-view="general" onclick="setRegVista('general')">General</button>
+        <button class="reg-view-btn" data-view="operaciones" onclick="setRegVista('operaciones')">Operaciones <span class="reg-view-count" id="reg-count-operaciones">0</span></button>
+        <button class="reg-view-btn otros" data-view="otros" onclick="setRegVista('otros')">Otros eventos <span class="reg-view-count" id="reg-count-otros">0</span></button>
+      </nav>
       <!-- Horarios por sesión -->
       <details class="horarios-cfg" id="horarios-cfg">
         <summary>Horarios de sesión</summary>
@@ -1051,6 +1122,30 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
           <label>General <input type="date" id="cfg-fecha-general" onchange="saveFechas()"></label>
         </div>
       </details>
+      <section class="otros-documento hidden" id="cartas-barrios-form" aria-labelledby="cartas-barrios-title">
+        <div class="otros-documento-head" style="margin-bottom:0">
+          <div>
+            <h3 id="cartas-barrios-title">Mensajes a barrios y ramas</h3>
+            <p>Genere una carta para asignar a un líder de estaca un discurso, con fecha, tema y duración.</p>
+          </div>
+          <button type="button" class="btn-reg-exp btn-reg-add" onclick="prepararCartaBarrio()">Crear carta</button>
+        </div>
+      </section>
+      <section class="otros-documento hidden" id="rel-sost-form" aria-labelledby="rel-sost-title">
+        <div class="otros-documento-head">
+          <div>
+            <h3 id="rel-sost-title">Relevos y sostenimientos</h3>
+            <p>Organice los bloques en el orden en que se presentarán. Las frases ceremoniales se agregan automáticamente.</p>
+          </div>
+          <button type="button" class="btn-reg-exp" onclick="agregarBloqueRelSost()">+ Agregar bloque</button>
+        </div>
+        <div class="rel-bloques" id="rel-sost-bloques"></div>
+        <div class="rel-footer">
+          <button type="button" class="btn-reg-exp btn-reg-add" onclick="generarRelevosSostenimientos()">Generar documento</button>
+          <button type="button" class="btn-reg-exp img" onclick="generarRelevosSostenimientos('img')">Generar PNG</button>
+          <button type="button" class="btn-reg-exp" onclick="reiniciarRelSost()">Limpiar formulario</button>
+        </div>
+      </section>
       <div class="form-group" style="margin-bottom:10px">
         <input type="search" id="reg-buscar" placeholder="Buscar por asignación o nombre" aria-label="Buscar por asignación o nombre" oninput="renderRegistro()">
       </div>
@@ -1067,6 +1162,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
             <option value="lideres">Sesión de Líderes</option>
             <option value="adultos">Sesión de Adultos</option>
             <option value="general">Sesión General</option>
+            <option value="otros">Otros eventos</option>
             <!-- <option value="jovenes">Sesión de Jóvenes</option> -->
           </select>
         </div>
@@ -1081,6 +1177,9 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
             <button type="button" class="asig-preset" data-asig="testimonio"       data-label="Testimonio"          onclick="_selAsigPreset(this)">📖 Testimonio</button>
             <button type="button" class="asig-preset" data-asig="capacitacion"     data-label="Capacitación"        onclick="_selAsigPreset(this)">🎓 Capacitación</button>
             <button type="button" class="asig-preset" data-asig="asistencia"       data-label="Asistencia"          onclick="_selAsigPreset(this)">📊 Asistencia</button>
+            <button type="button" class="asig-preset" data-asig="seguridad"        data-label="Seguridad"           onclick="_selAsigPreset(this)">🛡 Seguridad</button>
+            <button type="button" class="asig-preset" data-asig="estacionamiento"  data-label="Estacionamiento"     onclick="_selAsigPreset(this)">🚗 Estacionamiento</button>
+            <button type="button" class="asig-preset" data-asig="bienvenida"       data-label="Bienvenida y recepción" onclick="_selAsigPreset(this)">👋 Bienvenida</button>
             <button type="button" class="asig-preset" data-asig="extra"            data-label=""                    onclick="_selAsigPreset(this)">✏️ Otro...</button>
           </div>
           <input type="text" id="add-asig-custom" placeholder="Nombre de la asignación..." style="display:none;width:100%;padding:7px 9px;border:1px solid #ddd;border-radius:6px;font-size:12px;font-family:inherit;">
@@ -1120,8 +1219,15 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
             </div>
           </div>
         <div class="form-group">
-          <label>Nombre</label>
+          <label id="edit-nombre-label">Nombre</label>
           <input type="text" id="edit-nombre" placeholder="Nombre del hermano/a">
+          <p class="field-help" id="edit-nombre-help">Persona responsable de coordinar la asignación.</p>
+        </div>
+        <div class="form-group hidden" id="edit-grupo-ayudantes">
+          <label>Equipo de apoyo <span style="font-weight:400;color:#bbb">(opcional)</span></label>
+          <div class="helper-list" id="edit-ayudantes-list"></div>
+          <button type="button" class="helper-add" onclick="agregarAyudanteEdit()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Agregar integrante</button>
+          <p class="field-help">Agregue cada persona en un campo separado.</p>
         </div>
         <div class="form-group" id="edit-grupo-matrimonio">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -1139,6 +1245,15 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
         <div class="form-group">
           <label>Fecha del evento</label>
           <input type="date" id="edit-fecha">
+        </div>
+        <div class="form-group">
+          <label>Sesión</label>
+          <select id="edit-sesion">
+            <option value="lideres">Sesión de Líderes</option>
+            <option value="adultos">Sesión de Adultos</option>
+            <option value="general">Sesión General</option>
+            <option value="otros">Otros eventos</option>
+          </select>
         </div>
         <!-- Tema (mensaje/testimonio/capacitacion) -->
         <div class="form-group hidden" id="edit-grupo-tema">
@@ -1282,6 +1397,7 @@ const _db   = firebase.firestore();
 let _regCache      = null;
 let _horariosCache = null;
 let _fechasCache   = null;
+let _relevosCache  = null;
 let _currentUser   = null;
 
 _auth.onAuthStateChanged(async function(user){
@@ -1292,6 +1408,7 @@ _auth.onAuthStateChanged(async function(user){
     loadFechasUI();
     autoHoraSesion();
     renderRegistro();
+    renderRelSostForm();
   }
 });
 _auth.signInAnonymously().catch(function(e){ console.error('Firebase Auth:', e); });
@@ -1313,6 +1430,10 @@ async function _loadFromFirestore(){
     const doc = await _db.collection('datos').doc('fechas').get();
     _fechasCache = doc.exists ? doc.data() : { lideres:'', adultos:'', general:'' };
   } catch(e){ console.error('Firestore fechas:', e); _fechasCache = { lideres:'', adultos:'', general:'' }; }
+  try {
+    const doc = await _db.collection('datos').doc('relevos-sostenimientos').get();
+    _relevosCache = doc.exists && Array.isArray(doc.data().bloques) ? doc.data().bloques : crearRelSostInicial();
+  } catch(e){ console.error('Firestore relevos y sostenimientos:', e); _relevosCache = crearRelSostInicial(); }
 }
 function _saveFs(docId, data){
   if(!_currentUser) return;
@@ -1494,9 +1615,15 @@ function ajustarCartaContenido(guiaSeleccionada=null, tipoCarta=null){
     ? contenido.textContent.includes('Guía a considerar / material de consulta:')
     : guiaSeleccionada;
   const esDiscursoBarrio = tipoCarta === 'discurso_barrio' || contenido.textContent.includes('Como líder de estaca, se le ha asignado discursar');
-  contenido.classList.remove('carta-compacta','carta-densa','carta-discurso-barrio');
+  const esEspecial = tipoCarta === 'especial' || !!contenido.querySelector('.carta-titulo-especial');
+  const esOperacion = tipoCarta === 'operacion' || !!contenido.querySelector('.carta-titulo-operacion');
+  const esRelevos = tipoCarta === 'relevos' || !!contenido.querySelector('.carta-relevos');
+  contenido.classList.remove('carta-compacta','carta-densa','carta-discurso-barrio','carta-especial','carta-operacion','carta-relevos-doc');
   contenido.classList.toggle('carta-con-guia', tieneGuia);
   contenido.classList.toggle('carta-discurso-barrio', esDiscursoBarrio);
+  contenido.classList.toggle('carta-especial', esEspecial);
+  contenido.classList.toggle('carta-operacion', esOperacion);
+  contenido.classList.toggle('carta-relevos-doc', esRelevos);
   if(contenido.scrollHeight > limiteSeguro) contenido.classList.add('carta-compacta');
   if(contenido.scrollHeight > limiteSeguro) contenido.classList.add('carta-densa');
 }
@@ -1713,6 +1840,7 @@ function generarCarta(){
     acompananteGenero: himnos.acompananteGenero,
     cartaHTML: _cartaHTML
   });
+  if(asig==='discurso_barrio') _regVista = 'otros';
 }
 
 /* Generar invitacion especial (Pte Mision / Pte Templo) */
@@ -1763,15 +1891,16 @@ function generarEspecial(){
   }
 
   const _ext = conEsposa ? 'extenderles' : 'extenderle';
-  const _cuo = conEsposa ? ' cada uno' : '';
   let cuerpo;
   if(tieneSegunda){
     cuerpo = `<p>El <strong>${fmtDiaCap(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
 <p>El <strong>${fmtDiaCap(fev2)} ${fmtFecha(fev2)} a las ${hr2} Hs</strong> se llevará a cabo la <strong>${esc(ses2)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
-<p>En esta oportunidad queremos ${_ext} la invitación para participar compartiendo un mensaje de <strong>aproximadamente ${dur} minutos</strong>${_cuo}, en cada una de las sesiones mencionadas.</p>`;
+<p>En esta oportunidad queremos ${_ext} la invitación para participar compartiendo un mensaje en cada una de las sesiones mencionadas.</p>
+<div class="carta-asig-box"><p>Tiempo asignado en ${esc(sesion)}: <strong>${dur} minutos</strong></p><p>Tiempo asignado en ${esc(ses2)}: <strong>${dur2} minutos</strong></p></div>`;
   } else {
     cuerpo = `<p>El <strong>${fmtDiaCap(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
-<p>En esta oportunidad queremos ${_ext} la invitación para participar compartiendo un mensaje de <strong>aproximadamente ${dur} minutos</strong>${_cuo}, en la ${esc(sesion).toLowerCase()}.</p>`;
+<p>En esta oportunidad queremos ${_ext} la invitación para participar compartiendo un mensaje en la ${esc(sesion).toLowerCase()}.</p>
+<div class="carta-asig-box"><p>Tiempo asignado: <strong>${dur} minutos</strong></p></div>`;
   }
   cuerpo += `<p><strong>El tema será a su elección</strong>. Los invitamos a que se pueda preparar el mensaje utilizando las escrituras, las palabras de los profetas modernos y ejemplos de la vida del salvador.</p>
 <p>Les invitamos a <strong>estar sentada/o</strong> en el estrado con nosotros <strong>15 minutos antes</strong> del comienzo.</p>
@@ -1779,17 +1908,17 @@ function generarEspecial(){
 <p>¡Muchas gracias!</p>`;
 
   const _saludo = conEsposa
-    ? `Estimados <strong><u>${esc(cargoInvitado)}</u></strong> y Hna.${nombre ? ' ' + esc(nombre) : ''},`
-    : `Estimado <strong><u>${esc(cargoInvitado)}</u></strong>${nombre ? ' ' + esc(nombre) : ''},`;
+    ? `Estimados Pte. y Hna.${nombre ? ' ' + esc(nombre) : ''},`
+    : `Estimado Hno.${nombre ? ' ' + esc(nombre) : ''},`;
   const _cartaHTML = `
-    <div class="carta-titulo">ESTACA BUENOS AIRES<br>ARGENTINA ALDO BONZI</div>
+    <div class="carta-titulo carta-titulo-especial">ESTACA BUENOS AIRES<br>ARGENTINA ALDO BONZI</div>
     <div class="carta-fecha">${fmtCarta(fechaCarta, ciudad)}</div>
     <div class="carta-saludo">${_saludo}</div>
     <div class="carta-texto">${cuerpo}</div>
     <div class="carta-cierre"><p>Esperamos que el Señor ${conEsposa ? 'los' : 'le'} bendiga,</p></div>
     <div class="carta-firma"><p>Con amor</p><br><p><strong>${esc(firmante)}</strong></p></div>`;
   document.getElementById('carta-contenido').innerHTML = _cartaHTML;
-  ajustarCartaContenido();
+  ajustarCartaContenido(null, 'especial');
 
   cartaLista = true;
   const fn = nombre ? nombre.replace(/\s+/g,'_') : 'Especial';
@@ -1799,31 +1928,28 @@ function generarEspecial(){
   document.getElementById('esp-btn-img').onclick = ()=>descargar('img','esp-btn-pdf','esp-btn-img','esp-status-msg', fn);
   document.getElementById('esp-status-msg').textContent = 'Carta generada. Podés descargar PDF o imagen.';
 
-  // Guardar en registro — dos entradas: presidente y esposa
+  // El matrimonio ocupa una sola asignación y conserva la misma carta para ambos.
   const _sesMap = {'Sesión General':'general','Sesión de Adultos':'adultos','Sesión de Líderes':'lideres'};
   const _tipoLabels = {
-    mision:'Pte. de Misión', templo:'Pte. del Templo',
-    consejero_mision:'Consejero de Misión', consejero_templo:'Consejero del Templo'
+    mision: conEsposa ? 'Presidente de Misión y esposa' : 'Presidente de Misión',
+    templo: conEsposa ? 'Presidente del Templo y esposa' : 'Presidente del Templo',
+    consejero_mision: conEsposa ? 'Consejeros de la Presidencia de Misión' : 'Consejero de la Presidencia de Misión',
+    consejero_templo: conEsposa ? 'Consejeros de la Presidencia del Templo' : 'Consejero de la Presidencia del Templo'
   };
   const tipoLabel = tipoInvitado === 'otro' ? cargoInvitado : _tipoLabels[tipoInvitado];
+  const nombreRegistro = conEsposa
+    ? `Pte. y Hna.${nombre ? ' ' + nombre : ''}`
+    : `${cargoInvitado}${nombre ? ' ' + nombre : ''}`;
   const _durNum  = parseInt(dur)  || 0;
   const _dur2Num = parseInt(dur2) || 0;
   addToRegistro({
-    nombre: tipoLabel, asig: 'mensaje', asigLabel: 'Mensaje Especial – ' + tipoLabel,
+    nombre: nombreRegistro, asig: 'mensaje', asigLabel: tipoLabel,
     sesion: _sesMap[sesion] || 'general', fechaEvento: fechaEv, genero: 'o', duracion: _durNum, cartaHTML: _cartaHTML
-  });
-  if(conEsposa) addToRegistro({
-    nombre: 'Esposa ' + tipoLabel, asig: 'mensaje', asigLabel: 'Mensaje Especial – Esposa ' + tipoLabel,
-    sesion: _sesMap[sesion] || 'general', fechaEvento: fechaEv, genero: 'a', duracion: _durNum, cartaHTML: _cartaHTML
   });
   if(tieneSegunda && fev2){
     addToRegistro({
-      nombre: tipoLabel, asig: 'mensaje', asigLabel: 'Mensaje Especial – ' + tipoLabel,
+      nombre: nombreRegistro, asig: 'mensaje', asigLabel: tipoLabel,
       sesion: _sesMap[ses2] || 'general', fechaEvento: fev2, genero: 'o', duracion: _dur2Num, cartaHTML: _cartaHTML
-    });
-    if(conEsposa) addToRegistro({
-      nombre: 'Esposa ' + tipoLabel, asig: 'mensaje', asigLabel: 'Mensaje Especial – Esposa ' + tipoLabel,
-      sesion: _sesMap[ses2] || 'general', fechaEvento: fev2, genero: 'a', duracion: _dur2Num, cartaHTML: _cartaHTML
     });
   }
 }
@@ -1850,10 +1976,23 @@ async function descargar(tipo, btnPdfId='btn-pdf', btnImgId='btn-img', statusId=
     });
   };
 
+  const cartaEl = document.getElementById('carta');
+  const cartaContenido = document.getElementById('carta-contenido');
+  const medidasPrevias = {
+    width: cartaEl.style.width,
+    maxWidth: cartaEl.style.maxWidth,
+    minHeight: cartaEl.style.minHeight
+  };
+
   try{
     await document.fonts.ready;
-    const canvas = await html2canvas(document.getElementById('carta'),{
-      scale:6, useCORS:true, allowTaint:true, backgroundColor:'#ffffff', logging:false
+    // Mantener el formato A4 aunque la descarga se realice desde un teléfono.
+    cartaEl.style.width = '595px';
+    cartaEl.style.maxWidth = 'none';
+    cartaEl.style.minHeight = '842px';
+    ajustarCartaContenido(null, cartaContenido.classList.contains('carta-especial') ? 'especial' : null);
+    const canvas = await html2canvas(cartaEl,{
+      scale:3, useCORS:true, allowTaint:true, backgroundColor:'#ffffff', logging:false
     });
     const nombreFile = nombreOverride || (document.getElementById('nombre').value||'carta').replace(/\s+/g,'_');
     if(tipo==='pdf'){
@@ -1863,17 +2002,30 @@ async function descargar(tipo, btnPdfId='btn-pdf', btnImgId='btn-img', statusId=
       const imgH=pW*(canvas.height/canvas.width);
       if(imgH<=pH) pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,pW,imgH);
       else pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,pW*(pH/imgH),pH);
-      pdf.save(`Asignacion_${nombreFile}.pdf`);
+      const blob = pdf.output('blob');
+      const url = URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.download=`Asignacion_${nombreFile}.pdf`; a.href=url;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
       msg.textContent='PDF descargado correctamente.';
     } else {
+      const blob = await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+      if(!blob) throw new Error('No se pudo crear la imagen.');
+      const url = URL.createObjectURL(blob);
       const a=document.createElement('a');
-      a.download=`Asignacion_${nombreFile}.png`;
-      a.href=canvas.toDataURL('image/png');
-      a.click();
+      a.download=`Asignacion_${nombreFile}.png`; a.href=url;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
       msg.textContent='Imagen PNG descargada.';
     }
   } catch(e){ msg.textContent='Error al generar. Intentá de nuevo.'; console.error(e); }
-  finally{ window.getComputedStyle = _origGCS; }
+  finally{
+    cartaEl.style.width = medidasPrevias.width;
+    cartaEl.style.maxWidth = medidasPrevias.maxWidth;
+    cartaEl.style.minHeight = medidasPrevias.minHeight;
+    window.getComputedStyle = _origGCS;
+  }
   btn.disabled=false;
 }
 
@@ -1882,17 +2034,19 @@ async function descargar(tipo, btnPdfId='btn-pdf', btnImgId='btn-img', statusId=
 const REGISTRO_TEMPLATE = [
   ['adultos','director','Director/a de Música'], ['adultos','pianista','Pianista'], ['adultos','oracion_inicial','Oración Inicial'],
   ...Array(6).fill(['adultos','mensaje','Mensaje']), ['adultos','oracion_final','Oración Final'],
-  ...Array(2).fill(['adultos','asistencia','Asistencia']),
   ['lideres','director','Director/a de Música'], ['lideres','pianista','Pianista'], ['lideres','oracion_inicial','Oración Inicial'],
   ...Array(2).fill(['lideres','mensaje','Mensaje']), ['lideres','capacitacion','Capacitación'], ['lideres','oracion_final','Oración Final'],
-  ['lideres','asistencia','Asistencia'],
   ['general','director','Director/a de Música'], ['general','pianista','Pianista'], ['general','oracion_inicial','Oración Inicial'],
   ...Array(4).fill(['general','testimonio','Testimonio']), ...Array(4).fill(['general','mensaje','Mensaje']), ['general','oracion_final','Oración Final'],
-  ...Array(4).fill(['general','asistencia','Asistencia'])
+  ...['lideres','adultos','general'].flatMap(sesion=>[
+    [sesion,'asistencia','Asistencia'],
+    [sesion,'seguridad','Seguridad'],
+    [sesion,'estacionamiento','Estacionamiento'],
+    [sesion,'bienvenida','Bienvenida y recepción']
+  ])
 ];
 
-/* Mínimo de contadores de asistencia por sesión */
-const ASISTENCIA_MIN = { lideres: 1, adultos: 2, general: 4 };
+const OPERACIONES_ASIG = ['asistencia','seguridad','estacionamiento','bienvenida'];
 
 function buildDefaultRegistro(){
   return REGISTRO_TEMPLATE.map((t,i) => ({
@@ -1914,6 +2068,36 @@ function migrateRegistro(reg){
   for(const r of reg){
     if(r.asig==='mensaje' && r.nombre && _ESP.includes(r.nombre) && !(r.asigLabel||'').includes('Especial')){
       r.asigLabel = 'Mensaje Especial – ' + r.nombre; changed = true;
+    }
+  }
+  // Consolidar los antiguos contadores separados en una sola ficha por sesión.
+  for(const sesion of ['lideres','adultos','general']){
+    const antiguas = reg.filter(r=>r.asig==='asistencia' && r.sesion===sesion);
+    if(antiguas.length>1){
+      const principal = antiguas[0];
+      const nombres = [...new Set(antiguas.map(r=>(r.nombre||'').trim()).filter(Boolean))];
+      if(nombres.length) principal.nombre = nombres.join(', ');
+      principal.cartaAviso = antiguas.some(r=>r.cartaAviso===true) ? true : principal.cartaAviso;
+      principal.confirmado = antiguas.some(r=>r.confirmado===true) ? true : principal.confirmado;
+      principal.reconfirmado = antiguas.some(r=>r.reconfirmado===true) ? true : principal.reconfirmado;
+      reg = reg.filter(r=>r===principal || !(r.asig==='asistencia' && r.sesion===sesion));
+      changed = true;
+    }
+    for(const [asig,label] of [['asistencia','Asistencia'],['seguridad','Seguridad'],['estacionamiento','Estacionamiento'],['bienvenida','Bienvenida y recepción']]){
+      if(!reg.some(r=>r.asig===asig && r.sesion===sesion)){
+        reg.push({id:`ops_${sesion}_${asig}`,sesion,asig,asigLabel:label,nombre:'',fechaEvento:'',cartaAviso:null,cartaEnviada:null,confirmado:null,reconfirmado:null});
+        changed = true;
+      }
+    }
+  }
+  for(const operacion of reg.filter(r=>OPERACIONES_ASIG.includes(r.asig))){
+    if(!operacion.ayudantes && /[,\n]/.test(operacion.nombre||'')){
+      const integrantes = operacion.nombre.split(/[,\n]+/).map(nombre=>nombre.trim()).filter(Boolean);
+      if(integrantes.length>1){
+        operacion.nombre = integrantes.shift();
+        operacion.ayudantes = integrantes.join(', ');
+        changed = true;
+      }
     }
   }
   if(changed) saveRegistro(reg);
@@ -1975,6 +2159,10 @@ function updateNombre(id, val){
 function updateFecha(id, val){
   const r=getRegistro(); const x=r.find(e=>e.id===id);
   if(x){ x.fechaEvento=val; saveRegistro(r); renderRegistro(); }
+}
+function updateAsistencia(id, val){
+  const r=getRegistro(); const x=r.find(e=>e.id===id);
+  if(x){ const total=parseInt(val); if(total>=0) x.asistenciaTotal=total; else delete x.asistenciaTotal; saveRegistro(r); }
 }
 
 function irACarta(id){
@@ -2077,20 +2265,190 @@ function limpiarRegistro(){
   saveRegistro(buildDefaultRegistro()); renderRegistro();
 }
 
+let _regVista = 'conferencia';
+function setRegVista(vista){
+  _regVista = vista;
+  document.querySelectorAll('.reg-view-btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.view===vista));
+  document.getElementById('horarios-cfg').classList.toggle('hidden', vista==='otros');
+  document.getElementById('fechas-cfg').classList.toggle('hidden', vista==='otros');
+  document.getElementById('cartas-barrios-form').classList.toggle('hidden', vista!=='otros');
+  document.getElementById('rel-sost-form').classList.toggle('hidden', vista!=='otros');
+  renderRegistro();
+  document.getElementById('reg-view-nav')?.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+
+function prepararCartaBarrio(){
+  showTab('carta');
+  document.getElementById('asignacion').value='discurso_barrio';
+  actualizarCampos();
+  document.getElementById('nombre').focus();
+  document.getElementById('status-msg').textContent='Complete el líder, el barrio o rama, la fecha y el tema.';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---- Relevos y sostenimientos ---- */
+function crearRelSostInicial(){
+  return [
+    {id:'rel_'+Date.now(),tipo:'relevar',personas:[{nombre:'',llamamiento:'',genero:'o'}]},
+    {id:'sost_'+(Date.now()+1),tipo:'sostener',personas:[{nombre:'',llamamiento:'',genero:'o'}]}
+  ];
+}
+function getRelSost(){
+  if(!Array.isArray(_relevosCache) || !_relevosCache.length) _relevosCache = crearRelSostInicial();
+  return _relevosCache;
+}
+function saveRelSost(){
+  _saveFs('relevos-sostenimientos',{bloques:getRelSost()});
+}
+function renderRelSostForm(){
+  const cont = document.getElementById('rel-sost-bloques');
+  if(!cont) return;
+  const bloques = getRelSost();
+  cont.innerHTML = bloques.map((bloque,indice)=>`<article class="rel-bloque">
+    <div class="rel-bloque-head">
+      <select aria-label="Tipo de bloque" onchange="actualizarTipoRelSost('${bloque.id}',this.value)">
+        <option value="relevar" ${bloque.tipo==='relevar'?'selected':''}>Relevar con gratitud</option>
+        <option value="sostener" ${bloque.tipo==='sostener'?'selected':''}>Sostener</option>
+      </select>
+      <span class="rel-orden-label hint">Bloque ${indice+1}</span>
+      <div class="rel-bloque-actions">
+        <button type="button" class="rel-icon-btn" title="Subir bloque" aria-label="Subir bloque" onclick="moverBloqueRelSost('${bloque.id}',-1)" ${indice===0?'disabled':''}>↑</button>
+        <button type="button" class="rel-icon-btn" title="Bajar bloque" aria-label="Bajar bloque" onclick="moverBloqueRelSost('${bloque.id}',1)" ${indice===bloques.length-1?'disabled':''}>↓</button>
+        <button type="button" class="rel-icon-btn danger" title="Eliminar bloque" aria-label="Eliminar bloque" onclick="eliminarBloqueRelSost('${bloque.id}')">×</button>
+      </div>
+    </div>
+    <div class="rel-personas">${bloque.personas.map((persona,pIndice)=>`<div class="rel-persona">
+      <input class="rel-persona-nombre" type="text" value="${esc(persona.nombre||'')}" placeholder="Nombre completo" aria-label="Nombre completo" oninput="actualizarPersonaRelSost('${bloque.id}',${pIndice},'nombre',this.value)">
+      <input class="rel-persona-llamamiento" type="text" value="${esc(persona.llamamiento||'')}" placeholder="Llamamiento" aria-label="Llamamiento" oninput="actualizarPersonaRelSost('${bloque.id}',${pIndice},'llamamiento',this.value)">
+      <select class="rel-persona-genero" aria-label="Tratamiento" onchange="actualizarPersonaRelSost('${bloque.id}',${pIndice},'genero',this.value)">
+        <option value="o" ${(persona.genero||'o')==='o'?'selected':''}>Hermano</option>
+        <option value="a" ${persona.genero==='a'?'selected':''}>Hermana</option>
+      </select>
+      <button type="button" class="rel-icon-btn danger" title="Quitar persona" aria-label="Quitar persona" onclick="eliminarPersonaRelSost('${bloque.id}',${pIndice})">×</button>
+    </div>`).join('')}</div>
+    <button type="button" class="rel-add-persona" onclick="agregarPersonaRelSost('${bloque.id}')">+ Agregar persona</button>
+  </article>`).join('');
+}
+function agregarBloqueRelSost(tipo='relevar'){
+  getRelSost().push({id:'rel_'+Date.now(),tipo,personas:[{nombre:'',llamamiento:'',genero:'o'}]});
+  saveRelSost(); renderRelSostForm();
+}
+function actualizarTipoRelSost(id,tipo){
+  const bloque=getRelSost().find(item=>item.id===id); if(!bloque) return;
+  bloque.tipo=tipo; saveRelSost();
+}
+function moverBloqueRelSost(id,direccion){
+  const bloques=getRelSost(); const desde=bloques.findIndex(item=>item.id===id); const hasta=desde+direccion;
+  if(desde<0||hasta<0||hasta>=bloques.length) return;
+  [bloques[desde],bloques[hasta]]=[bloques[hasta],bloques[desde]];
+  saveRelSost(); renderRelSostForm();
+}
+function eliminarBloqueRelSost(id){
+  _relevosCache=getRelSost().filter(item=>item.id!==id);
+  if(!_relevosCache.length) _relevosCache=crearRelSostInicial().slice(0,1);
+  saveRelSost(); renderRelSostForm();
+}
+function agregarPersonaRelSost(id){
+  const bloque=getRelSost().find(item=>item.id===id); if(!bloque) return;
+  bloque.personas.push({nombre:'',llamamiento:'',genero:'o'}); saveRelSost(); renderRelSostForm();
+}
+function eliminarPersonaRelSost(id,indice){
+  const bloque=getRelSost().find(item=>item.id===id); if(!bloque) return;
+  bloque.personas.splice(indice,1);
+  if(!bloque.personas.length) bloque.personas.push({nombre:'',llamamiento:'',genero:'o'});
+  saveRelSost(); renderRelSostForm();
+}
+let _relSostSaveTimer=null;
+function actualizarPersonaRelSost(id,indice,campo,valor){
+  const bloque=getRelSost().find(item=>item.id===id); if(!bloque||!bloque.personas[indice]) return;
+  bloque.personas[indice][campo]=valor;
+  clearTimeout(_relSostSaveTimer);
+  _relSostSaveTimer=setTimeout(saveRelSost,500);
+}
+function reiniciarRelSost(){
+  if(!confirm('¿Limpiar todos los bloques de relevos y sostenimientos?')) return;
+  _relevosCache=crearRelSostInicial(); saveRelSost(); renderRelSostForm();
+}
+async function generarRelevosSostenimientos(tipoDescarga=null){
+  clearTimeout(_relSostSaveTimer);
+  saveRelSost();
+  const bloques=getRelSost().map(bloque=>({
+    ...bloque,
+    personas:(bloque.personas||[])
+      .map(persona=>({...persona,nombre:persona.nombre.trim(),llamamiento:persona.llamamiento.trim()}))
+      .filter(persona=>persona.nombre&&persona.llamamiento)
+  })).filter(bloque=>bloque.personas.length);
+  if(!bloques.length){ alert('Agregue al menos una persona con nombre y llamamiento.'); return; }
+  const contenido=bloques.map(bloque=>{
+    const esRelevo=bloque.tipo==='relevar';
+    const esSingular=bloque.personas.length===1;
+    const cantidadHermanas=bloque.personas.filter(persona=>persona.genero==='a').length;
+    const tratamiento=esSingular
+      ? (cantidadHermanas===1?'a la hermana':'al hermano')
+      : cantidadHermanas===0
+        ? 'a los hermanos'
+        : cantidadHermanas===bloque.personas.length
+          ? 'a las hermanas'
+          : 'a los hermanos y hermanas';
+    const titulo=esRelevo?'Se propone relevar con gratitud a:':'Se propone sostener a:';
+    const respuesta=esRelevo
+      ? esSingular
+        ? 'Quienes deseen expresar agradecimiento por el servicio prestado durante este tiempo, sírvanse manifestarlo levantando la mano.'
+        : 'Quienes deseen expresar agradecimiento por sus servicios prestados durante este tiempo, sírvanse manifestarlo levantando la mano.'
+      : `Quienes deseen sostener ${tratamiento}, sírvanse manifestarlo levantando la mano derecha.<br>Si hubiera alguien que se oponga, le invitamos a manifestarlo de la misma manera.`;
+    const personas=bloque.personas.map(persona=>`<li><strong>${esc(persona.nombre)}</strong>, como ${esc(persona.llamamiento)}</li>`).join('');
+    return `<div class="rel-doc-bloque"><p>${titulo}</p><ul>${personas}</ul><p class="rel-doc-respuesta">${respuesta}</p></div>`;
+  }).join('');
+  showTab('carta');
+  const carta=document.getElementById('carta-contenido');
+  carta.innerHTML=`<div class="carta-saludo"><strong>Estimados hermanos y hermanas,</strong></div><div class="carta-texto carta-relevos">${contenido}</div>`;
+  ajustarCartaContenido(null,'relevos');
+  cartaLista=true;
+  document.getElementById('btn-pdf').disabled=false;
+  document.getElementById('btn-img').disabled=false;
+  document.getElementById('btn-pdf').onclick=()=>descargar('pdf','btn-pdf','btn-img','status-msg','Relevos_y_sostenimientos');
+  document.getElementById('btn-img').onclick=()=>descargar('img','btn-pdf','btn-img','status-msg','Relevos_y_sostenimientos');
+  document.getElementById('status-msg').textContent='Documento listo para descargar.';
+  if(tipoDescarga==='img'){
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    await descargar('img','btn-pdf','btn-img','status-msg','Relevos_y_sostenimientos');
+  }
+}
+
 function renderRegistro(){
   const reg = getRegistro();
   const q   = (document.getElementById('reg-buscar')?.value||'').toLowerCase().trim();
-  const fil = q ? reg.filter(r=>r.nombre.toLowerCase().includes(q)) : reg;
-  const _pCount = r => r.nombre ? (r.esMatrimonio ? 2 : 1) : 0;
-  const tot=reg.reduce((a,r)=>a+_pCount(r),0);
-  const conf=reg.reduce((a,r)=>a+(r.nombre&&r.confirmado===true?_pCount(r):0),0);
-  const reconf=reg.reduce((a,r)=>a+(r.nombre&&r.reconfirmado===true?_pCount(r):0),0);
+  const conferencia = reg.filter(r=>['lideres','adultos','general','jovenes'].includes(r.sesion) && !OPERACIONES_ASIG.includes(r.asig));
+  const vistaReg = _regVista==='conferencia' ? conferencia
+    : _regVista==='operaciones' ? reg.filter(r=>OPERACIONES_ASIG.includes(r.asig))
+    : reg.filter(r=>r.sesion===_regVista && !OPERACIONES_ASIG.includes(r.asig));
+  const fil = q ? vistaReg.filter(r=>`${r.nombre||''} ${r.asigLabel||''}`.toLowerCase().includes(q)) : vistaReg;
+  const countConferencia = conferencia.filter(r=>r.nombre&&r.nombre.trim()).length;
+  const countOtros = reg.filter(r=>r.sesion==='otros'&&r.nombre&&r.nombre.trim()).length;
+  const countOperaciones = reg.filter(r=>OPERACIONES_ASIG.includes(r.asig)&&r.nombre&&r.nombre.trim()).length;
+  const countConferenciaEl = document.getElementById('reg-count-conferencia');
+  const countOtrosEl = document.getElementById('reg-count-otros');
+  const countOperacionesEl = document.getElementById('reg-count-operaciones');
+  if(countConferenciaEl) countConferenciaEl.textContent = countConferencia;
+  if(countOtrosEl) countOtrosEl.textContent = countOtros;
+  if(countOperacionesEl) countOperacionesEl.textContent = countOperaciones;
+  document.querySelectorAll('.reg-view-btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.view===_regVista));
+  const _pCount = r => {
+    if(!r.nombre) return 0;
+    const ayudantes = OPERACIONES_ASIG.includes(r.asig) && r.ayudantes
+      ? r.ayudantes.split(/[,\n]+/).map(nombre=>nombre.trim()).filter(Boolean).length
+      : 0;
+    return (r.esMatrimonio ? 2 : 1) + ayudantes;
+  };
+  const tot=vistaReg.reduce((a,r)=>a+_pCount(r),0);
+  const conf=vistaReg.reduce((a,r)=>a+(r.nombre&&r.confirmado===true?_pCount(r):0),0);
+  const reconf=vistaReg.reduce((a,r)=>a+(r.nombre&&r.reconfirmado===true?_pCount(r):0),0);
   const _parseDur = r => r.duracion ? Number(r.duracion) : ((r.asigLabel||'').match(/\((\d+)\s*min\)/i)||[])[1]|0;
   const totalMin = reg.reduce((a,r)=>a+_parseDur(r),0);
   const asistenciaTotal  = reg.filter(r => r.asig === 'asistencia').length;
   const asistenciaFilled = reg.filter(r => r.asig === 'asistencia' && r.nombre && r.nombre.trim()).length;
   const today = new Date(); today.setHours(0,0,0,0);
-  const urgentes = reg.filter(r => {
+  const urgentes = vistaReg.filter(r => {
     if(!r.nombre||!r.nombre.trim()||!r.fechaEvento) return false;
     const [_uy,_um,_ud]=r.fechaEvento.split('-').map(Number); const _d = Math.ceil((new Date(_uy,_um-1,_ud) - today) / (1000*60*60*24));
     return _d >= 0 && _d <= 7 && r.reconfirmado !== true;
@@ -2107,7 +2465,8 @@ function renderRegistro(){
     ${urgentes>0?`<div class="stat stat-urgente"><span class="stat-ico"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span><div class="stat-txt"><span class="stat-n" style="color:#dc2626">${urgentes}</span><span class="stat-l">Urgentes</span></div></div>`:''}` ;
 
   if(!fil.length){
-    document.getElementById('reg-tabla').innerHTML=`<div class="reg-empty">${q?'Sin resultados para "'+esc(q)+'".':"Aún no hay asignaciones registradas.<br>Generá cartas para verlas aquí."}</div>`;
+    const emptyLabel = _regVista==='otros' ? 'Todavía no hay otros eventos registrados.' : 'No hay asignaciones en esta sección.';
+    document.getElementById('reg-tabla').innerHTML=`<div class="reg-empty">${q?'Sin resultados para "'+esc(q)+'".':emptyLabel}</div>`;
     return;
   }
 
@@ -2132,24 +2491,24 @@ function renderRegistro(){
   const _theadRow = `<tr>
     <th style="width:28px;min-width:28px;padding:10px 4px;text-align:center"><input type="checkbox" id="reg-sel-all" onchange="_selAll(this)" title="Seleccionar todo"></th>
     <th style="width:28px;min-width:28px;padding:10px 2px;text-align:center"></th>
-    <th style="width:24%">Asignación</th>
-    <th style="width:17%">Nombre</th>
+    <th style="width:18%">Asignación</th>
+    <th style="width:23%">Nombre</th>
     <th style="width:115px;text-align:center">Fecha</th>
     <th style="text-align:center;width:75px">Carta</th>
     <th style="text-align:center;width:95px">Avisado</th>
     <th style="text-align:center;width:105px">Confirmado</th>
     <th style="text-align:center;width:115px">Reconfirmado</th>
-    <th style="width:160px;text-align:center">Acciones</th>
+    <th style="width:210px;text-align:center">Acciones</th>
   </tr>`;
   // Sticky header (FUERA del overflow-x) + body con scroll horizontal separado
-  let html=`<div class="reg-tabla-head-fixed" id="reg-thead-fixed"><table class="reg-table" id="reg-thead-table" style="table-layout:fixed;width:100%;margin:0"><thead>${_theadRow}</thead></table></div><div class="reg-tabla-wrap" id="reg-tabla-inner" onscroll="_syncTheadScroll(this)"><table class="reg-table" style="table-layout:fixed;width:100%"><colgroup><col style="width:28px;min-width:28px"><col style="width:28px;min-width:28px"><col style="width:24%"><col style="width:17%"><col style="width:115px"><col style="width:75px"><col style="width:95px"><col style="width:105px"><col style="width:115px"><col style="width:160px"></colgroup><tbody>`;
+  let html=`<div class="reg-tabla-head-fixed" id="reg-thead-fixed"><table class="reg-table" id="reg-thead-table" style="table-layout:fixed;width:100%;margin:0"><thead>${_theadRow}</thead></table></div><div class="reg-tabla-wrap" id="reg-tabla-inner" onscroll="_syncTheadScroll(this)"><table class="reg-table" style="table-layout:fixed;width:100%"><colgroup><col style="width:28px;min-width:28px"><col style="width:28px;min-width:28px"><col style="width:18%"><col style="width:23%"><col style="width:115px"><col style="width:75px"><col style="width:95px"><col style="width:105px"><col style="width:115px"><col style="width:210px"></colgroup><tbody>`;
 
   for(const ses of sesKeys){
     const col = SES_COLOR[ses]||'#1E293B';
     const sesIcon = SES_ICON[ses]||'🎙️';
     const items = groups[ses];
     const sesMin = items.reduce((a,r)=>a+_parseDur(r),0);
-    const sesPeople  = items.reduce((a,r)=>a+(r.nombre&&r.nombre.trim()?(r.esMatrimonio?2:1):0),0);
+    const sesPeople  = items.reduce((a,r)=>a+_pCount(r),0);
     const sesFilled  = items.filter(r=>r.nombre&&r.nombre.trim()).length;
     const sesConf    = items.filter(r=>r.nombre&&r.nombre.trim()&&r.confirmado===true).length;
     const sesReconf  = items.filter(r=>r.nombre&&r.nombre.trim()&&r.reconfirmado===true).length;
@@ -2177,6 +2536,7 @@ function renderRegistro(){
         return esc(_lbl || r.asig || '');
       })();
       const isFilled = !!(r.nombre && r.nombre.trim());
+      const isOperacion = OPERACIONES_ASIG.includes(r.asig);
       const canGen = isFilled;
       const isLast = idx === items.length - 1;
       const rowStyle = isLast ? 'border-bottom:2px solid #E2E8F0;' : '';
@@ -2209,9 +2569,12 @@ function renderRegistro(){
 aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</span>':''}</td>
         <td style="padding:6px 8px;${rowStyle}" class="${isFilled && !r.cartaAviso ? 'td-sin-avisar' : ''}">
           ${isFilled
-            ? `<div style="display:flex;align-items:center;gap:4px;"><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${r.esMatrimonio && !['director','pianista','oracion_inicial','oracion_final'].includes(r.asig)?'<span class="badge-matrimonio">👫 Matrimonio</span>':''}${r.nota?`<span class="nota-ico" title="${esc(r.nota)}" onclick="event.stopPropagation();abrirEditModal('${r.id}')">📝</span>`:''}</div>`
-            : `<label class="name-assign"><span style="font-size:13px;flex-shrink:0">👤</span><input type="text" value="" onchange="updateNombre('${r.id}',this.value)" class="name-assign-input" placeholder="Asignar encargado..."><span class="name-assign-plus">+</span></label>`
+            ? isOperacion
+              ? `<div class="operation-team"><div class="operation-principal"><span title="Coordinador">★</span><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${r.nota?`<span class="nota-ico" title="${esc(r.nota)}" onclick="event.stopPropagation();abrirEditModal('${r.id}')">📝</span>`:''}</div><div class="operation-helpers"><span><strong>Equipo de apoyo:</strong> ${r.ayudantes?esc(r.ayudantes).replace(/\n/g,', '):'Sin asignar'}</span><button type="button" class="operation-helper-edit" onclick="abrirEditModal('${r.id}')">${r.ayudantes?'Editar':'Agregar'}</button></div></div>`
+              : `<div style="display:flex;align-items:center;gap:4px;"><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${r.esMatrimonio && !['director','pianista','oracion_inicial','oracion_final'].includes(r.asig)?'<span class="badge-matrimonio">👫 Matrimonio</span>':''}${r.nota?`<span class="nota-ico" title="${esc(r.nota)}" onclick="event.stopPropagation();abrirEditModal('${r.id}')">📝</span>`:''}</div>`
+            : `<label class="name-assign"><span style="font-size:13px;flex-shrink:0">👤</span><input type="text" value="" onchange="updateNombre('${r.id}',this.value)" class="name-assign-input" placeholder="${isOperacion?'Asignar coordinador...':'Asignar encargado...'}"><span class="name-assign-plus">+</span></label>`
           }
+          ${r.asig==='asistencia' ? `<div class="attendance-count"><label>Asistencia</label><input type="number" min="0" max="9999" value="${r.asistenciaTotal??''}" placeholder="Total" onchange="updateAsistencia('${r.id}',this.value)"></div>` : ''}
         </td>
         <td data-label="Fecha" style="text-align:center;padding:6px 8px;${rowStyle}">
           <label class="fecha-wrap" title="Cambiar fecha">
@@ -2230,11 +2593,15 @@ aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</spa
         ${tCell(r.id,'confirmado',r.confirmado??null,r.confirmadoDate||'','Confirmado')}
         ${tCell(r.id,'reconfirmado',r.reconfirmado??null,r.reconfirmadoDate||'','Reconfirmado','pill-reconf','pill-reconf-no')}
         <td style="white-space:nowrap;text-align:center;padding:5px 8px;${rowStyle}">
-          <div style="display:inline-flex;align-items:center;gap:4px;">
-            ${canGen ? `<button class="btn-dl pdf" onclick="generarDesdeRegistro('${r.id}','pdf')" title="PDF">⬇️ PDF</button>
-            <button class="btn-dl img" onclick="generarDesdeRegistro('${r.id}','img')" title="PNG">🖼️ PNG</button>` : ''}
-            <button class="btn-edit" onclick="abrirEditModal('${r.id}')" title="Editar">✏️</button>
-            <button class="btn-del" onclick="eliminarEntrada('${r.id}')" title="Limpiar fila">🧹</button>
+          <div class="reg-row-actions">
+            <div class="reg-download-actions">
+              <button class="btn-dl pdf" onclick="generarDesdeRegistro('${r.id}','pdf')" title="${canGen?'Descargar asignación en PDF':'Asigne una persona para descargar'}" ${canGen?'':'disabled'}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>PDF</button>
+              <button class="btn-dl img" onclick="generarDesdeRegistro('${r.id}','img')" title="${canGen?'Descargar asignación como imagen':'Asigne una persona para descargar'}" ${canGen?'':'disabled'}><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>PNG</button>
+            </div>
+            <div class="reg-edit-actions">
+              <button class="btn-edit" onclick="abrirEditModal('${r.id}')" title="Editar asignación" aria-label="Editar asignación"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button>
+              <button class="btn-del" onclick="eliminarEntrada('${r.id}')" title="Limpiar fila" aria-label="Limpiar fila"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14M10 10v6m4-6v6"/></svg></button>
+            </div>
           </div>
         </td>
       </tr>`;
@@ -2253,13 +2620,18 @@ let _regHdrResizeObs = null;
 function _updRegHdrH(){
   const el = document.querySelector('#tab-registro .reg-header');
   if(!el) return;
+  const nav = document.getElementById('reg-view-nav');
   document.documentElement.style.setProperty('--reg-hdr-h', el.offsetHeight+'px');
+  if(nav) document.documentElement.style.setProperty('--reg-nav-h', nav.offsetHeight+'px');
   if(!_regHdrResizeObs && window.ResizeObserver){
     _regHdrResizeObs = new ResizeObserver(function(){
       const e = document.querySelector('#tab-registro .reg-header');
+      const n = document.getElementById('reg-view-nav');
       if(e) document.documentElement.style.setProperty('--reg-hdr-h', e.offsetHeight+'px');
+      if(n) document.documentElement.style.setProperty('--reg-nav-h', n.offsetHeight+'px');
     });
     _regHdrResizeObs.observe(el);
+    if(nav) _regHdrResizeObs.observe(nav);
     window.addEventListener('resize', _updRegHdrH);
   }
 }
@@ -2305,11 +2677,29 @@ function cambiarAsignacionEdit(){
   const asig = isNew ? 'extra' : (select.selectedOptions[0]?.dataset.asig || 'extra');
   const esMusica = ['director','pianista'].includes(asig);
   const esIntervencion = ['mensaje','testimonio','capacitacion'].includes(asig);
+  const esOperacion = OPERACIONES_ASIG.includes(asig);
   document.getElementById('edit-grupo-tema').classList.toggle('hidden', !esIntervencion);
   document.getElementById('edit-grupo-guia').classList.toggle('hidden', asig !== 'mensaje');
   document.getElementById('edit-grupo-himnos').classList.toggle('hidden', !esMusica);
-  document.getElementById('edit-grupo-matrimonio').classList.toggle('hidden', ['director','pianista','oracion_inicial','oracion_final'].includes(asig));
+  document.getElementById('edit-grupo-ayudantes').classList.toggle('hidden', !esOperacion);
+  document.getElementById('edit-nombre-label').textContent = esOperacion ? 'Coordinador' : 'Nombre';
+  document.getElementById('edit-grupo-matrimonio').classList.toggle('hidden', esOperacion || ['director','pianista','oracion_inicial','oracion_final'].includes(asig));
   if(isNew) setTimeout(()=>document.getElementById('edit-asig-label').focus(), 50);
+}
+function agregarAyudanteEdit(nombre=''){
+  const list = document.getElementById('edit-ayudantes-list');
+  const row = document.createElement('div');
+  row.className = 'helper-row';
+  row.innerHTML = `<input type="text" class="edit-ayudante" placeholder="Nombre del integrante" value="${esc(nombre)}"><button type="button" class="helper-remove" title="Quitar integrante" aria-label="Quitar integrante" onclick="this.parentElement.remove()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`;
+  list.appendChild(row);
+  if(!nombre) row.querySelector('input').focus();
+}
+function cargarAyudantesEdit(valor=''){
+  const list = document.getElementById('edit-ayudantes-list');
+  list.innerHTML = '';
+  const nombres = valor.split(/[\n,]+/).map(nombre=>nombre.trim()).filter(Boolean);
+  nombres.forEach(nombre=>agregarAyudanteEdit(nombre));
+  if(!nombres.length) agregarAyudanteEdit('');
 }
 function abrirEditModal(id){
   const r = getRegistro(); const x = r.find(e=>e.id===id); if(!x) return;
@@ -2317,6 +2707,7 @@ function abrirEditModal(id){
   _editAssignmentOptions(x);
   document.getElementById('edit-asig-label').value = '';
   document.getElementById('edit-nombre').value = x.nombre || '';
+  cargarAyudantesEdit(x.ayudantes || '');
   // Género: usar el guardado; si no hay, heurística sobre el primer nombre
   if(x.genero){
     document.getElementById('edit-genero').value = x.genero;
@@ -2325,15 +2716,20 @@ function abrirEditModal(id){
     document.getElementById('edit-genero').value = /[aá]$/i.test(firstName) ? 'a' : 'o';
   }
   const _esIndividual = ['director','pianista','oracion_inicial','oracion_final'].includes(x.asig);
-  document.getElementById('edit-grupo-matrimonio').classList.toggle('hidden', _esIndividual);
-  document.getElementById('edit-matrimonio').checked = _esIndividual ? false : (x.esMatrimonio || false);
+  const _esOperacion = OPERACIONES_ASIG.includes(x.asig);
+  document.getElementById('edit-grupo-matrimonio').classList.toggle('hidden', _esIndividual || _esOperacion);
+  document.getElementById('edit-matrimonio').checked = (_esIndividual || _esOperacion) ? false : (x.esMatrimonio || false);
   document.getElementById('edit-fecha').value = x.fechaEvento || (getFechas()[x.sesion] || '');
+  document.getElementById('edit-sesion').value = x.sesion || 'general';
   // Show/hide contextual fields
   const esMusica = ['director','pianista'].includes(x.asig);
   const esMensaje = ['mensaje','testimonio','capacitacion'].includes(x.asig);
+  const esOperacion = OPERACIONES_ASIG.includes(x.asig);
   document.getElementById('edit-grupo-tema').classList.toggle('hidden', !esMensaje);
   document.getElementById('edit-grupo-guia').classList.toggle('hidden', x.asig !== 'mensaje');
   document.getElementById('edit-grupo-himnos').classList.toggle('hidden', !esMusica);
+  document.getElementById('edit-grupo-ayudantes').classList.toggle('hidden', !esOperacion);
+  document.getElementById('edit-nombre-label').textContent = esOperacion ? 'Coordinador' : 'Nombre';
   document.getElementById('edit-tema').value = '';
   document.getElementById('edit-duracion').value = '';
   document.getElementById('edit-guia').value = '';
@@ -2439,11 +2835,15 @@ function guardarEditModal(){
   x.asig = isNew ? 'extra' : (selected.dataset.asig || x.asig);
   x.asigLabel = isNew ? nuevaLabel : (selected.dataset.label || x.asigLabel);
   x.nombre      = document.getElementById('edit-nombre').value.trim();
-  x.esMatrimonio = ['director','pianista','oracion_inicial','oracion_final'].includes(x.asig) ? false : document.getElementById('edit-matrimonio').checked;
+  const ayudantes = [...document.querySelectorAll('#edit-ayudantes-list .edit-ayudante')].map(input=>input.value.trim()).filter(Boolean).join('\n');
+  if(OPERACIONES_ASIG.includes(x.asig) && ayudantes) x.ayudantes = ayudantes;
+  else delete x.ayudantes;
+  x.esMatrimonio = (OPERACIONES_ASIG.includes(x.asig) || ['director','pianista','oracion_inicial','oracion_final'].includes(x.asig)) ? false : document.getElementById('edit-matrimonio').checked;
   x.genero      = document.getElementById('edit-genero').value;
   const _nota = document.getElementById('edit-nota').value.trim();
   if(_nota) x.nota = _nota; else delete x.nota;
   x.fechaEvento = document.getElementById('edit-fecha').value;
+  x.sesion = document.getElementById('edit-sesion').value;
   if(['mensaje','testimonio','capacitacion'].includes(x.asig)){
     x.tema = document.getElementById('edit-tema').value.trim();
     const _dur = parseInt(document.getElementById('edit-duracion').value);
@@ -2496,10 +2896,98 @@ function guardarEditModal(){
   saveRegistro(r); cerrarEditModal(); renderRegistro();
 }
 
+function generarCartaOperacion(entry){
+  const titulos = {
+    asistencia:'Conteo de asistencia',
+    seguridad:'Seguridad de pasillos y accesos',
+    estacionamiento:'Supervisión del estacionamiento',
+    bienvenida:'Bienvenida y recepción'
+  };
+  const instrucciones = {
+    asistencia:[
+      'Llegar con suficiente anticipación y coordinar el método de conteo para evitar duplicaciones.',
+      'Realizar el conteo de manera discreta durante la sesión, incluyendo los espacios auxiliares utilizados.',
+      'Registrar el total y comunicarlo a los Secretarios de Estaca minutos antes de terminar la reunión.'
+    ],
+    seguridad:[
+      'Mantener presencia visible y atenta en pasillos, accesos y sectores asignados, procurando no interrumpir la reverencia.',
+      'Observar si hay personas o situaciones inusuales y comunicar de inmediato cualquier inquietud al líder designado.',
+      'No confrontar ni intentar reducir a una persona sospechosa; priorizar la distancia, la comunicación y la seguridad de los asistentes.',
+      'Mantener pasillos y salidas de emergencia despejados y colaborar con los líderes o servicios de emergencia si fuera necesario.'
+    ],
+    estacionamiento:[
+      'Llegar al menos 30 minutos antes para organizar los accesos y el sentido de circulación.',
+      'Orientar a los conductores para aprovechar los espacios disponibles y evitar vehículos que obstruyan entradas, veredas o salidas.',
+      'Mantener libre el acceso para vehículos de emergencia y asistir con respeto a personas mayores o con movilidad reducida.',
+      'Ante un incidente, avisar al líder designado y evitar discusiones o confrontaciones.'
+    ],
+    bienvenida:[
+      'Coordinar con las presidencias de clase de las Mujeres Jóvenes y con los Hombres Jóvenes la distribución en las entradas.',
+      'Saludar cordialmente a miembros y visitantes a medida que ingresen, procurando que todos se sientan recibidos.',
+      'Responder preguntas y ayudar a encontrar asientos según sea necesario.',
+      'Fomentar la reverencia en entradas y pasillos mediante un servicio amable y discreto.'
+    ]
+  };
+  const sesionNombre = {lideres:'Sesión de Líderes',adultos:'Sesión de Adultos',general:'Sesión General'}[entry.sesion] || 'reunión asignada';
+  const fecha = entry.fechaEvento || getFechas()[entry.sesion] || '';
+  const hora = getHorarios()[entry.sesion] || '';
+  const encargado = esc(entry.nombre);
+  const ayudantes = esc(entry.ayudantes||'').replace(/\n/g,'<br>');
+  const lista = (instrucciones[entry.asig]||[]).map(item=>`<li>${item}</li>`).join('');
+  const fechaCarta = new Date().toISOString().split('T')[0];
+  const estacaUpper = (document.getElementById('estaca').value || 'Buenos Aires Argentina Aldo Bonzi').toUpperCase();
+  const splitAt = estacaUpper.search(/\bARGENTINA\b/);
+  const tituloEstaca = splitAt > 0 ? `ESTACA ${estacaUpper.substring(0,splitAt).trim()}<br>${estacaUpper.substring(splitAt).trim()}` : `ESTACA ${estacaUpper}`;
+  const cartaHTML = `
+    <div class="carta-titulo carta-titulo-operacion">${tituloEstaca}</div>
+    <div class="carta-fecha">${fmtCarta(fechaCarta,document.getElementById('ciudad').value||'Buenos Aires')}</div>
+    <div class="carta-saludo">Apreciados hermanos y hermanas:</div>
+    <div class="carta-texto">
+      <p>Por medio de la presente se les asigna colaborar con <strong>${titulos[entry.asig]}</strong> durante la <strong>${sesionNombre}</strong>${fecha ? ` del <strong>${fmtFecha(fecha)}</strong>` : ''}${hora ? ` a las <strong>${hora} Hs</strong>` : ''}.</p>
+      <div class="carta-asig-box"><p>Coordinador: <strong>${encargado}</strong></p>${ayudantes?`<p>Equipo de apoyo: <strong>${ayudantes}</strong></p>`:''}</div>
+      <p>Para cumplir esta asignación, les pedimos considerar las siguientes pautas:</p>
+      <ul class="carta-operacion-list">${lista}</ul>
+      <p>Si algún integrante del equipo no pudiera cumplir, por favor avise con anticipación para organizar un reemplazo.</p>
+      <p>¡Muchas gracias por su servicio!</p>
+    </div>
+    <div class="carta-cierre"><p>Esperamos que el Señor los bendiga,</p></div>
+    <div class="carta-firma"><p>Con amor</p><br><p><strong>${esc(document.getElementById('firmante').value||'Presidencia de Estaca')}</strong></p></div>`;
+  document.getElementById('carta-contenido').innerHTML = cartaHTML;
+  ajustarCartaContenido(null,'operacion');
+  cartaLista = true;
+  document.getElementById('btn-pdf').disabled = false;
+  document.getElementById('btn-img').disabled = false;
+}
+
 /* ---- Generar carta desde fila del registro ---- */
 async function generarDesdeRegistro(id, tipo){
   const entry = getRegistro().find(e => e.id === id);
   if(!entry || !entry.nombre){ alert('Completá el nombre antes de generar.'); return; }
+
+  if(OPERACIONES_ASIG.includes(entry.asig)){
+    showTab('carta');
+    generarCartaOperacion(entry);
+    entry.fechaGenerada = new Date().toISOString();
+    saveRegistro(getRegistro());
+    await new Promise(res => setTimeout(res, 120));
+    await descargar(tipo, 'btn-pdf', 'btn-img', 'status-msg', `${entry.asig}_${entry.sesion}`);
+    showTab('registro');
+    return;
+  }
+
+  // Las invitaciones especiales ya tienen su redacción final almacenada.
+  if(entry.cartaHTML){
+    showTab('carta');
+    document.getElementById('carta-contenido').innerHTML = entry.cartaHTML;
+    ajustarCartaContenido();
+    cartaLista = true;
+    document.getElementById('btn-pdf').disabled = false;
+    document.getElementById('btn-img').disabled = false;
+    await new Promise(res => setTimeout(res, 120));
+    await descargar(tipo, 'btn-pdf', 'btn-img', 'status-msg', entry.nombre.replace(/\s+/g,'_'));
+    showTab('registro');
+    return;
+  }
 
   // Rellenar campos del formulario con los datos del registro
   document.getElementById('nombre').value      = entry.nombre;
@@ -2521,6 +3009,7 @@ async function generarDesdeRegistro(id, tipo){
   }
   if(['mensaje','testimonio','capacitacion'].includes(entry.asig)){
     document.getElementById('tema').value = entry.tema || '';
+    document.getElementById('msg-dur').value = entry.duracion || (entry.asig==='testimonio' ? 3 : 10);
     document.getElementById('guia').value = entry.guia || '';
     document.getElementById('guia-check').checked = !!entry.guia;
     toggleGuia();
