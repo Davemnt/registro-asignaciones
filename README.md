@@ -9,7 +9,7 @@ Permite crear el registro de participantes, generar cartas de invitación person
 
 - **Registro de asignaciones** — Director, Pianista, Mensajes, Testimonios, Capacitaciones, Tiempos de instrucción, Oraciones y asignaciones especiales (Presidencia de Misión / Templo)
 - **Conferencia y Operaciones separadas** — Cada vista ofrece únicamente las asignaciones que corresponden a su función
-- **Minuta por sesión** — Preside, dirige, fecha, horario, reconocimientos, agradecimientos, himnos y Asuntos de Estaca opcionales integrados en el programa
+- **Minuta por sesión** — Preside, dirige, fecha, horario, reconocimientos y agradecimientos cargados como listas editables, himnos y Asuntos de Estaca opcionales integrados en el programa
 - **Orden automático en la minuta** — Mensajes, testimonios, capacitaciones y tiempos de instrucción reciben su ordinal según su posición; el registro conserva etiquetas genéricas
 - **Temas opcionales en la impresión** — Al exportar las minutas se puede elegir si se muestran o se omiten los temas
 - **Sincronización de himnos** — Los himnos de la minuta se adjuntan automáticamente a las asignaciones del director y pianista

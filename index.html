@@ -120,6 +120,7 @@ textarea { resize: vertical; min-height: 52px; }
 .minuta-export-label { font-weight:700; }
 .minuta-export-notes { margin-top:20px; }
 .minuta-export-note { margin-bottom:25px; }
+.minuta-export-recognition-separator { margin:0 5px; color:#64748B; font-weight:700; }
 .minuta-export-thanks { margin:8px 0 0 24px; padding-left:18px; }
 .minuta-export-thanks li { margin:4px 0; padding-left:5px; }
 .minuta-export-agenda { margin-top:20px; }
@@ -235,6 +236,17 @@ tr.row-asistencia > td:first-child { box-shadow: inset 4px 0 0 #9333ea !importan
 .row-informativa .minuta-value { border-color:#CBD5E1; background:#fff; color:#334155; font-weight:600; }
 .row-informativa .minuta-value::placeholder { color:#94A3B8; font-weight:400; }
 .row-informativa .minuta-empty { color:#CBD5E1; font-size:12px; }
+.minuta-list-editor { display:grid; gap:6px; min-width:150px; }
+.minuta-list-items { display:grid; gap:4px; }
+.minuta-list-item { display:flex; align-items:center; gap:5px; width:100%; min-width:0; }
+.minuta-list-item::before { content:'•'; flex:0 0 10px; color:#94A3B8; font-weight:700; text-align:center; }
+.minuta-list-item input { flex:1 1 auto; min-width:0; padding:5px 7px; font-size:11px; }
+.minuta-list-hint { padding-left:15px; color:#94A3B8; font-size:10px; }
+.minuta-list-remove { flex:0 0 auto; width:20px; height:20px; padding:0; border:0; border-radius:4px; background:#F1F5F9; color:#64748B; font-size:15px; line-height:1; cursor:pointer; }
+.minuta-list-remove:hover { background:#FEE2E2; color:#B91C1C; }
+@media (max-width:768px) {
+  .minuta-list-remove { width:28px; height:28px; }
+}
 .attendance-count { display:flex; align-items:center; gap:6px; flex:0 0 auto; padding-left:8px; border-left:1px solid #E2E8F0; }
 .attendance-count label { margin:0; font-size:9px; white-space:nowrap; }
 .attendance-count input { width:76px; min-height:32px; padding:5px 7px; text-align:center; font-weight:700; }
@@ -1870,6 +1882,7 @@ function initRegTopTools(){
 function fmtCarta(d,c){ if(!d) return '[fecha]'; const [y,m,dd]=d.split('-'); return `${c||'Buenos Aires'}, ${parseInt(dd)} de ${MESES[parseInt(m)-1]} de ${y}`; }
 function fmtCorta(d){ if(!d) return ''; const [y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; }
 function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAtributo(s){ return esc(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 /* Mantiene el texto fuera del área inferior ocupada por el símbolo del fondo. */
 function ajustarCartaContenido(guiaSeleccionada=null, tipoCarta=null){
@@ -2107,7 +2120,9 @@ function generarCarta(){
     esMatrimonio,
     duracionIndividual: INTERVENCIONES_ASIG.includes(asig) ? (asig==='testimonio' ? 3 : (parseInt(msgDur)||0)) : undefined,
     duracion: INTERVENCIONES_ASIG.includes(asig)
-      ? (asig==='testimonio' ? 3 : (parseInt(msgDur)||0)) * (esMatrimonio && ['mensaje','testimonio'].includes(asig) ? 2 : 1)
+      ? (esMatrimonio && ['mensaje','testimonio'].includes(asig)
+        ? duracionTotalMatrimonio(asig==='testimonio' ? 3 : (parseInt(msgDur)||0))
+        : (asig==='testimonio' ? 3 : (parseInt(msgDur)||0)))
       : asig==='discurso_barrio' ? discursoDuracion : undefined,
     barrio: discursoBarrio,
     discursoTema,
@@ -2169,7 +2184,7 @@ function generarEspecial(){
   }
   const _durNum  = parseInt(dur)  || 0;
   const _dur2Num = parseInt(dur2) || 0;
-  const _totalMatrimonio = minutos => Math.ceil((minutos * 2) / 5) * 5;
+  const _totalMatrimonio = minutos => duracionTotalMatrimonio(minutos, true);
   const _durTotal = conEsposa ? _totalMatrimonio(_durNum) : _durNum;
   const _dur2Total = conEsposa ? _totalMatrimonio(_dur2Num) : _dur2Num;
 
@@ -2464,6 +2479,23 @@ function migrateRegistro(reg){
       r.asigLabel = 'Mensaje Especial – ' + r.nombre; changed = true;
     }
   }
+  for(const r of reg){
+    if(!r.esMatrimonio || !['mensaje','testimonio'].includes(r.asig)) continue;
+    const duracionEtiqueta = Number(((r.asigLabel||'').match(/\((\d+)\s*min\)/i)||[])[1]||0);
+    const duracionIndividual = Number(r.duracionIndividual)||duracionEtiqueta||Number(r.duracion)||0;
+    if(!duracionIndividual) continue;
+    const duracionTotal = esAsignacionInvitadoEspecial(r)
+      ? duracionTotalMatrimonio(duracionIndividual,true)
+      : duracionTotalMatrimonio(duracionIndividual);
+    if(Number(r.duracionIndividual)!==duracionIndividual){
+      r.duracionIndividual=duracionIndividual;
+      changed=true;
+    }
+    if(Number(r.duracion)!==duracionTotal){
+      r.duracion=duracionTotal;
+      changed=true;
+    }
+  }
   // Consolidar los antiguos contadores separados en una sola ficha por sesión.
   for(const sesion of ['lideres','adultos','general']){
     const antiguas = reg.filter(r=>r.asig==='asistencia' && r.sesion===sesion);
@@ -2572,6 +2604,67 @@ function _toastRegistro(){
   t.style.opacity='1';
   clearTimeout(t._to);
   t._to = setTimeout(()=>{ t.style.opacity='0'; }, 2200);
+}
+
+function obtenerElementosMinuta(registro){
+  if(!['reconocimientos','agradecimientos'].includes(registro.asig)) return [];
+  if(Array.isArray(registro.elementosMinuta)){
+    return registro.elementosMinuta.map(elemento=>String(elemento||'').trim());
+  }
+  const separador = registro.asig==='reconocimientos' ? /[\n;,]+/ : /[\n;]+/;
+  return (registro.nombre||'').split(separador).map(elemento=>elemento.trim()).filter(Boolean);
+}
+function renderEditorListaMinuta(registro){
+  const elementos=obtenerElementosMinuta(registro);
+  if(!elementos.length || elementos[elementos.length-1]) elementos.push('');
+  const etiqueta=registro.asig==='reconocimientos'?'reconocimiento':'agradecimiento';
+  const placeholder=registro.asig==='reconocimientos'?'Agregar reconocimiento...':'Agregar persona o grupo...';
+  return `<div class="minuta-list-editor" data-minuta-list="${escAtributo(registro.id)}">
+    <div class="minuta-list-items">${elementos.map((elemento,indice)=>`<div class="minuta-list-item">
+      <input type="text" class="minuta-list-input" data-record-id="${escAtributo(registro.id)}" data-record-index="${indice}" value="${escAtributo(elemento)}" placeholder="${placeholder}" aria-label="${etiqueta} ${indice+1}" autocomplete="off">
+      <button type="button" class="minuta-list-remove" data-minuta-list-remove="${indice}" aria-label="Quitar ${etiqueta} ${indice+1}" title="Quitar">×</button>
+    </div>`).join('')}</div>
+    <span class="minuta-list-hint">Edite cada casillero; presione Enter para agregar el siguiente.</span>
+  </div>`;
+}
+function guardarElementosMinuta(registro,elementos,volverARenderizar=true){
+  registro.elementosMinuta=elementos;
+  registro.nombre=elementos.filter(Boolean).join('\n');
+  saveRegistro(getRegistro());
+  if(volverARenderizar) renderRegistro();
+}
+function editarElementoMinuta(input,abrirSiguiente=false){
+  const editor=input.closest('.minuta-list-editor');
+  const id=editor?.dataset.minutaList;
+  const indice=Number(input.dataset.recordIndex);
+  if(!id||!Number.isInteger(indice)) return;
+  const registro=getRegistro().find(item=>item.id===id);
+  if(!registro) return;
+  const elementos=obtenerElementosMinuta(registro);
+  while(elementos.length<=indice) elementos.push('');
+  elementos[indice]=input.value.trim();
+  let indiceSiguiente=null;
+  if(abrirSiguiente&&elementos[indice]){
+    if(elementos[indice+1]) elementos.splice(indice+1,0,'');
+    else if(indice+1===elementos.length) elementos.push('');
+    indiceSiguiente=indice+1;
+  }
+  guardarElementosMinuta(registro,elementos,abrirSiguiente);
+  if(indiceSiguiente!==null){
+    [...document.querySelectorAll('.minuta-list-input')].find(campo=>
+      campo.dataset.recordId===id&&Number(campo.dataset.recordIndex)===indiceSiguiente
+    )?.focus();
+  }
+}
+function quitarElementoMinuta(editor,indice){
+  const registro=getRegistro().find(item=>item.id===editor?.dataset.minutaList);
+  if(!registro) return;
+  const elementos=obtenerElementosMinuta(registro);
+  if(!Number.isInteger(indice)||indice<0||indice>=elementos.length) return;
+  elementos.splice(indice,1);
+  const id=registro.id;
+  guardarElementosMinuta(registro,elementos);
+  [...document.querySelectorAll('.minuta-list-input')].find(campo=>campo.dataset.recordId===id)?.focus();
 }
 
 function updateNombre(id, val){
@@ -2918,6 +3011,24 @@ function esAsignacionInvitadoEspecial(r){
    && /(?:presidente|pte\.?|consejero).*(?:misi[oó]n|templo)|(?:misi[oó]n|templo).*(?:presidente|pte\.?|consejero)/i.test(label);
 }
 
+function duracionTotalMatrimonio(minutosIndividuales, redondearA5=false){
+ const total = (Number(minutosIndividuales)||0) * 2;
+ if(redondearA5) return Math.ceil(total/5)*5;
+ return [6,7].includes(Number(minutosIndividuales)) ? 15 : total;
+}
+
+function obtenerDuracionRegistro(registro){
+ const duracionEtiqueta = Number(((registro.asigLabel||'').match(/\((\d+)\s*min\)/i)||[])[1]||0);
+ if(registro.esMatrimonio && ['mensaje','testimonio'].includes(registro.asig)){
+   const duracionIndividual = Number(registro.duracionIndividual)||duracionEtiqueta||Number(registro.duracion);
+   if([6,7].includes(duracionIndividual)) return 15;
+   if(esAsignacionInvitadoEspecial(registro) && duracionIndividual>0){
+     return duracionTotalMatrimonio(duracionIndividual,true);
+   }
+ }
+ return Number(registro.duracion)||duracionEtiqueta;
+}
+
 function etiquetaAsignacionRegistro(r){
  const label = ((r.asigLabel || '').replace(/\s*\(\d+\s*min\)/gi,'')).trim();
  if(esAsignacionInvitadoEspecial(r)) return label;
@@ -2977,7 +3088,7 @@ function renderRegistro(){
   const tot=vistaReg.reduce((a,r)=>a+_pCount(r),0);
   const conf=vistaReg.reduce((a,r)=>a+(r.nombre&&r.confirmado===true?_pCount(r):0),0);
   const reconf=vistaReg.reduce((a,r)=>a+(r.nombre&&r.reconfirmado===true?_pCount(r):0),0);
-  const _parseDur = r => r.duracion ? Number(r.duracion) : ((r.asigLabel||'').match(/\((\d+)\s*min\)/i)||[])[1]|0;
+  const _parseDur = obtenerDuracionRegistro;
   const totalMin = reg.reduce((a,r)=>a+_parseDur(r),0);
   const asistenciaTotal  = reg.filter(r => r.asig === 'asistencia').length;
   const asistenciaFilled = reg.filter(r => r.asig === 'asistencia' && r.nombre && r.nombre.trim()).length;
@@ -3087,8 +3198,8 @@ function renderRegistro(){
       const infoPlaceholder = {
         preside:'Nombre de quien preside',
         dirige:'Nombre de quien dirige',
-        reconocimientos:'Separar personas con comas',
-        agradecimientos:'Personas o grupos que serán agradecidos',
+        reconocimientos:'Agregar reconocimiento...',
+        agradecimientos:'Agregar persona o grupo...',
         asuntos_estaca:'Detalle de los asuntos y responsables',
         himno_inicial:'Número y título del himno',
         himno_intermedio:'Número y título del himno',
@@ -3103,6 +3214,8 @@ aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</spa
           ${isInformativa
             ? r.asig==='asuntos_estaca'
               ? `<div style="display:flex;align-items:center;gap:8px"><label style="display:flex;align-items:center;gap:5px;margin:0;white-space:nowrap;cursor:pointer"><input type="checkbox" style="width:auto" ${r.habilitado?'checked':''} onchange="updateMinutaHabilitada('${r.id}',this.checked)"> Incluir</label><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="minuta-value" placeholder="${infoPlaceholder}" ${r.habilitado?'':'disabled'}></div>`
+              : ['reconocimientos','agradecimientos'].includes(r.asig)
+                ? renderEditorListaMinuta(r)
               : `<input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="minuta-value" placeholder="${infoPlaceholder}">`
             : isFilled
             ? isOperacion
@@ -3146,7 +3259,27 @@ aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</spa
     });
   }
   html += '</tbody></table></div>';
-  document.getElementById('reg-tabla').innerHTML = html;
+  const regTabla=document.getElementById('reg-tabla');
+  regTabla.innerHTML = html;
+  regTabla.onclick = event=>{
+    const target=event.target;
+    if(!(target instanceof Element)) return;
+    const quitar=target.closest('[data-minuta-list-remove]');
+    if(quitar) {
+      quitarElementoMinuta(quitar.closest('.minuta-list-editor'),Number(quitar.dataset.minutaListRemove));
+    }
+  };
+  regTabla.onchange = event=>{
+    const target=event.target;
+    if(target instanceof HTMLInputElement && target.matches('.minuta-list-input')) editarElementoMinuta(target);
+  };
+  regTabla.onkeydown = event=>{
+    const target=event.target;
+    if(target instanceof HTMLInputElement && target.matches('.minuta-list-input') && event.key==='Enter' && !event.isComposing){
+      event.preventDefault();
+      editarElementoMinuta(target,true);
+    }
+  };
   _cntSel();
   initDatePickers(document.getElementById('reg-tabla'));
   setTimeout(_updRegHdrH, 0);
@@ -3438,8 +3571,10 @@ function guardarEditModal(){
     if(_dur > 0){
       x.duracionIndividual = _dur;
       x.duracion = esAsignacionInvitadoEspecial(x)
-        ? Math.ceil((_dur * 2) / 5) * 5
-        : _dur * (x.esMatrimonio && ['mensaje','testimonio'].includes(x.asig) ? 2 : 1);
+        ? duracionTotalMatrimonio(_dur, true)
+        : x.esMatrimonio && ['mensaje','testimonio'].includes(x.asig)
+          ? duracionTotalMatrimonio(_dur)
+          : _dur;
     } else {
       delete x.duracion;
       delete x.duracionIndividual;
@@ -3453,7 +3588,10 @@ function guardarEditModal(){
   } else {
     delete x.tema; delete x.duracion; delete x.guia;
   }
-  if(!esAsignacionInvitadoEspecial(x) && esCartaEspecialGuardada(x)){
+  if(esAsignacionInvitadoEspecial(x) && x.esMatrimonio){
+    x.cartaHTML=construirCartaEspecialDesdeRegistro(x);
+    x.esCartaEspecial=true;
+  } else if(!esAsignacionInvitadoEspecial(x) && esCartaEspecialGuardada(x)){
     delete x.cartaHTML;
     delete x.esCartaEspecial;
   }
@@ -3692,6 +3830,10 @@ function construirPaginaMinuta(sesion, opciones={}){
   const items = reg.filter(r=>r.sesion===sesion && !OPERACIONES_ASIG.includes(r.asig));
   const porTipo = asig => items.find(r=>r.asig===asig);
   const valor = asig => esc((porTipo(asig)?.nombre||'').trim());
+  const reconocimientosHTML = obtenerElementosMinuta(porTipo('reconocimientos')||{})
+    .filter(Boolean)
+    .map(esc)
+    .join('<span class="minuta-export-recognition-separator">•</span>');
   const nombresSesion = {lideres:'Sesión de Líderes',adultos:'Sesión de Adultos',general:'Sesión General'};
   const fechaSesion = getFechas()[sesion] || '';
   const horarios = getHorarios();
@@ -3700,7 +3842,7 @@ function construirPaginaMinuta(sesion, opciones={}){
   const fechaTexto = fechaSesion ? `${fmtDiaCap(fechaSesion)} ${fmtFecha(fechaSesion)}` : '';
   const horaTexto = horaInicio ? `${horaInicio}${horaFin ? ` – ${horaFin}` : ''} hs` : '';
   const excluirAgenda = new Set(['preside','dirige','director','pianista','reconocimientos','agradecimientos']);
-  const agradecimientosGuardados = (porTipo('agradecimientos')?.nombre||'').split(/[\n;]+/).map(v=>v.trim()).filter(Boolean);
+  const agradecimientosGuardados = obtenerElementosMinuta(porTipo('agradecimientos')||{}).filter(Boolean);
   const agradecimientos = [...agradecimientosGuardados];
   if(!agradecimientos.some(v=>/todos los demás/i.test(v))){
     agradecimientos.push('Todos los demás que participaron en la preparación');
@@ -3709,7 +3851,7 @@ function construirPaginaMinuta(sesion, opciones={}){
   const agenda = items.filter(r=>
     !excluirAgenda.has(r.asig) && (r.asig!=='asuntos_estaca' || r.habilitado)
   ).map(r=>{
-    const duracion = r.duracion ? Number(r.duracion) : Number(((r.asigLabel||'').match(/\((\d+)\s*min\)/i)||[])[1]||0);
+    const duracion = obtenerDuracionRegistro(r);
     const tema = (r.tema||'').trim();
     const mostrarTema = opciones.mostrarTemas !== false
       && INTERVENCIONES_ASIG.includes(r.asig)
@@ -3737,7 +3879,7 @@ function construirPaginaMinuta(sesion, opciones={}){
         <div><span class="minuta-export-label">Pianista:</span> ${valor('pianista')}</div>
       </div>
       <div class="minuta-export-notes">
-        <div class="minuta-export-note"><span class="minuta-export-label">Reconocimientos:</span> ${valor('reconocimientos')}</div>
+        <div class="minuta-export-note"><span class="minuta-export-label">Reconocimientos:</span> ${reconocimientosHTML}</div>
         <div class="minuta-export-note"><span class="minuta-export-label">Agradecimientos:</span><ul class="minuta-export-thanks">${agradecimientosHTML}</ul></div>
       </div>
       <div class="minuta-export-agenda">${agenda}</div>
