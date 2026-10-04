@@ -111,16 +111,18 @@ textarea { resize: vertical; min-height: 52px; }
 .minuta-export-host { position:fixed; left:-10000px; top:0; width:794px; z-index:-1; }
 .minuta-export-page { width:794px; height:1123px; position:relative; overflow:hidden; background:#fff; color:#111; font-family:'Times New Roman',serif; }
 .minuta-export-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
-.minuta-export-content { position:relative; z-index:1; padding:116px 112px 100px; height:100%; font-size:13.5px; line-height:1.2; }
+.minuta-export-content { position:relative; z-index:1; padding:100px 112px 100px; height:100%; font-size:13.5px; line-height:1.2; }
 .minuta-export-title { text-align:center; font-size:13.5px; font-weight:400; }
 .minuta-export-session { text-align:center; font-size:13.5px; font-weight:700; margin-top:2px; text-transform:uppercase; }
-.minuta-export-meta { display:grid; grid-template-columns:1fr 1fr; column-gap:70px; row-gap:26px; margin-top:27px; }
+.minuta-export-date, .minuta-export-time { text-align:center; font-weight:700; margin-top:3px; }
+.minuta-export-time { margin-top:1px; }
+.minuta-export-meta { display:grid; grid-template-columns:1fr 1fr; column-gap:70px; row-gap:26px; margin-top:18px; }
 .minuta-export-label { font-weight:700; }
-.minuta-export-notes { margin-top:26px; }
+.minuta-export-notes { margin-top:20px; }
 .minuta-export-note { margin-bottom:25px; }
 .minuta-export-thanks { margin:8px 0 0 24px; padding-left:18px; }
 .minuta-export-thanks li { margin:4px 0; padding-left:5px; }
-.minuta-export-agenda { margin-top:25px; }
+.minuta-export-agenda { margin-top:20px; }
 .minuta-export-row { margin-bottom:24px; }
 .minuta-export-row-label { font-weight:700; }
 .minuta-export-row-value { margin-left:3px; }
@@ -301,10 +303,17 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
 /* Edit modal */
 .reg-modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,.62); z-index:1000; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(3px); }
 .reg-modal { background:#fff; border-radius:8px; padding:0; width:min(480px,95vw); max-height:calc(100vh - 40px); overflow-y:auto; box-shadow:0 24px 70px rgba(15,23,42,.24); border:1px solid #CBD5E1; }
+#reg-edit-modal .reg-modal { width:min(760px,95vw); }
 .reg-modal-head { padding:20px 24px 16px; border-bottom:1px solid #E2E8F0; background:#F8FAFC; }
 .reg-modal h3 { font-size:15px; font-weight:700; color:#0F172A; margin:0; letter-spacing:0; }
 .reg-modal-subtitle { margin-top:5px; font-size:11.5px; line-height:1.45; color:#64748B; }
 .reg-modal-body { padding:20px 24px 24px; }
+#reg-edit-modal .reg-modal-body { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); column-gap:14px; row-gap:10px; }
+#reg-edit-modal .reg-modal-body > * { grid-column:1 / -1; }
+#reg-edit-modal .reg-modal-body > .edit-layout-half { grid-column:span 3; }
+#reg-edit-modal .reg-modal-body > .form-group { margin-bottom:0; }
+#reg-edit-modal .edit-layout-check { display:flex; align-items:flex-end; min-height:58px; padding-bottom:5px; }
+#reg-edit-modal .reg-modal-btns { margin-top:8px; }
 #reg-add-modal .reg-modal, #reg-export-modal .reg-modal { padding:28px; }
 .reg-modal .form-group { margin-bottom:10px; }
 .reg-modal label { font-size:10px; font-weight:600; color:#64748B; text-transform:uppercase; letter-spacing:.4px; display:block; margin-bottom:3px; }
@@ -327,6 +336,14 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
 
 /* ===== RESPONSIVE ===== */
 .panel-footer-mobile { display: none; }
+
+@media (max-width: 600px) {
+  #reg-edit-modal .reg-modal-body { display:block; }
+  #reg-edit-modal .reg-modal-body > .form-group,
+  #reg-edit-modal .reg-modal-body > #edit-grupo-himnos { margin-bottom:10px; }
+  #reg-edit-modal .edit-layout-check { min-height:0; padding-bottom:0; }
+  #reg-edit-modal .reg-modal-btns { margin-top:18px; }
+}
 
 @media (min-width: 769px) and (max-width: 1100px) {
   .app { grid-template-columns: 500px minmax(0,1fr); }
@@ -639,6 +656,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 .carta-contenido.carta-relevos-doc.carta-densa { padding-top:150px; }
 .otros-documento { margin:14px 0; padding:18px; border:1px solid #d8d4cc; background:var(--paper); }
 .otros-documento-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:14px; }
+.rel-head-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:6px; }
 .otros-documento h3 { font:600 16px 'Lora',serif; color:var(--ink); }
 .otros-documento-head p { margin-top:4px; color:#697586; font-size:11.5px; line-height:1.45; }
 .rel-bloques { display:flex; flex-direction:column; gap:10px; }
@@ -651,6 +669,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 .rel-icon-btn.danger { color:#B42318; }
 .rel-personas { display:flex; flex-direction:column; gap:7px; margin-top:10px; }
 .rel-persona { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) 110px 32px; gap:7px; }
+.rel-persona.rel-persona-sacerdocio { grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) 32px; }
 .rel-add-persona { margin-top:9px; border:0; background:transparent; color:var(--wine); font:600 11px inherit; cursor:pointer; }
 .rel-footer { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
 .rel-footer .btn-reg-exp { min-height:36px; }
@@ -659,6 +678,8 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 .carta-relevos ul { margin:16px 0 24px 24px; padding-left:10px; }
 .carta-relevos li { margin:7px 0; padding-left:4px; }
 .carta-relevos .rel-doc-respuesta { margin-top:0; }
+.carta-relevos .rel-doc-sacerdocio-titulo { text-align:center; text-decoration:underline; font-weight:700; margin-bottom:22px; }
+.carta-relevos .rel-doc-sacerdocio ul { margin-bottom:20px; }
 .carta-operacion-list { margin:7px 0 12px 22px; padding:0; list-style:none; }
 .carta-operacion-list li { margin-bottom:5px; padding-left:13px; position:relative; }
 .carta-operacion-list li::before { content:'\2022'; position:absolute; left:0; font-weight:700; }
@@ -745,9 +766,11 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
   .panel-footer-mobile a { color:var(--wine); border-color:var(--wine); border-radius:3px; }
   .otros-documento { padding:14px; }
   .otros-documento-head { flex-direction:column; }
+  .rel-head-actions { justify-content:flex-start; }
   .rel-bloque-head { grid-template-columns:1fr auto; }
   .rel-bloque-head .rel-orden-label { display:none; }
   .rel-persona { grid-template-columns:minmax(0,1fr) 32px; }
+  .rel-persona.rel-persona-sacerdocio { grid-template-columns:minmax(0,1fr) 32px; }
   .rel-persona-nombre { grid-column:1; grid-row:1; }
   .rel-persona-llamamiento { grid-column:1 / -1; grid-row:2; }
   .rel-persona-genero { grid-column:1 / -1; grid-row:3; width:100%; }
@@ -916,9 +939,12 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
         <details class="horarios-cfg" id="horarios-cfg">
           <summary>Horarios de sesión</summary>
           <div class="horarios-cfg-body">
-            <label>Líderes <input type="time" id="cfg-hora-lideres" value="16:00" onchange="saveHorarios()"></label>
-            <label>Adultos <input type="time" id="cfg-hora-adultos" value="18:30" onchange="saveHorarios()"></label>
-            <label>General <input type="time" id="cfg-hora-general" value="10:00" onchange="saveHorarios()"></label>
+            <label>Líderes inicio <input type="time" id="cfg-hora-lideres" value="16:00" onchange="saveHorarios()"></label>
+            <label>Fin <input type="time" id="cfg-hora-fin-lideres" onchange="saveHorarios()"></label>
+            <label>Adultos inicio <input type="time" id="cfg-hora-adultos" value="18:30" onchange="saveHorarios()"></label>
+            <label>Fin <input type="time" id="cfg-hora-fin-adultos" onchange="saveHorarios()"></label>
+            <label>General inicio <input type="time" id="cfg-hora-general" value="10:00" onchange="saveHorarios()"></label>
+            <label>Fin <input type="time" id="cfg-hora-fin-general" onchange="saveHorarios()"></label>
           </div>
         </details>
         <details class="horarios-cfg" id="fechas-cfg">
@@ -1014,6 +1040,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
             <option value="mensaje">Mensaje</option>
             <option value="testimonio">Testimonio</option>
             <option value="capacitacion">Capacitación</option>
+            <option value="tiempo_instruccion">Tiempo de instrucción</option>
           </optgroup>
           <optgroup label="Otros eventos">
             <option value="discurso_barrio">Discurso en barrio o rama</option>
@@ -1315,7 +1342,11 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
             <h3 id="rel-sost-title">Relevos y sostenimientos</h3>
             <p>Organice los bloques en el orden en que se presentarán. Las frases ceremoniales se agregan automáticamente.</p>
           </div>
-          <button type="button" class="btn-reg-exp" onclick="agregarBloqueRelSost()">+ Agregar bloque</button>
+          <div class="rel-head-actions">
+            <button type="button" class="btn-reg-exp" onclick="agregarBloqueRelSost()">+ Agregar bloque</button>
+            <button type="button" class="btn-reg-exp" onclick="agregarBloqueRelSost('futuro_elder')">+ Futuros élderes</button>
+            <button type="button" class="btn-reg-exp" onclick="agregarBloqueRelSost('futuro_sumo_sacerdote')">+ Futuros sumos sacerdotes</button>
+          </div>
         </div>
         <div class="rel-bloques" id="rel-sost-bloques"></div>
         <div class="rel-footer">
@@ -1338,24 +1369,30 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
             <option value="adultos">Sesión de Adultos</option>
             <option value="general">Sesión General</option>
             <option value="otros">Otros eventos</option>
+            <option value="operaciones">Operaciones</option>
             <!-- <option value="jovenes">Sesión de Jóvenes</option> -->
           </select>
         </div>
         <div class="form-group">
           <label>Asignación</label>
           <div class="asig-preset-grid">
-            <button type="button" class="asig-preset" data-asig="director"         data-label="Director/a de Música" onclick="_selAsigPreset(this)">🎵 Director/a<br>Música</button>
-            <button type="button" class="asig-preset" data-asig="pianista"          data-label="Pianista"             onclick="_selAsigPreset(this)">🎹 Pianista</button>
-            <button type="button" class="asig-preset" data-asig="oracion_inicial"  data-label="Oración Inicial"     onclick="_selAsigPreset(this)">🙏 Oración<br>Inicial</button>
-            <button type="button" class="asig-preset" data-asig="oracion_final"    data-label="Oración Final"       onclick="_selAsigPreset(this)">🙏 Oración<br>Final</button>
-            <button type="button" class="asig-preset" data-asig="mensaje"          data-label="Mensaje"             onclick="_selAsigPreset(this)">💬 Mensaje</button>
-            <button type="button" class="asig-preset" data-asig="testimonio"       data-label="Testimonio"          onclick="_selAsigPreset(this)">📖 Testimonio</button>
-            <button type="button" class="asig-preset" data-asig="capacitacion"     data-label="Capacitación"        onclick="_selAsigPreset(this)">🎓 Capacitación</button>
-            <button type="button" class="asig-preset" data-asig="asistencia"       data-label="Asistencia"          onclick="_selAsigPreset(this)">📊 Asistencia</button>
-            <button type="button" class="asig-preset" data-asig="seguridad"        data-label="Seguridad"           onclick="_selAsigPreset(this)">🛡 Seguridad</button>
-            <button type="button" class="asig-preset" data-asig="estacionamiento"  data-label="Estacionamiento"     onclick="_selAsigPreset(this)">🚗 Estacionamiento</button>
-            <button type="button" class="asig-preset" data-asig="bienvenida"       data-label="Bienvenida y recepción" onclick="_selAsigPreset(this)">👋 Bienvenida</button>
-            <button type="button" class="asig-preset" data-asig="extra"            data-label=""                    onclick="_selAsigPreset(this)">✏️ Otro...</button>
+            <button type="button" class="asig-preset" data-scope="conferencia" data-asig="director"         data-label="Director/a de Música" onclick="_selAsigPreset(this)">🎵 Director/a<br>Música</button>
+            <button type="button" class="asig-preset" data-scope="conferencia" data-asig="pianista"          data-label="Pianista"             onclick="_selAsigPreset(this)">🎹 Pianista</button>
+            <button type="button" class="asig-preset" data-scope="conferencia" data-asig="oracion_inicial"  data-label="Oración Inicial"     onclick="_selAsigPreset(this)">🙏 Oración<br>Inicial</button>
+            <button type="button" class="asig-preset" data-scope="conferencia" data-asig="oracion_final"    data-label="Oración Final"       onclick="_selAsigPreset(this)">🙏 Oración<br>Final</button>
+            <button type="button" class="asig-preset" data-scope="conferencia" data-asig="mensaje"          data-label="Mensaje"             onclick="_selAsigPreset(this)">💬 Mensaje</button>
+            <button type="button" class="asig-preset" data-scope="conferencia" data-asig="testimonio"       data-label="Testimonio"          onclick="_selAsigPreset(this)">📖 Testimonio</button>
+            <button type="button" class="asig-preset" data-scope="conferencia" data-asig="capacitacion"     data-label="Capacitación"        onclick="_selAsigPreset(this)">🎓 Capacitación</button>
+            <button type="button" class="asig-preset" data-scope="conferencia" data-asig="tiempo_instruccion" data-label="Tiempo de instrucción" onclick="_selAsigPreset(this)">🗣 Tiempo de<br>instrucción</button>
+            <button type="button" class="asig-preset" data-scope="conferencia" data-asig="mensaje" data-label="Presidente de Misión y esposa" onclick="_selAsigPreset(this)">💬 Pte. Misión<br>y esposa</button>
+            <button type="button" class="asig-preset" data-scope="conferencia" data-asig="mensaje" data-label="Presidente de Templo y esposa" onclick="_selAsigPreset(this)">💬 Pte. Templo<br>y esposa</button>
+            <button type="button" class="asig-preset" data-scope="conferencia" data-asig="mensaje" data-label="Consejero de Misión y esposa" onclick="_selAsigPreset(this)">💬 Cons. Misión<br>y esposa</button>
+            <button type="button" class="asig-preset" data-scope="conferencia" data-asig="mensaje" data-label="Consejero de Templo y esposa" onclick="_selAsigPreset(this)">💬 Cons. Templo<br>y esposa</button>
+            <button type="button" class="asig-preset" data-scope="operaciones" data-asig="asistencia"       data-label="Asistencia"          onclick="_selAsigPreset(this)">📊 Asistencia</button>
+            <button type="button" class="asig-preset" data-scope="operaciones" data-asig="seguridad"        data-label="Seguridad"           onclick="_selAsigPreset(this)">🛡 Seguridad</button>
+            <button type="button" class="asig-preset" data-scope="operaciones" data-asig="estacionamiento"  data-label="Estacionamiento"     onclick="_selAsigPreset(this)">🚗 Estacionamiento</button>
+            <button type="button" class="asig-preset" data-scope="operaciones" data-asig="bienvenida"       data-label="Bienvenida y recepción" onclick="_selAsigPreset(this)">👋 Bienvenida</button>
+            <button type="button" class="asig-preset" data-scope="conferencia" data-asig="extra"            data-label=""                    onclick="_selAsigPreset(this)">✏️ Otro...</button>
           </div>
           <input type="text" id="add-asig-custom" placeholder="Nombre de la asignación..." style="display:none;width:100%;padding:7px 9px;border:1px solid #ddd;border-radius:6px;font-size:12px;font-family:inherit;">
           <input type="hidden" id="add-asig" value="">
@@ -1384,7 +1421,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
           <p class="reg-modal-subtitle">Actualice los datos de la participación y el material que se incluirá en la carta.</p>
         </div>
         <div class="reg-modal-body">
-          <div class="form-group">
+          <div class="form-group edit-layout-half">
             <label for="edit-asig-select">Asignación</label>
             <select id="edit-asig-select" onchange="cambiarAsignacionEdit()"></select>
             <p class="field-help">Elija una asignación ya registrada o cree una nueva.</p>
@@ -1393,7 +1430,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
               <input type="text" id="edit-asig-label" placeholder="Ej: Presentación especial">
             </div>
           </div>
-        <div class="form-group">
+        <div class="form-group edit-layout-half">
           <label id="edit-nombre-label">Nombre</label>
           <input type="text" id="edit-nombre" placeholder="Nombre del hermano/a">
           <p class="field-help" id="edit-nombre-help">Persona responsable de coordinar la asignación.</p>
@@ -1404,30 +1441,31 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
           <button type="button" class="helper-add" onclick="agregarAyudanteEdit()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Agregar integrante</button>
           <p class="field-help">Agregue cada persona en un campo separado.</p>
         </div>
-        <div class="form-group" id="edit-grupo-matrimonio">
+        <div class="form-group edit-layout-half edit-layout-check" id="edit-grupo-matrimonio">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
             <input type="checkbox" id="edit-matrimonio" style="width:auto;accent-color:#0F766E;transform:scale(1.2);">
             Es matrimonio <span style="font-weight:400;color:#64748b">(cuenta como 2 personas)</span>
           </label>
         </div>
-        <div class="form-group">
+        <div class="form-group edit-layout-half">
           <label>Género</label>
           <select id="edit-genero">
             <option value="o">Hermano</option>
             <option value="a">Hermana</option>
           </select>
         </div>
-        <div class="form-group">
+        <div class="form-group edit-layout-half">
           <label>Fecha del evento</label>
           <input type="date" id="edit-fecha">
         </div>
-        <div class="form-group">
+        <div class="form-group edit-layout-half">
           <label>Sesión</label>
           <select id="edit-sesion">
             <option value="lideres">Sesión de Líderes</option>
             <option value="adultos">Sesión de Adultos</option>
             <option value="general">Sesión General</option>
             <option value="otros">Otros eventos</option>
+            <option value="operaciones">Operaciones</option>
           </select>
         </div>
         <!-- Tema (mensaje/testimonio/capacitacion) -->
@@ -1505,6 +1543,10 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
             ✨ Sesión General
           </label>
         </div>
+        <label style="display:flex;align-items:center;gap:9px;font-size:12px;font-weight:600;color:#334155;cursor:pointer;margin-bottom:14px;">
+          <input type="checkbox" id="exp-mostrar-temas" checked style="width:auto;accent-color:#0F766E;transform:scale(1.15);">
+          Mostrar los temas en las minutas
+        </label>
         <div class="reg-modal-btns">
           <button class="reg-modal-cancel" onclick="cerrarExportModal()">Cancelar</button>
           <button class="reg-modal-save" id="exp-confirm-btn" onclick="confirmarExport()">⬇️ Descargar</button>
@@ -1599,8 +1641,8 @@ async function _loadFromFirestore(){
   } catch(e){ console.error('Firestore registro:', e); _regCache = buildDefaultRegistro(); }
   try {
     const doc = await _db.collection('datos').doc('horarios').get();
-    _horariosCache = doc.exists ? doc.data() : { lideres:'16:00', adultos:'18:30', general:'10:00' };
-  } catch(e){ console.error('Firestore horarios:', e); _horariosCache = { lideres:'16:00', adultos:'18:30', general:'10:00' }; }
+    _horariosCache = doc.exists ? doc.data() : { lideres:'16:00', adultos:'18:30', general:'10:00', lideresFin:'', adultosFin:'', generalFin:'' };
+  } catch(e){ console.error('Firestore horarios:', e); _horariosCache = { lideres:'16:00', adultos:'18:30', general:'10:00', lideresFin:'', adultosFin:'', generalFin:'' }; }
   try {
     const doc = await _db.collection('datos').doc('fechas').get();
     _fechasCache = doc.exists ? doc.data() : { lideres:'', adultos:'', general:'' };
@@ -1619,6 +1661,7 @@ function _saveFs(docId, data){
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const DIAS  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const ORDINAL = ['primer','segundo','tercer','cuarto','quinto','sexto','séptimo','octavo','noveno','décimo','undécimo','duodécimo'];
+const INTERVENCIONES_ASIG = ['mensaje','testimonio','capacitacion','tiempo_instruccion'];
 const SESION_LABEL = { adultos:'la Sesión de Adultos', lideres:'la Sesión de Líderes', general:'la Sesión General', jovenes:'la Sesión de Jóvenes' };
 
 (function init(){
@@ -1641,8 +1684,8 @@ function showTab(tab){
 function actualizarCampos(){
   const asig=document.getElementById('asignacion').value;
   const esDiscursoBarrio = asig==='discurso_barrio';
-  const esMensaje=['mensaje','capacitacion'].includes(asig);
-  const esMsg    = ['mensaje','testimonio','capacitacion'].includes(asig);
+  const esMensaje=['mensaje','capacitacion','tiempo_instruccion'].includes(asig);
+  const esMsg    = INTERVENCIONES_ASIG.includes(asig);
   const admiteMatrimonio = ['mensaje','testimonio'].includes(asig);
   const esMusica =['director','pianista'].includes(asig);
   document.getElementById('bloque-msg').classList.toggle('hidden',!esMsg);
@@ -1655,7 +1698,7 @@ function actualizarCampos(){
   document.getElementById('grupo-matrimonio-carta').classList.toggle('hidden',!admiteMatrimonio);
   if(!admiteMatrimonio) document.getElementById('carta-matrimonio').checked=false;
   if(esMsg){
-    const msgLabels={mensaje:'Mensaje N°',testimonio:'Testimonio N°',capacitacion:'Intervención N°'};
+    const msgLabels={mensaje:'Mensaje N°',testimonio:'Testimonio N°',capacitacion:'Capacitación N°',tiempo_instruccion:'Tiempo de instrucción N°'};
     const lbl=document.getElementById('lbl-msg-num'); if(lbl) lbl.innerHTML=msgLabels[asig]||'N°';
     const durInput=document.getElementById('msg-dur');
     if(asig==='testimonio'){ durInput.value=3; durInput.readOnly=true; }
@@ -1702,13 +1745,16 @@ function autoHoraSesion(){
 
 function getHorarios(){
   if(_horariosCache) return _horariosCache;
-  return { lideres:'16:00', adultos:'18:30', general:'10:00' };
+  return { lideres:'16:00', adultos:'18:30', general:'10:00', lideresFin:'', adultosFin:'', generalFin:'' };
 }
 function saveHorarios(){
   const h = {
     lideres: document.getElementById('cfg-hora-lideres')?.value || '16:00',
     adultos: document.getElementById('cfg-hora-adultos')?.value || '18:30',
-    general: document.getElementById('cfg-hora-general')?.value || '10:00'
+    general: document.getElementById('cfg-hora-general')?.value || '10:00',
+    lideresFin: document.getElementById('cfg-hora-fin-lideres')?.value || '',
+    adultosFin: document.getElementById('cfg-hora-fin-adultos')?.value || '',
+    generalFin: document.getElementById('cfg-hora-fin-general')?.value || ''
   };
   _horariosCache = h;
   _saveFs('horarios', h);
@@ -1718,9 +1764,15 @@ function loadHorariosUI(){
   const fl = document.getElementById('cfg-hora-lideres');
   const fa = document.getElementById('cfg-hora-adultos');
   const fg = document.getElementById('cfg-hora-general');
+  const flFin = document.getElementById('cfg-hora-fin-lideres');
+  const faFin = document.getElementById('cfg-hora-fin-adultos');
+  const fgFin = document.getElementById('cfg-hora-fin-general');
   if(fl) fl.value = h.lideres||'16:00';
   if(fa) fa.value = h.adultos||'18:30';
   if(fg) fg.value = h.general||'10:00';
+  if(flFin) flFin.value = h.lideresFin||'';
+  if(faFin) faFin.value = h.adultosFin||'';
+  if(fgFin) fgFin.value = h.generalFin||'';
 }
 function getFechas(){
   if(_fechasCache) return _fechasCache;
@@ -1876,9 +1928,12 @@ function buildAsig(asig, genero, himnos, sesLbl, msgNum, msgDur, esMatrimonio){
     oracion_final:   { ac:'ofrecer la <strong>oración final</strong> en',   min:15 },
     testimonio:      { ac:'compartir su <strong>testimonio</strong> en',          min:15 },
     capacitacion:    { ac:'ofrecer la <strong>capacitación</strong> en',     min:15 },
+    tiempo_instruccion:{ ac:'ofrecer un <strong>tiempo de instrucción</strong> en', min:15 },
   };
   const d=D[asig]; if(!d) return '';
-  let extra='';
+  let extra=['capacitacion','tiempo_instruccion'].includes(asig)
+    ? `<div class="carta-asig-box"><p>Tiempo asignado: <strong>${parseInt(msgDur)||10} minutos</strong></p></div>`
+    : '';
   if(d.mus && (himnos.inicial || himnos.intermedio || himnos.final)){
     const lbl = asig==='pianista' ? 'Los himnos seleccionados son los siguientes' : 'Los himnos seleccionados son los siguientes';
     const items = [
@@ -1923,7 +1978,7 @@ function generarCarta(){
     acompananteGenero: document.getElementById('acompanante-genero').value,
   };
   // Auto-detectar posición ordinal desde el registro si el nombre ya existe
-  if(['mensaje','testimonio','capacitacion'].includes(asig) && nombre !== '[Nombre]'){
+  if(INTERVENCIONES_ASIG.includes(asig) && nombre !== '[Nombre]'){
     const _rA = getRegistro();
     const _mx = _rA.find(r => r.nombre === nombre && r.asig === asig && r.sesion === sesion);
     if(_mx){
@@ -1960,7 +2015,7 @@ function generarCarta(){
       ? `<div class="carta-asig-box"><p><strong>Guía a considerar / material de consulta:</strong></p><p>${esc(guia).replace(/\n/g,'<br>')}</p></div>`
       : '';
     asigHTML = asigHTML.replace(/(<p>Le(?:s)? invitamos)/, temaLine + guiaLine + '$1');
-  } else if(asig === 'capacitacion' && tema){
+  } else if(['capacitacion','tiempo_instruccion'].includes(asig) && tema){
     asigHTML = asigHTML.replace(/(<p>Le invitamos)/,
       `<div class="carta-asig-box"><p>Tema asignado: <strong>${esc(tema)}</strong></p></div>$1`);
   }
@@ -2036,20 +2091,23 @@ function generarCarta(){
   // Etiqueta para el registro
   let asigLabel = { director:'Director de Música', pianista:'Pianista', oracion_inicial:'Oración Inicial', oracion_final:'Oración Final' }[asig] || asig;
   if(asig==='discurso_barrio') asigLabel = `Discurso en ${discursoBarrio || 'barrio o rama'}`;
-  if(['mensaje','testimonio','capacitacion'].includes(asig)){
+  if(INTERVENCIONES_ASIG.includes(asig)){
     const _numOrdinal = parseInt(msgNum) || 1;
     const _ordinal = ORDINAL[_numOrdinal-1] || `${_numOrdinal}°`;
     const _ordinalCap = _ordinal.charAt(0).toUpperCase() + _ordinal.slice(1);
-    const _tipoIntervencion = asig==='mensaje' ? 'mensaje' : asig==='testimonio' ? 'testimonio' : 'capacitación';
-    asigLabel = `${_ordinalCap} ${_tipoIntervencion}${asig==='mensaje' ? ` (${msgDur} min)` : ''}`;
+    const _tipoIntervencion = asig==='mensaje' ? 'mensaje'
+      : asig==='testimonio' ? 'testimonio'
+      : asig==='capacitacion' ? 'capacitación'
+      : 'tiempo de instrucción';
+    asigLabel = `${_ordinalCap} ${_tipoIntervencion} (${msgDur} min)`;
   }
 
   addToRegistro({ nombre, asig, asigLabel, sesion:asig==='discurso_barrio'?'otros':sesion, fechaEvento:asig==='discurso_barrio'?discursoFecha:fechaEv,
     genero, tema, guia,
     esMatrimonio,
-    duracionIndividual: ['mensaje','testimonio'].includes(asig) ? (asig==='testimonio' ? 3 : (parseInt(msgDur)||0)) : undefined,
-    duracion: ['mensaje','testimonio'].includes(asig)
-      ? (asig==='testimonio' ? 3 : (parseInt(msgDur)||0)) * (esMatrimonio ? 2 : 1)
+    duracionIndividual: INTERVENCIONES_ASIG.includes(asig) ? (asig==='testimonio' ? 3 : (parseInt(msgDur)||0)) : undefined,
+    duracion: INTERVENCIONES_ASIG.includes(asig)
+      ? (asig==='testimonio' ? 3 : (parseInt(msgDur)||0)) * (esMatrimonio && ['mensaje','testimonio'].includes(asig) ? 2 : 1)
       : asig==='discurso_barrio' ? discursoDuracion : undefined,
     barrio: discursoBarrio,
     discursoTema,
@@ -2308,12 +2366,18 @@ const REGISTRO_TEMPLATE = [
 const OPERACIONES_ASIG = ['asistencia','seguridad','estacionamiento','bienvenida'];
 
 function buildDefaultRegistro(){
-  return REGISTRO_TEMPLATE.map((t,i) => ({
-    id: INFORMATIVAS_ASIG.includes(t[1]) ? `minuta_${t[0]}_${t[1]}` : 'slot_'+i,
-    sesion: t[0], asig: t[1], asigLabel: t[2], nombre: '', fechaEvento: '', minutaVersion: 3,
-    ...(t[1]==='asuntos_estaca' ? {habilitado:false} : {}),
-    cartaAviso: null, cartaEnviada: null, confirmado: null, reconfirmado: null
-  }));
+  const repeticiones = new Map();
+  return REGISTRO_TEMPLATE.map(t => {
+    const clave = `${t[0]}_${t[1]}`;
+    const numero = (repeticiones.get(clave) || 0) + 1;
+    repeticiones.set(clave, numero);
+    return {
+      id: INFORMATIVAS_ASIG.includes(t[1]) ? `minuta_${clave}` : `slot_${clave}_${numero}`,
+      sesion: t[0], asig: t[1], asigLabel: t[2], nombre: '', fechaEvento: '', minutaVersion: 3,
+      ...(t[1]==='asuntos_estaca' ? {habilitado:false} : {}),
+      cartaAviso: null, cartaEnviada: null, confirmado: null, reconfirmado: null
+    };
+  });
 }
 
 function migrateRegistro(reg){
@@ -2430,6 +2494,22 @@ function migrateRegistro(reg){
       }
     }
   }
+  const idsUsados = new Set();
+  reg.forEach((r,index)=>{
+    const idOriginal = String(r.id || '').trim();
+    let idUnico = idOriginal || `registro_${r.sesion || 'sin_sesion'}_${r.asig || 'sin_asignacion'}_${index+1}`;
+    if(idsUsados.has(idUnico)){
+      const base = `${idUnico}_${r.sesion || 'sin_sesion'}_${r.asig || 'sin_asignacion'}`;
+      let numero = 2;
+      idUnico = base;
+      while(idsUsados.has(idUnico)) idUnico = `${base}_${numero++}`;
+    }
+    if(r.id !== idUnico){
+      r.id = idUnico;
+      changed = true;
+    }
+    idsUsados.add(idUnico);
+  });
   if(changed) saveRegistro(reg);
   return reg;
 }
@@ -2527,9 +2607,43 @@ function esCartaEspecialGuardada(entry){
   return !!(entry.esCartaEspecial || (entry.cartaHTML||'').includes('carta-titulo-especial'));
 }
 
+function construirCartaEspecialDesdeRegistro(entry){
+  const sesion = {adultos:'Sesión de Adultos',lideres:'Sesión de Líderes',general:'Sesión General'}[entry.sesion] || 'Sesión de Conferencia';
+  const fecha = entry.fechaEvento || getFechas()[entry.sesion] || '';
+  const hora = getHorarios()[entry.sesion] || '10:00';
+  const lugar = document.getElementById('lugar').value.trim() || 'el centro de estaca';
+  const duracionIndividual = parseInt(entry.duracionIndividual) || 7;
+  const duracionTotal = parseInt(entry.duracion) || Math.ceil((duracionIndividual * 2) / 5) * 5;
+  const nombre = (entry.nombre || '').replace(/^(?:pte\.?\s+y\s+hna\.?|presidente\s+y\s+hermana)\s*/i,'').trim();
+  const fechaCarta = new Date().toISOString().split('T')[0];
+  const ciudad = document.getElementById('ciudad').value || 'Buenos Aires';
+  const firmante = document.getElementById('firmante').value || 'Presidencia de Estaca';
+  return `
+    <div class="carta-titulo carta-titulo-especial">ESTACA BUENOS AIRES<br>ARGENTINA ALDO BONZI</div>
+    <div class="carta-fecha">${fmtCarta(fechaCarta, ciudad)}</div>
+    <div class="carta-saludo">Estimados Pte. y Hna.${nombre ? ' ' + esc(nombre) : ''},</div>
+    <div class="carta-texto">
+      <p>El <strong>${fmtDiaCap(fecha)} ${fmtFecha(fecha)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
+      <p>En esta oportunidad queremos extenderles la invitación para participar compartiendo un mensaje en la ${esc(sesion).toLowerCase()}.</p>
+      <div class="carta-asig-box"><p>Tiempo asignado a cada uno: <strong>${duracionIndividual} minutos</strong></p></div>
+      <p>En caso de que su esposa no pueda participar, dispondrá de <strong>${duracionTotal} minutos</strong> para compartir el mensaje.</p>
+      <p><strong>El tema será a su elección</strong>. Los invitamos a que se pueda preparar el mensaje utilizando las escrituras, las palabras de los profetas modernos y ejemplos de la vida del salvador.</p>
+      <p>Les invitamos a <strong>estar sentada/o</strong> en el estrado con nosotros <strong>15 minutos antes</strong> del comienzo.</p>
+      <p>Favor de confirmar su presencia. De no poder asistir por algún motivo, avísenos con anticipación.</p>
+      <p>¡Muchas gracias!</p>
+    </div>
+    <div class="carta-cierre"><p>Esperamos que el Señor los bendiga,</p></div>
+    <div class="carta-firma"><p>Con amor</p><br><p><strong>${esc(firmante)}</strong></p></div>`;
+}
+
 function irACarta(id){
   const r=getRegistro(); const x=r.find(e=>e.id===id); if(!x) return;
-  if(!['director','pianista','mensaje','testimonio','capacitacion','discurso_barrio'].includes(x.asig)) return;
+  if(!['director','pianista','mensaje','testimonio','capacitacion','tiempo_instruccion','discurso_barrio'].includes(x.asig)) return;
+  if(esAsignacionInvitadoEspecial(x) && !esCartaEspecialGuardada(x)){
+    x.cartaHTML = construirCartaEspecialDesdeRegistro(x);
+    x.esCartaEspecial = true;
+    saveRegistro(r);
+  }
   // Si tiene carta especial almacenada, mostrarla directamente
   if(x.cartaHTML && esCartaEspecialGuardada(x)){
     showTab('carta');
@@ -2576,7 +2690,7 @@ function irACarta(id){
     document.getElementById('acompanante').value        = x.acompanante || (_ac && _ac.nombre) || '';
     document.getElementById('acompanante-genero').value = x.acompananteGenero || (_ac && _ac.genero) || 'o';
   }
-  if(['mensaje','testimonio','capacitacion'].includes(x.asig)){
+  if(INTERVENCIONES_ASIG.includes(x.asig)){
     const _allReg = getRegistro();
     const _sameAsig = _allReg.filter(e => e.asig === x.asig && e.sesion === x.sesion);
     const _pos = _sameAsig.findIndex(e => e.id === x.id) + 1;
@@ -2668,11 +2782,15 @@ function renderRelSostForm(){
   const cont = document.getElementById('rel-sost-bloques');
   if(!cont) return;
   const bloques = getRelSost();
-  cont.innerHTML = bloques.map((bloque,indice)=>`<article class="rel-bloque">
+  cont.innerHTML = bloques.map((bloque,indice)=>{
+    const esSacerdocio = ['futuro_elder','futuro_sumo_sacerdote'].includes(bloque.tipo);
+    return `<article class="rel-bloque">
     <div class="rel-bloque-head">
       <select aria-label="Tipo de bloque" onchange="actualizarTipoRelSost('${bloque.id}',this.value)">
         <option value="relevar" ${bloque.tipo==='relevar'?'selected':''}>Relevar con gratitud</option>
         <option value="sostener" ${bloque.tipo==='sostener'?'selected':''}>Sostener</option>
+        <option value="futuro_elder" ${bloque.tipo==='futuro_elder'?'selected':''}>Sostener futuros élderes</option>
+        <option value="futuro_sumo_sacerdote" ${bloque.tipo==='futuro_sumo_sacerdote'?'selected':''}>Sostener futuros sumos sacerdotes</option>
       </select>
       <span class="rel-orden-label hint">Bloque ${indice+1}</span>
       <div class="rel-bloque-actions">
@@ -2681,17 +2799,18 @@ function renderRelSostForm(){
         <button type="button" class="rel-icon-btn danger" title="Eliminar bloque" aria-label="Eliminar bloque" onclick="eliminarBloqueRelSost('${bloque.id}')">×</button>
       </div>
     </div>
-    <div class="rel-personas">${bloque.personas.map((persona,pIndice)=>`<div class="rel-persona">
+    <div class="rel-personas">${bloque.personas.map((persona,pIndice)=>`<div class="rel-persona${esSacerdocio?' rel-persona-sacerdocio':''}">
       <input class="rel-persona-nombre" type="text" value="${esc(persona.nombre||'')}" placeholder="Nombre completo" aria-label="Nombre completo" oninput="actualizarPersonaRelSost('${bloque.id}',${pIndice},'nombre',this.value)">
-      <input class="rel-persona-llamamiento" type="text" value="${esc(persona.llamamiento||'')}" placeholder="Llamamiento" aria-label="Llamamiento" oninput="actualizarPersonaRelSost('${bloque.id}',${pIndice},'llamamiento',this.value)">
-      <select class="rel-persona-genero" aria-label="Tratamiento" onchange="actualizarPersonaRelSost('${bloque.id}',${pIndice},'genero',this.value)">
+      <input class="rel-persona-llamamiento" type="text" value="${esc(persona.llamamiento||'')}" placeholder="${esSacerdocio?'Barrio o rama':'Llamamiento'}" aria-label="${esSacerdocio?'Barrio o rama':'Llamamiento'}" oninput="actualizarPersonaRelSost('${bloque.id}',${pIndice},'llamamiento',this.value)">
+      ${esSacerdocio?'':`<select class="rel-persona-genero" aria-label="Tratamiento" onchange="actualizarPersonaRelSost('${bloque.id}',${pIndice},'genero',this.value)">
         <option value="o" ${(persona.genero||'o')==='o'?'selected':''}>Hermano</option>
         <option value="a" ${persona.genero==='a'?'selected':''}>Hermana</option>
-      </select>
+      </select>`}
       <button type="button" class="rel-icon-btn danger" title="Quitar persona" aria-label="Quitar persona" onclick="eliminarPersonaRelSost('${bloque.id}',${pIndice})">×</button>
     </div>`).join('')}</div>
     <button type="button" class="rel-add-persona" onclick="agregarPersonaRelSost('${bloque.id}')">+ Agregar persona</button>
-  </article>`).join('');
+  </article>`;
+  }).join('');
 }
 function agregarBloqueRelSost(tipo='relevar'){
   getRelSost().push({id:'rel_'+Date.now(),tipo,personas:[{nombre:'',llamamiento:'',genero:'o'}]});
@@ -2699,7 +2818,7 @@ function agregarBloqueRelSost(tipo='relevar'){
 }
 function actualizarTipoRelSost(id,tipo){
   const bloque=getRelSost().find(item=>item.id===id); if(!bloque) return;
-  bloque.tipo=tipo; saveRelSost();
+  bloque.tipo=tipo; saveRelSost(); renderRelSostForm();
 }
 function moverBloqueRelSost(id,direccion){
   const bloques=getRelSost(); const desde=bloques.findIndex(item=>item.id===id); const hasta=desde+direccion;
@@ -2739,11 +2858,24 @@ async function generarRelevosSostenimientos(tipoDescarga=null){
   const bloques=getRelSost().map(bloque=>({
     ...bloque,
     personas:(bloque.personas||[])
-      .map(persona=>({...persona,nombre:persona.nombre.trim(),llamamiento:persona.llamamiento.trim()}))
+      .map(persona=>({...persona,nombre:(persona.nombre||'').trim(),llamamiento:(persona.llamamiento||'').trim()}))
       .filter(persona=>persona.nombre&&persona.llamamiento)
   })).filter(bloque=>bloque.personas.length);
   if(!bloques.length){ alert('Agregue al menos una persona con nombre y llamamiento.'); return; }
   const contenido=bloques.map(bloque=>{
+    const esFuturoElder=bloque.tipo==='futuro_elder';
+    const esFuturoSumo=bloque.tipo==='futuro_sumo_sacerdote';
+    if(esFuturoElder || esFuturoSumo){
+      const oficio = esFuturoElder ? 'élder' : 'sumo sacerdote';
+      const titulo = esFuturoElder ? 'Sostenimientos de futuros Élderes' : 'Sostenimientos de futuros Sumos Sacerdotes';
+      const personas=bloque.personas.map(persona=>`<li><strong>${esc(persona.nombre)}</strong>&nbsp;&nbsp; ${esc(persona.llamamiento)}</li>`).join('');
+      return `<div class="rel-doc-bloque rel-doc-sacerdocio">
+        <p class="rel-doc-sacerdocio-titulo">${titulo}</p>
+        <p>Se propone sostener a los siguientes hermanos para conferirles el sacerdocio de Melquisedec y ordenarlos al oficio de ${oficio}:</p>
+        <ul>${personas}</ul>
+        <p class="rel-doc-respuesta">Quienes estén a favor, sírvanse manifestarlo levantando la mano derecha.<br>Si hubiera alguien que se oponga, le invitamos a manifestarlo de la misma manera.</p>
+      </div>`;
+    }
     const esRelevo=bloque.tipo==='relevar';
     const esSingular=bloque.personas.length===1;
     const cantidadHermanas=bloque.personas.filter(persona=>persona.genero==='a').length;
@@ -2765,7 +2897,8 @@ async function generarRelevosSostenimientos(tipoDescarga=null){
   }).join('');
   showTab('carta');
   const carta=document.getElementById('carta-contenido');
-  carta.innerHTML=`<div class="carta-saludo"><strong>Estimados hermanos y hermanas,</strong></div><div class="carta-texto carta-relevos">${contenido}</div>`;
+  const soloSacerdocio=bloques.every(bloque=>['futuro_elder','futuro_sumo_sacerdote'].includes(bloque.tipo));
+  carta.innerHTML=`${soloSacerdocio?'':'<div class="carta-saludo"><strong>Estimados hermanos y hermanas,</strong></div>'}<div class="carta-texto carta-relevos">${contenido}</div>`;
   ajustarCartaContenido(null,'relevos');
   cartaLista=true;
   document.getElementById('btn-pdf').disabled=false;
@@ -2779,22 +2912,41 @@ async function generarRelevosSostenimientos(tipoDescarga=null){
   }
 }
 
-function etiquetaAsignacionRegistro(r, reg=getRegistro()){
+function esAsignacionInvitadoEspecial(r){
+ const label = `${r.asigLabel || ''} ${r.cargo || ''}`;
+ return r.asig === 'mensaje'
+   && /(?:presidente|pte\.?|consejero).*(?:misi[oó]n|templo)|(?:misi[oó]n|templo).*(?:presidente|pte\.?|consejero)/i.test(label);
+}
+
+function etiquetaAsignacionRegistro(r){
  const label = ((r.asigLabel || '').replace(/\s*\(\d+\s*min\)/gi,'')).trim();
- const normalizado = label.replace(/^(Mensaje|Testimonio|Capacitación)\s+\d+$/i,'$1');
- const genericos = ['Mensaje','Testimonio','Capacitación',''];
- const ordinales = ['mensaje','testimonio','capacitacion'];
- const base = r.asig==='mensaje' ? 'mensaje' : r.asig==='testimonio' ? 'testimonio' : 'capacitación';
- const minuscula = normalizado.toLocaleLowerCase('es');
- const esOrdinalGuardado = ORDINAL.some(ordinal => minuscula === `${ordinal} ${base}`)
-   || new RegExp(`^\\d+°? ${base}$`,'i').test(normalizado);
- if(ordinales.includes(r.asig) && (genericos.includes(normalizado) || esOrdinalGuardado)){
-   const mismas = reg.filter(x => x.asig===r.asig && x.sesion===r.sesion);
-   const posicion = mismas.findIndex(x=>x.id===r.id) + 1;
-   const ordinal = ORDINAL[posicion-1] || `${posicion}°`;
-   return `${ordinal.charAt(0).toUpperCase() + ordinal.slice(1)} ${base}`;
+ if(esAsignacionInvitadoEspecial(r)) return label;
+ const generica = {
+   mensaje:'Mensaje',
+   testimonio:'Testimonio',
+   capacitacion:'Capacitación',
+   tiempo_instruccion:'Tiempo de instrucción'
+ };
+ return generica[r.asig] || label || r.asig || '';
+}
+
+function etiquetaAsignacionMinuta(r, reg=getRegistro()){
+ if(!INTERVENCIONES_ASIG.includes(r.asig) || esAsignacionInvitadoEspecial(r)){
+   return etiquetaAsignacionRegistro(r);
  }
- return label || r.asig || '';
+ const mismas = reg.filter(x => x.asig===r.asig && x.sesion===r.sesion);
+ const posicion = mismas.findIndex(x=>x.id===r.id) + 1;
+ let ordinal = ORDINAL[posicion-1] || `${posicion}°`;
+ if(r.asig === 'capacitacion'){
+   ordinal = ordinal === 'primer' ? 'primera' : ordinal === 'tercer' ? 'tercera' : ordinal.replace(/o$/,'a');
+ }
+ const base = {
+   mensaje:'mensaje',
+   testimonio:'testimonio',
+   capacitacion:'capacitación',
+   tiempo_instruccion:'tiempo de instrucción'
+ }[r.asig];
+ return `${ordinal.charAt(0).toUpperCase() + ordinal.slice(1)} ${base}`;
 }
 
 function renderRegistro(){
@@ -2909,7 +3061,7 @@ function renderRegistro(){
       const canGen = isFilled && !isInformativa;
       const isLast = idx === items.length - 1;
       const rowStyle = isLast ? 'border-bottom:2px solid #E2E8F0;' : '';
-      const canIrCarta = ['director','pianista','mensaje','testimonio','capacitacion','discurso_barrio'].includes(r.asig);
+      const canIrCarta = ['director','pianista','mensaje','testimonio','capacitacion','tiempo_instruccion','discurso_barrio'].includes(r.asig);
       const rowStatus = isInformativa ? ''
         : r.reconfirmado===true ? 'row-reconf'
         : r.confirmado===true ? 'row-confirmado'
@@ -2917,7 +3069,7 @@ function renderRegistro(){
         : isFilled ? 'row-pendiente'
         : '';
       const _rDur = _parseDur(r);
-      const _isSpeaking = ['mensaje','testimonio','capacitacion','discurso_barrio','extra'].includes(r.asig);
+      const _isSpeaking = [...INTERVENCIONES_ASIG,'discurso_barrio','extra'].includes(r.asig);
       const durBadge = (_rDur > 0 && _isSpeaking)
         ? `<span style="font-size:10.5px;color:#64748B;background:#F1F5F9;border:1px solid #E2E8F0;border-radius:6px;padding:1px 6px;margin-left:4px;font-weight:600">${_rDur} min</span>`
         : '';
@@ -3028,25 +3180,55 @@ function _updRegHdrH(){
 let _editId = null;
 function _editAssignmentOptions(current){
   const select = document.getElementById('edit-asig-select');
+  const esOperacionActual = OPERACIONES_ASIG.includes(current.asig);
+  const base = esOperacionActual
+    ? [
+        ['asistencia','Asistencia'],
+        ['seguridad','Seguridad'],
+        ['estacionamiento','Estacionamiento'],
+        ['bienvenida','Bienvenida y recepción']
+      ]
+    : [
+        ['director','Director/a de Música'],
+        ['pianista','Pianista'],
+        ['oracion_inicial','Oración Inicial'],
+        ['oracion_final','Oración Final'],
+        ['mensaje','Mensaje'],
+        ['testimonio','Testimonio'],
+        ['capacitacion','Capacitación'],
+        ['tiempo_instruccion','Tiempo de instrucción'],
+        ['mensaje','Presidente de Misión y esposa'],
+        ['mensaje','Presidente de Templo y esposa'],
+        ['mensaje','Consejero de Misión y esposa'],
+        ['mensaje','Consejero de Templo y esposa']
+      ];
   const seen = new Set();
   select.innerHTML = '';
-  getRegistro().forEach(item=>{
-    const label = (item.asigLabel || item.asig || '').replace(/\s*\(\d+\s*min\)/gi,'').trim();
-    const key = `${item.asig}|${label}`;
+  const addOption = (asig,label)=>{
+    const key = `${asig}|${label}`;
     if(!label || seen.has(key)) return;
     seen.add(key);
     const option = document.createElement('option');
     option.value = key;
     option.textContent = label;
-    option.dataset.asig = item.asig;
+    option.dataset.asig = asig;
     option.dataset.label = label;
     select.appendChild(option);
+  };
+  base.forEach(([asig,label])=>addOption(asig,label));
+  getRegistro().forEach(item=>{
+    const esOperacion = OPERACIONES_ASIG.includes(item.asig);
+    if(esOperacion !== esOperacionActual || INFORMATIVAS_ASIG.includes(item.asig)) return;
+    addOption(item.asig, etiquetaAsignacionRegistro(item));
   });
-  const createOption = document.createElement('option');
-  createOption.value = '__new__';
-  createOption.textContent = '+ Crear nueva asignación';
-  select.appendChild(createOption);
-  const currentLabel = (current.asigLabel || current.asig || '').replace(/\s*\(\d+\s*min\)/gi,'').trim();
+  let createOption = null;
+  if(!esOperacionActual){
+    createOption = document.createElement('option');
+    createOption.value = '__new__';
+    createOption.textContent = '+ Crear nueva asignación';
+    select.appendChild(createOption);
+  }
+  const currentLabel = etiquetaAsignacionRegistro(current);
   const currentKey = `${current.asig}|${currentLabel}`;
   if(!seen.has(currentKey)){
     const option = document.createElement('option');
@@ -3064,7 +3246,7 @@ function cambiarAsignacionEdit(){
   document.getElementById('edit-asig-new').classList.toggle('hidden', !isNew);
   const asig = isNew ? 'extra' : (select.selectedOptions[0]?.dataset.asig || 'extra');
   const esMusica = ['director','pianista'].includes(asig);
-  const esIntervencion = ['mensaje','testimonio','capacitacion'].includes(asig);
+  const esIntervencion = INTERVENCIONES_ASIG.includes(asig);
   const esOperacion = OPERACIONES_ASIG.includes(asig);
   document.getElementById('edit-grupo-tema').classList.toggle('hidden', !esIntervencion);
   document.getElementById('edit-grupo-guia').classList.toggle('hidden', asig !== 'mensaje');
@@ -3072,6 +3254,11 @@ function cambiarAsignacionEdit(){
   document.getElementById('edit-grupo-ayudantes').classList.toggle('hidden', !esOperacion);
   document.getElementById('edit-nombre-label').textContent = esOperacion ? 'Coordinador' : 'Nombre';
   document.getElementById('edit-grupo-matrimonio').classList.toggle('hidden', esOperacion || ['director','pianista','oracion_inicial','oracion_final'].includes(asig));
+  const label = isNew ? '' : (select.selectedOptions[0]?.dataset.label || '');
+  if(esAsignacionInvitadoEspecial({asig,asigLabel:label})){
+    document.getElementById('edit-matrimonio').checked = true;
+    document.getElementById('edit-duracion').value = 7;
+  }
   if(isNew) setTimeout(()=>document.getElementById('edit-asig-label').focus(), 50);
 }
 function agregarAyudanteEdit(nombre=''){
@@ -3111,7 +3298,7 @@ function abrirEditModal(id){
   document.getElementById('edit-sesion').value = x.sesion || 'general';
   // Show/hide contextual fields
   const esMusica = ['director','pianista'].includes(x.asig);
-  const esMensaje = ['mensaje','testimonio','capacitacion'].includes(x.asig);
+  const esMensaje = INTERVENCIONES_ASIG.includes(x.asig);
   const esOperacion = OPERACIONES_ASIG.includes(x.asig);
   document.getElementById('edit-grupo-tema').classList.toggle('hidden', !esMensaje);
   document.getElementById('edit-grupo-guia').classList.toggle('hidden', x.asig !== 'mensaje');
@@ -3164,14 +3351,18 @@ function _autoAcomp(asig, sesion){
 
 /* ---- Add row modal ---- */
 function abrirAddModal(){
-  document.getElementById('add-sesion').value = 'adultos';
+  const scope = _regVista === 'operaciones' ? 'operaciones' : 'conferencia';
+  document.getElementById('add-sesion').value = _regVista === 'operaciones' ? 'operaciones' : 'adultos';
   document.getElementById('add-asig').value = '';
   document.getElementById('add-asig-label').value = '';
   document.getElementById('add-asig-custom').value = '';
   document.getElementById('add-asig-custom').style.display = 'none';
-  document.querySelectorAll('.asig-preset').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('.asig-preset').forEach(b=>{
+    b.classList.remove('selected');
+    b.classList.toggle('hidden', b.dataset.scope !== scope);
+  });
   document.getElementById('add-nombre').value = '';
-  setDateInputValue('add-fecha', getFechas()['adultos'] || '');
+  setDateInputValue('add-fecha', scope === 'operaciones' ? '' : (getFechas()['adultos'] || ''));
   document.getElementById('reg-add-modal').classList.remove('hidden');
 }
 function autoFechaAdd(){
@@ -3209,10 +3400,16 @@ function guardarAddModal(){
   const nombre = document.getElementById('add-nombre').value.trim();
   const fechaEvento = document.getElementById('add-fecha').value;
   const reg = getRegistro();
-  reg.push({
+  const nueva = {
     id: 'extra_'+Date.now(), sesion, asig, asigLabel, nombre, fechaEvento,
     cartaAviso:null, cartaEnviada:null, confirmado:null, reconfirmado:null
-  });
+  };
+  if(esAsignacionInvitadoEspecial(nueva)){
+    nueva.esMatrimonio = true;
+    nueva.duracionIndividual = 7;
+    nueva.duracion = 15;
+  }
+  reg.push(nueva);
   saveRegistro(reg); cerrarAddModal(); renderRegistro();
 }
 function guardarEditModal(){
@@ -3235,12 +3432,14 @@ function guardarEditModal(){
   if(_nota) x.nota = _nota; else delete x.nota;
   x.fechaEvento = document.getElementById('edit-fecha').value;
   x.sesion = document.getElementById('edit-sesion').value;
-  if(['mensaje','testimonio','capacitacion'].includes(x.asig)){
+  if(INTERVENCIONES_ASIG.includes(x.asig)){
     x.tema = document.getElementById('edit-tema').value.trim();
     const _dur = parseInt(document.getElementById('edit-duracion').value) || (x.asig==='testimonio' ? 3 : 0);
     if(_dur > 0){
       x.duracionIndividual = _dur;
-      x.duracion = _dur * (x.esMatrimonio && ['mensaje','testimonio'].includes(x.asig) ? 2 : 1);
+      x.duracion = esAsignacionInvitadoEspecial(x)
+        ? Math.ceil((_dur * 2) / 5) * 5
+        : _dur * (x.esMatrimonio && ['mensaje','testimonio'].includes(x.asig) ? 2 : 1);
     } else {
       delete x.duracion;
       delete x.duracionIndividual;
@@ -3253,6 +3452,10 @@ function guardarEditModal(){
     } else delete x.guia;
   } else {
     delete x.tema; delete x.duracion; delete x.guia;
+  }
+  if(!esAsignacionInvitadoEspecial(x) && esCartaEspecialGuardada(x)){
+    delete x.cartaHTML;
+    delete x.esCartaEspecial;
   }
   if(['director','pianista'].includes(x.asig)){
     x.himnoInicial     = document.getElementById('edit-himno-inicial').value.trim();
@@ -3373,6 +3576,13 @@ async function generarDesdeRegistro(id, tipo){
     return;
   }
 
+  if(esAsignacionInvitadoEspecial(entry) && !esCartaEspecialGuardada(entry)){
+    entry.cartaHTML = construirCartaEspecialDesdeRegistro(entry);
+    entry.esCartaEspecial = true;
+    entry.fechaGenerada = new Date().toISOString();
+    saveRegistro(getRegistro());
+  }
+
   // Las invitaciones especiales ya tienen su redacción final almacenada.
   if(entry.cartaHTML && esCartaEspecialGuardada(entry)){
     showTab('carta');
@@ -3405,7 +3615,7 @@ async function generarDesdeRegistro(id, tipo){
     document.getElementById('acompanante').value        = entry.acompanante || (_ac && _ac.nombre) || '';
     document.getElementById('acompanante-genero').value = entry.acompananteGenero || (_ac && _ac.genero) || 'o';
   }
-  if(['mensaje','testimonio','capacitacion'].includes(entry.asig)){
+  if(INTERVENCIONES_ASIG.includes(entry.asig)){
     const _intervenciones = getRegistro().filter(r => r.asig === entry.asig && r.sesion === entry.sesion);
     const _posicion = _intervenciones.findIndex(r => r.id === entry.id) + 1;
     document.getElementById('msg-num').value = _posicion > 0 ? _posicion : 1;
@@ -3467,24 +3677,31 @@ async function confirmarExport(){
   if(document.getElementById('exp-sel-adultos').checked) ses.push('adultos');
   if(document.getElementById('exp-sel-general').checked) ses.push('general');
   if(!ses.length){ alert('Seleccioná al menos una sesión.'); return; }
+  const mostrarTemas = document.getElementById('exp-mostrar-temas').checked;
   const printWindow = _exportTipo==='print' ? window.open('','_blank') : null;
   if(_exportTipo==='print' && !printWindow){
     alert('El navegador bloqueó la ventana de impresión. Habilitá las ventanas emergentes e intentá nuevamente.');
     return;
   }
   cerrarExportModal();
-  await descargarRegistro(_exportTipo, ses, printWindow);
+  await descargarRegistro(_exportTipo, ses, printWindow, {mostrarTemas});
 }
 
-function construirPaginaMinuta(sesion){
+function construirPaginaMinuta(sesion, opciones={}){
   const reg = getRegistro();
   const items = reg.filter(r=>r.sesion===sesion && !OPERACIONES_ASIG.includes(r.asig));
   const porTipo = asig => items.find(r=>r.asig===asig);
   const valor = asig => esc((porTipo(asig)?.nombre||'').trim());
   const nombresSesion = {lideres:'Sesión de Líderes',adultos:'Sesión de Adultos',general:'Sesión General'};
+  const fechaSesion = getFechas()[sesion] || '';
+  const horarios = getHorarios();
+  const horaInicio = horarios[sesion] || '';
+  const horaFin = horarios[`${sesion}Fin`] || '';
+  const fechaTexto = fechaSesion ? `${fmtDiaCap(fechaSesion)} ${fmtFecha(fechaSesion)}` : '';
+  const horaTexto = horaInicio ? `${horaInicio}${horaFin ? ` – ${horaFin}` : ''} hs` : '';
   const excluirAgenda = new Set(['preside','dirige','director','pianista','reconocimientos','agradecimientos']);
   const agradecimientosGuardados = (porTipo('agradecimientos')?.nombre||'').split(/[\n;]+/).map(v=>v.trim()).filter(Boolean);
-  const agradecimientos = agradecimientosGuardados.length ? agradecimientosGuardados : ['(música)'];
+  const agradecimientos = [...agradecimientosGuardados];
   if(!agradecimientos.some(v=>/todos los demás/i.test(v))){
     agradecimientos.push('Todos los demás que participaron en la preparación');
   }
@@ -3494,9 +3711,11 @@ function construirPaginaMinuta(sesion){
   ).map(r=>{
     const duracion = r.duracion ? Number(r.duracion) : Number(((r.asigLabel||'').match(/\((\d+)\s*min\)/i)||[])[1]||0);
     const tema = (r.tema||'').trim();
-    const mostrarTema = r.asig==='mensaje' && (sesion==='adultos' || tema);
+    const mostrarTema = opciones.mostrarTemas !== false
+      && INTERVENCIONES_ASIG.includes(r.asig)
+      && (tema || r.asig==='mensaje' && sesion==='adultos');
     return `<div class="minuta-export-row">
-      <span class="minuta-export-row-label">${esc(etiquetaAsignacionRegistro(r,reg))}:</span>
+      <span class="minuta-export-row-label">${esc(etiquetaAsignacionMinuta(r,reg))}:</span>
       <span class="minuta-export-row-value">${esc((r.nombre||'').trim())}</span>
       ${duracion>0?`<span class="minuta-export-row-time">(${duracion} min)</span>`:''}
       ${mostrarTema?`<span class="minuta-export-row-topic">Tema:${tema?' '+esc(tema):''}</span>`:''}
@@ -3509,6 +3728,8 @@ function construirPaginaMinuta(sesion){
     <div class="minuta-export-content">
       <div class="minuta-export-title">CONFERENCIA DE ESTACA ALDO BONZI</div>
       <div class="minuta-export-session">${nombresSesion[sesion]||sesion}</div>
+      ${fechaTexto?`<div class="minuta-export-date">${esc(fechaTexto)}</div>`:''}
+      ${horaTexto?`<div class="minuta-export-time">${esc(horaTexto)}</div>`:''}
       <div class="minuta-export-meta">
         <div><span class="minuta-export-label">Preside:</span> ${valor('preside')}</div>
         <div><span class="minuta-export-label">Dirige:</span> ${valor('dirige')}</div>
@@ -3524,10 +3745,10 @@ function construirPaginaMinuta(sesion){
   return page;
 }
 
-async function capturarPaginasMinuta(sesiones){
+async function capturarPaginasMinuta(sesiones, opciones={}){
   const host = document.createElement('div');
   host.className = 'minuta-export-host';
-  sesiones.forEach(sesion=>host.appendChild(construirPaginaMinuta(sesion)));
+  sesiones.forEach(sesion=>host.appendChild(construirPaginaMinuta(sesion, opciones)));
   document.body.appendChild(host);
   const imagenes = [...host.querySelectorAll('img')];
   await Promise.all(imagenes.map(img=>img.complete && img.naturalWidth
@@ -3555,7 +3776,7 @@ function crearPdfMinutas(canvases){
   return pdf;
 }
 
-async function descargarRegistro(tipo, sesionesFiltro, printWindow=null){
+async function descargarRegistro(tipo, sesionesFiltro, printWindow=null, opciones={}){
   const SNAME = { lideres:'Lideres', adultos:'Adultos', general:'General' };
   const sfx = sesionesFiltro.length===3 ? 'Conferencia' : sesionesFiltro.map(s=>SNAME[s]||s).join('_');
   let host = null;
@@ -3566,7 +3787,7 @@ async function descargarRegistro(tipo, sesionesFiltro, printWindow=null){
     return new Proxy(style, { get(t,p){ const v=Reflect.get(t,p); if(typeof v==='string'&&v.includes('oklch')) return 'transparent'; if(typeof v==='function') return v.bind(t); return v; } });
   };
   try{
-    const captura = await capturarPaginasMinuta(sesionesFiltro);
+    const captura = await capturarPaginasMinuta(sesionesFiltro, opciones);
     host = captura.host;
     const canvases = captura.canvases;
     if(tipo==='pdf'){

@@ -7,13 +7,17 @@ Permite crear el registro de participantes, generar cartas de invitación person
 
 ## ✨ Funcionalidades
 
-- **Registro de asignaciones** — Director, Pianista, Mensajes, Testimonios, Capacitaciones, Oraciones, Especiales (Presidente de Misión / Templo)
-- **Minuta por sesión** — Preside, dirige, reconocimientos, agradecimientos, himnos y Asuntos de Estaca opcionales integrados en el programa
+- **Registro de asignaciones** — Director, Pianista, Mensajes, Testimonios, Capacitaciones, Tiempos de instrucción, Oraciones y asignaciones especiales (Presidencia de Misión / Templo)
+- **Conferencia y Operaciones separadas** — Cada vista ofrece únicamente las asignaciones que corresponden a su función
+- **Minuta por sesión** — Preside, dirige, fecha, horario, reconocimientos, agradecimientos, himnos y Asuntos de Estaca opcionales integrados en el programa
+- **Orden automático en la minuta** — Mensajes, testimonios, capacitaciones y tiempos de instrucción reciben su ordinal según su posición; el registro conserva etiquetas genéricas
+- **Temas opcionales en la impresión** — Al exportar las minutas se puede elegir si se muestran o se omiten los temas
 - **Sincronización de himnos** — Los himnos de la minuta se adjuntan automáticamente a las asignaciones del director y pianista
-- **Generación de cartas** — Carta personalizada por asignado con saludo, sesión, himnos y cierre firmado
+- **Generación de cartas** — Carta personalizada por asignado con saludo, sesión, himnos y cierre firmado, incluso para invitaciones especiales creadas desde el registro
 - **Asignaciones para matrimonios** — Muestra el tiempo individual en la carta y reserva el tiempo total de ambos en el registro
 - **Exportación** — Cartas en PDF/PNG y minutas A4 con descarga o impresión individual/multipágina
 - **Control de seguimiento** — Registro de aviso, confirmación y reconfirmación por participante
+- **Relevos y sostenimientos** — Incluye bloques manuales para futuros élderes y futuros sumos sacerdotes, con nombre y barrio o rama
 - **Sesiones** — Adultos, Líderes y General, con horarios configurables
 - **Drag & drop** — Reordenamiento de filas en el registro
 - **Tipografía LDS** — Fuente McKay para las cartas impresas
