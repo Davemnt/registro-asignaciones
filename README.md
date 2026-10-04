@@ -8,6 +8,7 @@ Permite crear el registro de participantes, generar cartas de invitación person
 ## ✨ Funcionalidades
 
 - **Registro de asignaciones** — Director, Pianista, Mensajes, Testimonios, Capacitaciones, Tiempos de instrucción, Oraciones y asignaciones especiales (Presidencia de Misión / Templo)
+- **Extender y editar asignaciones** — El recuadro «Asignar encargado…» con el signo + abre el formulario «Extender asignación»; el lápiz abre el mismo formulario como «Editar asignación».
 - **Conferencia y Operaciones separadas** — Cada vista ofrece únicamente las asignaciones que corresponden a su función
 - **Minuta por sesión** — Preside, dirige, fecha, horario, reconocimientos y agradecimientos cargados como listas editables, himnos y Asuntos de Estaca opcionales integrados en el programa
 - **Orden automático en la minuta** — Mensajes, testimonios, capacitaciones y tiempos de instrucción reciben su ordinal según su posición; el registro conserva etiquetas genéricas

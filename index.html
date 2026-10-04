@@ -165,10 +165,11 @@ textarea { resize: vertical; min-height: 52px; }
 .ses-hdr-inner { display:flex; align-items:center; gap:10px; padding:11px 14px 12px; background:#253349; border-radius:6px; border-left:4px solid #0F766E; }
 .ses-hdr-name { font-weight:700; font-size:11.5px; letter-spacing:.9px; color:#fff !important; padding:0 14px; border-left:2px solid rgba(255,255,255,.3); }
 /* Name cell */
-.name-assign { display:flex; align-items:center; gap:6px; background:#f8fafc; border:1.5px dashed #cbd5e1; border-radius:8px; padding:5px 6px 5px 8px; transition:border-color .15s; }
+.name-assign { display:flex; align-items:center; gap:6px; width:100%; background:#f8fafc; border:1.5px dashed #cbd5e1; border-radius:8px; padding:5px 6px 5px 8px; transition:border-color .15s; font-family:inherit; text-align:left; cursor:pointer; }
 .name-assign:focus-within { border-color:#0F766E; border-style:solid; background:#f0fdf9; }
 .name-assign-input { border:none; background:transparent; font-size:13px; color:#0F766E; outline:none; flex:1; min-width:0; }
 .name-assign-input::placeholder { color:#94a3b8; }
+.name-assign-placeholder { color:#94a3b8; padding:7px 10px; }
 .name-assign-plus { background:#0F766E; color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:13px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; }
 .name-filled-input { border:none; background:transparent; font-weight:600; font-size:13.5px; color:#0F172A; outline:none; width:100%; padding:3px 2px; }
 .name-filled-input:focus { background:#f0fdf9; border-radius:5px; padding:3px 6px; }
@@ -526,7 +527,7 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
   /* Nombre: ancho completo */
   .reg-table tbody tr[data-id] td:nth-child(4) { flex: 1 1 100%; width: 100%; }
   .reg-table tbody tr[data-id] td:nth-child(4) > * { max-width: 100%; }
-  .reg-table tbody tr[data-id] td:nth-child(4) label.name-assign,
+  .reg-table tbody tr[data-id] td:nth-child(4) .name-assign,
   .reg-table tbody tr[data-id] td:nth-child(4) > div { width: 100%; box-sizing: border-box; }
   .reg-table tbody tr[data-id] .attendance-count { margin-top:7px; padding:8px 0 0; border-left:0; border-top:1px solid #E2E8F0; }
   .reg-table tbody tr[data-id] .attendance-count input { width:96px; }
@@ -1429,7 +1430,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
     <div class="reg-modal-overlay hidden" id="reg-edit-modal">
       <div class="reg-modal">
         <div class="reg-modal-head">
-          <h3>Editar asignación</h3>
+          <h3 id="edit-modal-title">Editar asignación</h3>
           <p class="reg-modal-subtitle">Actualice los datos de la participación y el material que se incluirá en la carta.</p>
         </div>
         <div class="reg-modal-body">
@@ -3221,7 +3222,7 @@ aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</spa
             ? isOperacion
               ? `<div class="operation-team"><div class="operation-principal"><span title="Coordinador">★</span><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${r.nota?`<span class="nota-ico" title="${esc(r.nota)}" onclick="event.stopPropagation();abrirEditModal('${r.id}')">📝</span>`:''}</div><div class="operation-helpers"><span><strong>Equipo de apoyo:</strong> ${r.ayudantes?esc(r.ayudantes).replace(/\n/g,', '):'Sin asignar'}</span><button type="button" class="operation-helper-edit" onclick="abrirEditModal('${r.id}')">${r.ayudantes?'Editar':'Agregar'}</button></div></div>`
               : `<div style="display:flex;align-items:center;gap:4px;"><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${r.esMatrimonio && !['director','pianista','oracion_inicial','oracion_final'].includes(r.asig)?'<span class="badge-matrimonio">👫 Matrimonio</span>':''}${r.nota?`<span class="nota-ico" title="${esc(r.nota)}" onclick="event.stopPropagation();abrirEditModal('${r.id}')">📝</span>`:''}</div>`
-            : `<label class="name-assign"><span style="font-size:13px;flex-shrink:0">👤</span><input type="text" value="" onchange="updateNombre('${r.id}',this.value)" class="name-assign-input" placeholder="${isOperacion?'Asignar coordinador...':'Asignar encargado...'}"><span class="name-assign-plus">+</span></label>`
+            : `<button type="button" class="name-assign" onclick="abrirEditModal('${r.id}',true)" title="Extender asignación" aria-label="Extender asignación: ${esc(aLbl)}"><span style="font-size:13px;flex-shrink:0" aria-hidden="true">👤</span><span class="name-assign-input name-assign-placeholder">${isOperacion?'Asignar coordinador...':'Asignar encargado...'}</span><span class="name-assign-plus" aria-hidden="true">+</span></button>`
           }
           ${r.asig==='asistencia' ? `<div class="attendance-count"><label>Asistencia</label><input type="number" min="0" max="9999" value="${r.asistenciaTotal??''}" placeholder="Total" onchange="updateAsistencia('${r.id}',this.value)"></div>` : ''}
         </td>
@@ -3409,9 +3410,10 @@ function cargarAyudantesEdit(valor=''){
   nombres.forEach(nombre=>agregarAyudanteEdit(nombre));
   if(!nombres.length) agregarAyudanteEdit('');
 }
-function abrirEditModal(id){
+function abrirEditModal(id, extender=false){
   const r = getRegistro(); const x = r.find(e=>e.id===id); if(!x) return;
   _editId = id;
+  document.getElementById('edit-modal-title').textContent = extender ? 'Extender asignación' : 'Editar asignación';
   _editAssignmentOptions(x);
   document.getElementById('edit-asig-label').value = '';
   document.getElementById('edit-nombre').value = x.nombre || '';
