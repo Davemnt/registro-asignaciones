@@ -6,6 +6,9 @@
 <title>Asignaciones Conferencias – Estaca Aldo Bonzi</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -104,6 +107,28 @@ textarea { resize: vertical; min-height: 52px; }
 .carta-cierre { margin-top: 16px; }
 .carta-firma { margin-top: 38px; }
 
+/* minuta exportable */
+.minuta-export-host { position:fixed; left:-10000px; top:0; width:794px; z-index:-1; }
+.minuta-export-page { width:794px; height:1123px; position:relative; overflow:hidden; background:#fff; color:#111; font-family:'Times New Roman',serif; }
+.minuta-export-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+.minuta-export-content { position:relative; z-index:1; padding:116px 112px 100px; height:100%; font-size:13.5px; line-height:1.2; }
+.minuta-export-title { text-align:center; font-size:13.5px; font-weight:400; }
+.minuta-export-session { text-align:center; font-size:13.5px; font-weight:700; margin-top:2px; text-transform:uppercase; }
+.minuta-export-meta { display:grid; grid-template-columns:1fr 1fr; column-gap:70px; row-gap:26px; margin-top:27px; }
+.minuta-export-label { font-weight:700; }
+.minuta-export-notes { margin-top:26px; }
+.minuta-export-note { margin-bottom:25px; }
+.minuta-export-thanks { margin:8px 0 0 24px; padding-left:18px; }
+.minuta-export-thanks li { margin:4px 0; padding-left:5px; }
+.minuta-export-agenda { margin-top:25px; }
+.minuta-export-row { margin-bottom:24px; }
+.minuta-export-row-label { font-weight:700; }
+.minuta-export-row-value { margin-left:3px; }
+.minuta-export-row-time { margin-left:4px; white-space:nowrap; }
+.minuta-export-row-topic { display:block; margin-top:3px; }
+.minuta-export-page[data-sesion="general"] .minuta-export-row { margin-bottom:22px; }
+.minuta-export-page[data-sesion="lideres"] .minuta-export-row { margin-bottom:25px; }
+
 
 
 /* ====== REGISTRO ====== */
@@ -121,7 +146,7 @@ textarea { resize: vertical; min-height: 52px; }
 .stat-n.pink  { color: #1d4ed8; }
 .stat-l { display:block; font-size:9px; text-transform:uppercase; color:#697586; letter-spacing:.7px; font-weight:600; margin-top:3px; }
 /* Sticky column header wrapper — sits OUTSIDE the overflow-x container so sticky works relative to panel-body */
-.reg-tabla-head-fixed { position: sticky; top: calc(var(--reg-hdr-h, 78px) + var(--reg-nav-h, 46px) + 16px); z-index: 28; overflow: hidden; border: 1px solid #E2E8F0; border-bottom: none; border-radius: 11px 11px 0 0; box-shadow: 0 2px 8px rgba(0,0,0,.08); background:#fff; }
+.reg-tabla-head-fixed { position: sticky; top: calc(var(--reg-hdr-h, 78px) + var(--reg-nav-h, 46px) + 1px); z-index: 28; overflow: hidden; border: none; border-bottom: none; border-radius: 11px 11px 0 0; box-shadow: none; background: var(--navy); }
 .reg-tabla-head-fixed .reg-table { margin: 0; box-shadow: none; border-radius: 0; }
 .reg-tabla-wrap { overflow-x: auto; border-radius: 0 0 12px 12px; box-shadow: 0 1px 4px rgba(0,0,0,.06); border: 1px solid #E2E8F0; border-top: none; }
 .reg-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
@@ -204,6 +229,10 @@ tr.row-reconf     > td:first-child { box-shadow: inset 4px 0 0 #059669; }
 /* ---- Asistencia ---- */
 tr.row-asistencia td:not(.ses-header-td) { background: #fdf4ff !important; }
 tr.row-asistencia > td:first-child { box-shadow: inset 4px 0 0 #9333ea !important; }
+.row-informativa td { background:#F8FAFC; color:#475569; }
+.row-informativa .minuta-value { border-color:#CBD5E1; background:#fff; color:#334155; font-weight:600; }
+.row-informativa .minuta-value::placeholder { color:#94A3B8; font-weight:400; }
+.row-informativa .minuta-empty { color:#CBD5E1; font-size:12px; }
 .attendance-count { display:flex; align-items:center; gap:6px; flex:0 0 auto; padding-left:8px; border-left:1px solid #E2E8F0; }
 .attendance-count label { margin:0; font-size:9px; white-space:nowrap; }
 .attendance-count input { width:76px; min-height:32px; padding:5px 7px; text-align:center; font-weight:700; }
@@ -241,7 +270,7 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
 .reg-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; position:sticky; top:0; z-index:30; background:rgba(255,255,255,.97); margin:-16px -18px 0; padding:13px 18px; border-bottom:1px solid #D7DEE7; box-shadow:0 3px 12px rgba(15,23,42,.06); backdrop-filter:blur(8px); }
 .reg-header h2 { font-size:18px; font-weight:700; color:#172033; letter-spacing:0; }
 .reg-header-btns { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-.reg-view-nav { position:sticky; top:var(--reg-hdr-h,78px); z-index:29; display:flex; gap:6px; margin:14px 0 2px; padding:5px; overflow-x:auto; background:#E9EDF1; border:1px solid #D7DEE7; border-radius:6px; box-shadow:0 3px 8px rgba(15,23,42,.08); scrollbar-width:none; }
+.reg-view-nav { position:sticky; top:var(--reg-hdr-h,78px); z-index:29; display:flex; gap:6px; margin:14px 0 2px; padding:6px; overflow-x:auto; background:#E9EDF1; border:1px solid #D7DEE7; border-radius:6px; box-shadow:0 3px 8px rgba(15,23,42,.08); scrollbar-width:none; }
 .reg-view-nav::-webkit-scrollbar { display:none; }
 .reg-view-btn { flex:0 0 auto; min-height:34px; padding:7px 12px; border:1px solid transparent; border-radius:4px; color:#475569; background:transparent; font:600 11px inherit; cursor:pointer; white-space:nowrap; }
 .reg-view-btn.active { color:#fff; background:#253349; border-color:#253349; }
@@ -519,7 +548,7 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
 body { font-family:'DM Sans','Segoe UI',sans-serif; color:var(--ink); background:var(--canvas); }
 .app { grid-template-columns:650px minmax(0,1fr); background:var(--canvas); }
 .panel { max-width:none; background:var(--paper); border-right:1px solid #cec9c0; box-shadow:8px 0 30px rgba(32,40,51,.06); }
-.app-brand { flex:0 0 auto; display:flex; align-items:center; gap:18px; padding:20px 30px 17px; background:var(--paper); border-bottom:1px solid #ebe7df; }
+.app-brand { flex:0 0 auto; display:flex; align-items:center; gap:18px; padding:5px 30px 5px; background:var(--paper); border-bottom:1px solid #ebe7df; }
 .app-brand-mark { display:grid; place-items:center; width:210px; height:105px; flex:0 0 210px; }
 .app-brand-mark img { display:block; width:100%; height:100%; object-fit:contain; }
 .app-brand-copy { min-width:0; }
@@ -636,10 +665,10 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 
 /* Registro */
 .app.registro-mode { background:#f3f1ec; }
-.app.registro-mode .app-brand { padding:13px 22px; }
+.app.registro-mode .app-brand { padding:3px 22px; }
 .app.registro-mode .panel { box-shadow:none; }
-#tab-registro { padding:20px 28px 40px; background:#f3f1ec; }
-.reg-header { margin:-20px -28px 0; padding:16px 28px; gap:16px; background:rgba(255,254,251,.97); border-bottom:1px solid #d8d4cc; box-shadow:none; }
+#tab-registro { padding: 0 28px 40px; background:#f3f1ec; }
+.reg-header { margin:-20px -28px 0; padding:5px 28px; gap:16px; background:rgba(255,254,251,.97); border-bottom:1px solid #d8d4cc; box-shadow:none; }
 .reg-header h2 { font-family:'Lora',serif; font-size:21px; font-weight:600; color:var(--ink); }
 .reg-stats { justify-content:flex-start; }
 .stat { padding:2px 13px; border-left-color:#d8d4cc; }
@@ -658,7 +687,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 #reg-buscar { max-width:560px; background:var(--paper); border-color:#c8c2b9; border-radius:3px; }
 .reg-tabla-head-fixed { border-color:#cfc9bf; border-radius:3px 3px 0 0; box-shadow:none; }
 .reg-tabla-wrap { border-color:#cfc9bf; border-radius:0 0 3px 3px; background:var(--paper); }
-.reg-table thead th { padding:10px 11px; background:var(--navy); color:#f7f4ee; font-size:9.5px; letter-spacing:.8px; }
+.reg-tabla-head-fixed .reg-table thead th { padding:4px 10px; line-height:1; height:30px; background: transparent; color:#f7f4ee; font-size:9px; letter-spacing:.6px; }
 .reg-table td { padding:9px 11px; border-bottom-color:#e8e3dc; }
 .ses-header-td { padding:27px 0 7px !important; }
 .ses-hdr-inner { padding:11px 14px 12px; background:var(--paper); border:1px solid #cbc5bb; border-left:4px solid var(--wine); border-radius:2px; color:var(--ink); }
@@ -728,6 +757,147 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
   .panel-tab { font-size:9px; padding:0 2px; }
   .panel-tab::before { content:none; }
 }
+
+/* Herramientas compactas del Registro */
+.reg-top-tools { display:none; }
+.app.registro-mode .reg-top-tools {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+  margin-left:auto;
+}
+.reg-top-tools .horarios-cfg,
+.reg-top-tools #fechas-cfg {
+  position:relative;
+  display:block;
+  width:auto;
+  margin:0;
+  overflow:visible;
+  border-color:#d8d4cc;
+  border-radius:3px;
+  background:var(--paper);
+}
+.reg-top-tools .horarios-cfg summary {
+  min-height:34px;
+  padding:7px 10px;
+  color:var(--navy);
+  font:600 10.5px 'DM Sans','Segoe UI',sans-serif;
+  white-space:nowrap;
+}
+.reg-top-tools .horarios-cfg-body {
+  position:absolute;
+  top:calc(100% + 7px);
+  right:0;
+  z-index:110;
+  display:grid;
+  gap:9px;
+  width:310px;
+  padding:12px;
+  border:1px solid #d8d4cc;
+  border-radius:4px;
+  background:var(--paper);
+  box-shadow:0 12px 30px rgba(32,40,51,.16);
+}
+.reg-top-tools .horarios-cfg-body label {
+  justify-content:space-between;
+  margin:0;
+  font-size:9.5px;
+}
+.reg-top-tools .horarios-cfg-body input[type=time],
+.reg-top-tools .horarios-cfg-body input[type=date] {
+  width:145px;
+  min-height:32px;
+  padding:5px 7px;
+}
+.reg-top-tools #reg-buscar {
+  width:clamp(190px,22vw,320px);
+  min-height:34px;
+  height:34px;
+  padding:6px 10px;
+  background:var(--paper);
+  border-color:#c8c2b9;
+  border-radius:3px;
+  font-size:11.5px;
+}
+
+/* Navegación y encabezado de tabla más compactos */
+.reg-view-nav {
+  gap:4px;
+  margin-top:8px;
+  padding:3px 5px;
+  border-radius:5px;
+  box-shadow:0 2px 5px rgba(15,23,42,.06);
+}
+.reg-view-btn {
+  min-height:28px;
+  padding:4px 10px;
+  font-size:10.5px;
+}
+.reg-tabla-head-fixed .reg-table thead th {
+  height:26px;
+  padding:3px 8px;
+  line-height:1;
+  font-size:8.5px;
+  letter-spacing:.55px;
+}
+.reg-tabla-head-fixed .reg-table thead input[type=checkbox] {
+  display:block;
+  width:16px;
+  height:16px;
+  min-height:0;
+  margin:auto;
+  padding:0;
+  box-shadow:none;
+}
+
+.flatpickr-input[readonly] { background:#fff; cursor:pointer; }
+.reg-top-tools #fechas-cfg .horarios-cfg-body {
+  width:230px;
+  gap:6px;
+  padding:8px;
+}
+.reg-top-tools #fechas-cfg .horarios-cfg-body input[type=text] {
+  flex:0 0 145px;
+  width:145px;
+  min-height:28px;
+  height:28px;
+  padding:4px 7px;
+  font-size:11.5px;
+}
+
+@media (max-width:1100px) and (min-width:769px) {
+  .app.registro-mode .app-brand { flex-wrap:wrap; }
+  .app.registro-mode .reg-top-tools {
+    flex:1 1 560px;
+    justify-content:flex-end;
+  }
+}
+@media (max-width:768px) {
+  .app.registro-mode .app-brand { flex-wrap:wrap; }
+  .app.registro-mode .reg-top-tools {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    width:100%;
+    margin-left:0;
+  }
+  .reg-top-tools .horarios-cfg,
+  .reg-top-tools #fechas-cfg { width:100%; }
+  .reg-top-tools .horarios-cfg summary { justify-content:center; }
+  .reg-top-tools #reg-buscar {
+    grid-column:1 / -1;
+    width:100%;
+    max-width:none;
+  }
+  .reg-top-tools .horarios-cfg-body {
+    width:min(320px,calc(100vw - 32px));
+  }
+  .reg-top-tools #horarios-cfg .horarios-cfg-body {
+    left:0;
+    right:auto;
+  }
+  .reg-top-tools #fechas-cfg .horarios-cfg-body { right:0; }
+}
 </style>
 </head>
 <body>
@@ -741,6 +911,25 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
       <div class="app-brand-copy">
         <div class="app-brand-title">Gestión de Conferencia</div>
         <div class="app-brand-subtitle">Asignaciones, cartas y seguimiento</div>
+      </div>
+      <div class="reg-top-tools" aria-label="Herramientas del registro">
+        <details class="horarios-cfg" id="horarios-cfg">
+          <summary>Horarios de sesión</summary>
+          <div class="horarios-cfg-body">
+            <label>Líderes <input type="time" id="cfg-hora-lideres" value="16:00" onchange="saveHorarios()"></label>
+            <label>Adultos <input type="time" id="cfg-hora-adultos" value="18:30" onchange="saveHorarios()"></label>
+            <label>General <input type="time" id="cfg-hora-general" value="10:00" onchange="saveHorarios()"></label>
+          </div>
+        </details>
+        <details class="horarios-cfg" id="fechas-cfg">
+          <summary>Fechas de conferencia</summary>
+          <div class="horarios-cfg-body">
+            <label>Líderes <input type="date" id="cfg-fecha-lideres" onchange="saveFechas()"></label>
+            <label>Adultos <input type="date" id="cfg-fecha-adultos" onchange="saveFechas()"></label>
+            <label>General <input type="date" id="cfg-fecha-general" onchange="saveFechas()"></label>
+          </div>
+        </details>
+        <input type="search" id="reg-buscar" placeholder="Buscar asignación o nombre" aria-label="Buscar por asignación o nombre" oninput="renderRegistro()">
       </div>
     </div>
     <div class="panel-tabs">
@@ -831,6 +1020,12 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
           </optgroup>
         </select>
       </div>
+      <div class="form-group hidden" id="grupo-matrimonio-carta">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="carta-matrimonio" style="width:auto;accent-color:#0F766E;transform:scale(1.2);">
+          Invitación para matrimonio <span style="font-weight:400;color:#64748b">(el tiempo indicado es por persona)</span>
+        </label>
+      </div>
 
       <div class="bloque-msg hidden" id="bloque-discurso-barrio">
         <div class="row2 row-wide">
@@ -904,7 +1099,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
           <input type="text" id="himno-inicial" placeholder="Ej: N° 161 – Llamados a Servir">
         </div>
         <div class="form-group">
-          <label>Himno intermedio — sesión principal <span style="font-weight:400;color:#bbb">(opcional)</span></label>
+          <label>Himno intermedio (Congregación de pie) — sesión principal <span style="font-weight:400;color:#bbb">(opcional)</span></label>
           <input type="text" id="himno-intermedio" placeholder="Ej: N° 85 – Cuán grande es Él">
         </div>
         <div class="form-group">
@@ -934,7 +1129,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
             <input type="text" id="himno-inicial2" placeholder="Ej: N° 161 – Llamados a Servir">
           </div>
           <div class="form-group">
-            <label>Himno intermedio — segunda sesión <span style="font-weight:400;color:#bbb">(opcional)</span></label>
+            <label>Himno intermedio (Congregación de pie) — segunda sesión <span style="font-weight:400;color:#bbb">(opcional)</span></label>
             <input type="text" id="himno-intermedio2" placeholder="Ej: N° 85 – Cuán grande es Él">
           </div>
           <div class="form-group">
@@ -1091,8 +1286,9 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
         <div class="reg-header-btns">
           <button class="btn-reg-exp btn-reg-add" onclick="abrirAddModal()">+ Nueva asignación</button>
           <button id="btn-del-sel" class="btn-reg-exp" style="display:none;background:#dc2626;color:#fff" onclick="eliminarSeleccionados()">Eliminar (0)</button>
-          <button class="btn-reg-exp pdf" onclick="abrirExportModal('pdf')">Exportar PDF</button>
-          <button class="btn-reg-exp img" onclick="abrirExportModal('img')">Exportar PNG</button>
+          <button class="btn-reg-exp pdf" onclick="abrirExportModal('pdf')">Minuta PDF</button>
+          <button class="btn-reg-exp img" onclick="abrirExportModal('img')">Minuta PNG</button>
+          <button class="btn-reg-exp" onclick="abrirExportModal('print')">Imprimir minutas</button>
           <button class="btn-clr" onclick="limpiarRegistro()">Limpiar registro</button>
         </div>
       </div>
@@ -1104,24 +1300,6 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
         <button class="reg-view-btn" data-view="operaciones" onclick="setRegVista('operaciones')">Operaciones <span class="reg-view-count" id="reg-count-operaciones">0</span></button>
         <button class="reg-view-btn otros" data-view="otros" onclick="setRegVista('otros')">Otros eventos <span class="reg-view-count" id="reg-count-otros">0</span></button>
       </nav>
-      <!-- Horarios por sesión -->
-      <details class="horarios-cfg" id="horarios-cfg">
-        <summary>Horarios de sesión</summary>
-        <div class="horarios-cfg-body">
-          <label>Líderes <input type="time" id="cfg-hora-lideres" value="16:00" onchange="saveHorarios()"></label>
-          <label>Adultos <input type="time" id="cfg-hora-adultos" value="18:30" onchange="saveHorarios()"></label>
-          <label>General <input type="time" id="cfg-hora-general" value="10:00" onchange="saveHorarios()"></label>
-        </div>
-      </details>
-      <!-- Fechas de la conferencia -->
-      <details class="horarios-cfg" id="fechas-cfg">
-        <summary>Fechas de la conferencia</summary>
-        <div class="horarios-cfg-body">
-          <label>Líderes <input type="date" id="cfg-fecha-lideres" onchange="saveFechas()"></label>
-          <label>Adultos <input type="date" id="cfg-fecha-adultos" onchange="saveFechas()"></label>
-          <label>General <input type="date" id="cfg-fecha-general" onchange="saveFechas()"></label>
-        </div>
-      </details>
       <section class="otros-documento hidden" id="cartas-barrios-form" aria-labelledby="cartas-barrios-title">
         <div class="otros-documento-head" style="margin-bottom:0">
           <div>
@@ -1146,9 +1324,6 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
           <button type="button" class="btn-reg-exp" onclick="reiniciarRelSost()">Limpiar formulario</button>
         </div>
       </section>
-      <div class="form-group" style="margin-bottom:10px">
-        <input type="search" id="reg-buscar" placeholder="Buscar por asignación o nombre" aria-label="Buscar por asignación o nombre" oninput="renderRegistro()">
-      </div>
       <div id="reg-tabla"></div>
     </div><!-- /tab-registro -->
 
@@ -1259,7 +1434,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
         <div class="form-group hidden" id="edit-grupo-tema">
           <label>Tema asignado</label>
           <input type="text" id="edit-tema" placeholder="Ej: La fe como principio de acción">
-          <label style="margin-top:8px;display:block">Duración del mensaje (min) <span style="font-weight:400;color:#bbb">(opcional)</span></label>
+          <label id="edit-duracion-label" style="margin-top:8px;display:block">Duración del mensaje (min) <span style="font-weight:400;color:#bbb">(opcional)</span></label>
           <input type="number" id="edit-duracion" min="0" max="90" placeholder="0" style="max-width:80px;padding:7px 9px;border:1px solid #ddd;border-radius:6px;font-size:12px;font-family:inherit;">
           <div class="guide-field hidden" id="edit-grupo-guia">
             <label class="guide-toggle">
@@ -1291,7 +1466,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
             <input type="text" id="edit-himno-inicial" placeholder="Ej: N° 161 – Llamados a Servir">
           </div>
           <div class="form-group">
-            <label>Himno intermedio <span style="font-weight:400;color:#bbb">(opcional)</span></label>
+            <label>Himno intermedio (Congregación de pie) <span style="font-weight:400;color:#bbb">(opcional)</span></label>
             <input type="text" id="edit-himno-intermedio" placeholder="Ej: N° 85 – Cuán grande es Él">
           </div>
           <div class="form-group">
@@ -1314,8 +1489,8 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
     <!-- Export session selection modal -->
     <div class="reg-modal-overlay hidden" id="reg-export-modal">
       <div class="reg-modal">
-        <h3>📸 Exportar Registro</h3>
-        <p style="font-size:12px;color:#666;margin-bottom:14px;">Seleccioná las sesiones a incluir en la captura:</p>
+        <h3>Exportar o imprimir minutas</h3>
+        <p style="font-size:12px;color:#666;margin-bottom:14px;">Seleccioná una, varias o las tres sesiones:</p>
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
           <label style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;color:#1E293B;cursor:pointer;padding:9px 12px;border-radius:8px;border:1.5px solid #E2E8F0;background:#F8FAFC;transition:border-color .15s;">
             <input type="checkbox" id="exp-sel-lideres" checked style="width:auto;accent-color:#0F766E;transform:scale(1.2);">
@@ -1448,8 +1623,8 @@ const SESION_LABEL = { adultos:'la Sesión de Adultos', lideres:'la Sesión de L
 
 (function init(){
   const hoy = new Date().toISOString().split('T')[0];
-  document.getElementById('fechaCarta').value = hoy;
-  document.getElementById('esp-fechaCarta').value = hoy;
+  setDateInputValue('fechaCarta', hoy);
+  setDateInputValue('esp-fechaCarta', hoy);
 })();
 
 /* Tabs */
@@ -1468,6 +1643,7 @@ function actualizarCampos(){
   const esDiscursoBarrio = asig==='discurso_barrio';
   const esMensaje=['mensaje','capacitacion'].includes(asig);
   const esMsg    = ['mensaje','testimonio','capacitacion'].includes(asig);
+  const admiteMatrimonio = ['mensaje','testimonio'].includes(asig);
   const esMusica =['director','pianista'].includes(asig);
   document.getElementById('bloque-msg').classList.toggle('hidden',!esMsg);
   document.getElementById('grupo-tema').classList.toggle('hidden',!esMensaje);
@@ -1476,6 +1652,8 @@ function actualizarCampos(){
   document.getElementById('bloque-discurso-barrio').classList.toggle('hidden',!esDiscursoBarrio);
   document.getElementById('grupo-himnos').classList.toggle('hidden',!esMusica);
   document.getElementById('bloque-segunda').classList.toggle('hidden',!esMusica);
+  document.getElementById('grupo-matrimonio-carta').classList.toggle('hidden',!admiteMatrimonio);
+  if(!admiteMatrimonio) document.getElementById('carta-matrimonio').checked=false;
   if(esMsg){
     const msgLabels={mensaje:'Mensaje N°',testimonio:'Testimonio N°',capacitacion:'Intervención N°'};
     const lbl=document.getElementById('lbl-msg-num'); if(lbl) lbl.innerHTML=msgLabels[asig]||'N°';
@@ -1573,7 +1751,7 @@ function _aplicarFechasARegistro(f){
     if(typeof renderRegistro === 'function') renderRegistro();
     if(document.getElementById('edit-fecha') && _editId){
       const x = reg.find(e=>e.id===_editId);
-      if(x) document.getElementById('edit-fecha').value = x.fechaEvento || '';
+      if(x) setDateInputValue('edit-fecha', x.fechaEvento || '');
     }
   }
 }
@@ -1582,9 +1760,9 @@ function loadFechasUI(){
   const fl = document.getElementById('cfg-fecha-lideres');
   const fa = document.getElementById('cfg-fecha-adultos');
   const fg = document.getElementById('cfg-fecha-general');
-  if(fl) fl.value = f.lideres||'';
-  if(fa) fa.value = f.adultos||'';
-  if(fg) fg.value = f.general||'';
+  if(fl) setDateInputValue('cfg-fecha-lideres', f.lideres||'');
+  if(fa) setDateInputValue('cfg-fecha-adultos', f.adultos||'');
+  if(fg) setDateInputValue('cfg-fecha-general', f.general||'');
 }
 // Mapa para selects de especiales (usan label completo)
 const _ESP_SES_KEY = { 'Sesión de Líderes':'lideres', 'Sesión de Adultos':'adultos', 'Sesión General':'general' };
@@ -1596,12 +1774,47 @@ function autoHoraEspSes(selId, horaId, fechaId){
   if(h && key && H[key]) h.value = H[key];
   if(fechaId){
     const fe = document.getElementById(fechaId);
-    if(fe && key && F[key]) fe.value = F[key];
+    if(fe && key && F[key]) setDateInputValue(fechaId, F[key]);
   }
 }
 
 /* Formatters */
 function fmtFecha(d){ if(!d) return '[fecha]'; const [y,m,dd]=d.split('-'); return `${parseInt(dd)} de ${MESES[parseInt(m)-1]} de ${y}`; }
+
+function setDateInputValue(id, value){
+  const input = document.getElementById(id);
+  if(!input) return;
+  if(input._flatpickr) input._flatpickr.setDate(value || '', false, 'Y-m-d');
+  else input.value = value || '';
+}
+
+function initDatePickers(root=document){
+  if(typeof flatpickr !== 'function') return;
+  const locale = {...flatpickr.l10ns.es, firstDayOfWeek:0};
+  root.querySelectorAll('input[type="date"]:not(.flatpickr-input)').forEach(input=>{
+    const ocultoEnTabla = input.classList.contains('fecha-input-hidden');
+    flatpickr(input, {
+      locale,
+      dateFormat:'Y-m-d',
+      altInput:!ocultoEnTabla,
+      altFormat:'d/m/Y',
+      allowInput:!ocultoEnTabla,
+      disableMobile:true
+    });
+  });
+}
+
+function initRegTopTools(){
+  const panels = [...document.querySelectorAll('.reg-top-tools details')];
+  panels.forEach(panel=>{
+    panel.addEventListener('toggle', ()=>{
+      if(!panel.open) return;
+      panels.forEach(other=>{
+        if(other !== panel) other.open = false;
+      });
+    });
+  });
+}
 function fmtCarta(d,c){ if(!d) return '[fecha]'; const [y,m,dd]=d.split('-'); return `${c||'Buenos Aires'}, ${parseInt(dd)} de ${MESES[parseInt(m)-1]} de ${y}`; }
 function fmtCorta(d){ if(!d) return ''; const [y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; }
 function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -1629,7 +1842,7 @@ function ajustarCartaContenido(guiaSeleccionada=null, tipoCarta=null){
 }
 
 /* Construir bloque de asignacion */
-function buildAsig(asig, genero, himnos, sesLbl, msgNum, msgDur){
+function buildAsig(asig, genero, himnos, sesLbl, msgNum, msgDur, esMatrimonio){
   const suf=genero==='a'?'a':'o';
 
   if(asig==='mensaje'){
@@ -1637,14 +1850,15 @@ function buildAsig(asig, genero, himnos, sesLbl, msgNum, msgDur){
     const dur= parseInt(msgDur)  || 10;
     const ord= ORDINAL[n-1] || `${n}°`;
     return `<p>En esta oportunidad queremos extenderles la invitación para compartir el <strong>${ord} mensaje</strong>.</p>
-<div class="carta-asig-box"><p>Tiempo asignado: <strong>${dur} minutos</strong></p></div>
-<p>Le invitamos a <strong>estar sentad${suf}</strong> en el estrado con nosotros <strong>15 minutos </strong>antes del comienzo.</p>`;
+<div class="carta-asig-box"><p>Tiempo asignado${esMatrimonio ? ' a cada uno' : ''}: <strong>${dur} minutos</strong></p></div>
+<p>${esMatrimonio ? 'Les invitamos' : 'Le invitamos'} a <strong>${esMatrimonio ? 'estar sentados' : `estar sentad${suf}`}</strong> en el estrado con nosotros <strong>15 minutos </strong>antes del comienzo.</p>`;
   }
 
   if(asig==='testimonio'){
     const n  = parseInt(msgNum)  || 1;
+    const dur = 3;
     const ord= ORDINAL[n-1] || `${n}°`;
-    return `<p>En esta oportunidad queremos extenderles la invitación para compartir el <strong>${ord} testimonio de 3 minutos</strong>.</p>
+    return `<p>En esta oportunidad queremos extenderles la invitación para compartir el <strong>${ord} testimonio de ${dur} minutos${esMatrimonio ? ' cada uno' : ''}</strong>.</p>
 <div class="carta-asig-box"><p style="font-size:11.5px;margin-bottom:6px">Recuerde que el testimonio se debe centrar en:</p><ol class="carta-testimonio-list">
   <li>Dios es Nuestro Padre Celestial y nos ama</li>
   <li>Jesucristo, su hijo, es nuestro salvador y redentor</li>
@@ -1652,7 +1866,7 @@ function buildAsig(asig, genero, himnos, sesLbl, msgNum, msgDur){
   <li>La Iglesia de Jesucristo de los Santos de los Últimos Días es la iglesia del Señor en la tierra en la actualidad</li>
   <li>La iglesia es guiada por un profeta viviente</li>
 </ol></div>
-<p>Le invitamos a <strong>estar sentad${suf}</strong> en el estrado con nosotros <strong>15 minutos </strong>antes del comienzo.</p>`;
+<p>${esMatrimonio ? 'Les invitamos' : 'Le invitamos'} a <strong>${esMatrimonio ? 'estar sentados' : `estar sentad${suf}`}</strong> en el estrado con nosotros <strong>15 minutos </strong>antes del comienzo.</p>`;
   }
 
   const D={
@@ -1669,7 +1883,7 @@ function buildAsig(asig, genero, himnos, sesLbl, msgNum, msgDur){
     const lbl = asig==='pianista' ? 'Los himnos seleccionados son los siguientes' : 'Los himnos seleccionados son los siguientes';
     const items = [
       himnos.inicial    ? `<li><strong>Himno inicial:</strong> ${himnos.inicial}</li>` : '',
-      himnos.intermedio ? `<li><strong>Himno intermedio:</strong> ${himnos.intermedio}</li>` : '',
+      himnos.intermedio ? `<li><strong>Himno intermedio (Congregación de pie):</strong> ${himnos.intermedio}</li>` : '',
       himnos.final      ? `<li><strong>Himno final:</strong> ${himnos.final}</li>` : '',
     ].join('');
     extra = `<div class="carta-asig-box"><p>${lbl}:</p><ul class="carta-himnos-list">${items}</ul></div>`;
@@ -1720,8 +1934,10 @@ function generarCarta(){
   }
   const msgNum   = document.getElementById('msg-num').value;
   const msgDur   = document.getElementById('msg-dur').value;
+  const esMatrimonio = ['mensaje','testimonio'].includes(asig)
+    && document.getElementById('carta-matrimonio').checked;
   // Auto-actualizar fecha de carta a hoy
-  document.getElementById('fechaCarta').value = new Date().toISOString().split('T')[0];
+  setDateInputValue('fechaCarta', new Date().toISOString().split('T')[0]);
   const fechaCarta = document.getElementById('fechaCarta').value;
   const ciudad   = document.getElementById('ciudad').value || 'Buenos Aires';
   const firmante = document.getElementById('firmante').value || 'Presidencia de Estaca';
@@ -1733,7 +1949,7 @@ function generarCarta(){
   const sesLbl = SESION_LABEL[sesion];
 
   // Construir bloque asignacion
-  let asigHTML = buildAsig(asig, genero, himnos, sesLbl, msgNum, msgDur);
+  let asigHTML = buildAsig(asig, genero, himnos, sesLbl, msgNum, msgDur, esMatrimonio);
 
   // Inyectar tema si corresponde
   if(asig === 'mensaje'){
@@ -1743,7 +1959,7 @@ function generarCarta(){
     const guiaLine = guia
       ? `<div class="carta-asig-box"><p><strong>Guía a considerar / material de consulta:</strong></p><p>${esc(guia).replace(/\n/g,'<br>')}</p></div>`
       : '';
-    asigHTML = asigHTML.replace(/(<p>Le invitamos)/, temaLine + guiaLine + '$1');
+    asigHTML = asigHTML.replace(/(<p>Le(?:s)? invitamos)/, temaLine + guiaLine + '$1');
   } else if(asig === 'capacitacion' && tema){
     asigHTML = asigHTML.replace(/(<p>Le invitamos)/,
       `<div class="carta-asig-box"><p>Tema asignado: <strong>${esc(tema)}</strong></p></div>$1`);
@@ -1762,7 +1978,7 @@ function generarCarta(){
     const lbl2= asig==='pianista' ? 'Los himnos a ejecutar son los siguientes' : 'Los himnos seleccionados son los siguientes';
     const items2 = [
       h2.inicial    ? `<li><strong>Himno inicial:</strong> ${h2.inicial}</li>` : '',
-      h2.intermedio ? `<li><strong>Himno intermedio:</strong> ${h2.intermedio}</li>` : '',
+      h2.intermedio ? `<li><strong>Himno intermedio (Congregación de pie):</strong> ${h2.intermedio}</li>` : '',
       h2.final      ? `<li><strong>Himno final:</strong> ${h2.final}</li>` : '',
     ].join('');
     const e2 = (h2.inicial || h2.intermedio || h2.final) ? `<div class="carta-asig-box"><p>${lbl2}:</p><ul class="carta-himnos-list">${items2}</ul></div>` : '';
@@ -1798,7 +2014,7 @@ function generarCarta(){
     _cartaHTML = `
       <div class="carta-titulo">${tituloHTML}</div>
       <div class="carta-fecha">${fmtCarta(fechaCarta,ciudad)}</div>
-      <div class="carta-saludo">Estimad${suf} ${trat} ${esc(nombre)},</div>
+      <div class="carta-saludo">${esMatrimonio ? 'Estimados hermanos' : `Estimad${suf} ${trat}`} ${esc(nombre)},</div>
       <div class="carta-texto">
         <p>El <strong>${fmtFecha(fechaEv)}${hora ? ' a las ' + hora + ' Hs' : ''}</strong> se llevará a cabo ${sesLbl} de nuestra Conferencia de Estaca en el centro de estaca (${esc(lugar)}).</p>
         ${asigHTML}${seg}
@@ -1806,7 +2022,7 @@ function generarCarta(){
         <p>Favor de confirmar su presencia. De no poder asistir por algún motivo, avísenos con anticipación.</p>
         <p>¡Muchas gracias!</p>
       </div>
-      <div class="carta-cierre"><p>Esperamos que el Señor ${genero==='a'?'la':'lo'} bendiga,</p></div>
+      <div class="carta-cierre"><p>Esperamos que el Señor ${esMatrimonio ? 'los' : genero==='a'?'la':'lo'} bendiga,</p></div>
       <div class="carta-firma"><p>Con amor</p><br><p><strong>${esc(firmante)}</strong></p></div>`;
   }
   document.getElementById('carta-contenido').innerHTML = _cartaHTML;
@@ -1830,7 +2046,11 @@ function generarCarta(){
 
   addToRegistro({ nombre, asig, asigLabel, sesion:asig==='discurso_barrio'?'otros':sesion, fechaEvento:asig==='discurso_barrio'?discursoFecha:fechaEv,
     genero, tema, guia,
-    duracion: asig==='mensaje' ? (parseInt(msgDur)||0) : asig==='discurso_barrio' ? discursoDuracion : undefined,
+    esMatrimonio,
+    duracionIndividual: ['mensaje','testimonio'].includes(asig) ? (asig==='testimonio' ? 3 : (parseInt(msgDur)||0)) : undefined,
+    duracion: ['mensaje','testimonio'].includes(asig)
+      ? (asig==='testimonio' ? 3 : (parseInt(msgDur)||0)) * (esMatrimonio ? 2 : 1)
+      : asig==='discurso_barrio' ? discursoDuracion : undefined,
     barrio: discursoBarrio,
     discursoTema,
     himnoInicial:    himnos.inicial,
@@ -1878,7 +2098,7 @@ function generarEspecial(){
   const ciudad   = document.getElementById('esp-ciudad').value || 'Buenos Aires';
   const firmante = document.getElementById('esp-firmante').value || 'Presidencia de Estaca';
 
-  document.getElementById('esp-fechaCarta').value = new Date().toISOString().split('T')[0];
+  setDateInputValue('esp-fechaCarta', new Date().toISOString().split('T')[0]);
   const fechaCarta = document.getElementById('esp-fechaCarta').value;
 
   const tieneSegunda = document.getElementById('esp-segunda-check').checked;
@@ -1889,6 +2109,11 @@ function generarEspecial(){
     hr2  = document.getElementById('esp-hora2').value || '09:00';
     dur2 = document.getElementById('esp-duracion2').value || '6';
   }
+  const _durNum  = parseInt(dur)  || 0;
+  const _dur2Num = parseInt(dur2) || 0;
+  const _totalMatrimonio = minutos => Math.ceil((minutos * 2) / 5) * 5;
+  const _durTotal = conEsposa ? _totalMatrimonio(_durNum) : _durNum;
+  const _dur2Total = conEsposa ? _totalMatrimonio(_dur2Num) : _dur2Num;
 
   const _ext = conEsposa ? 'extenderles' : 'extenderle';
   let cuerpo;
@@ -1896,11 +2121,13 @@ function generarEspecial(){
     cuerpo = `<p>El <strong>${fmtDiaCap(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
 <p>El <strong>${fmtDiaCap(fev2)} ${fmtFecha(fev2)} a las ${hr2} Hs</strong> se llevará a cabo la <strong>${esc(ses2)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
 <p>En esta oportunidad queremos ${_ext} la invitación para participar compartiendo un mensaje en cada una de las sesiones mencionadas.</p>
-<div class="carta-asig-box"><p>Tiempo asignado en ${esc(sesion)}: <strong>${dur} minutos</strong></p><p>Tiempo asignado en ${esc(ses2)}: <strong>${dur2} minutos</strong></p></div>`;
+<div class="carta-asig-box"><p>Tiempo asignado${conEsposa ? ' a cada uno' : ''} en ${esc(sesion)}: <strong>${dur} minutos</strong></p><p>Tiempo asignado${conEsposa ? ' a cada uno' : ''} en ${esc(ses2)}: <strong>${dur2} minutos</strong></p></div>
+${conEsposa ? `<p>En caso de que su esposa no pueda participar, dispondrá de <strong>${_durTotal} minutos</strong> en la ${esc(sesion).toLowerCase()} y de <strong>${_dur2Total} minutos</strong> en la ${esc(ses2).toLowerCase()} para compartir el mensaje.</p>` : ''}`;
   } else {
-    cuerpo = `<p>El <strong>${fmtDiaCap(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
-<p>En esta oportunidad queremos ${_ext} la invitación para participar compartiendo un mensaje en la ${esc(sesion).toLowerCase()}.</p>
-<div class="carta-asig-box"><p>Tiempo asignado: <strong>${dur} minutos</strong></p></div>`;
+    cuerpo = `    <p>El <strong>${fmtDiaCap(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
+    <p>En esta oportunidad queremos ${_ext} la invitación para participar compartiendo un mensaje en la ${esc(sesion).toLowerCase()}.</p>
+    <div class="carta-asig-box"><p>Tiempo asignado${conEsposa ? ' a cada uno' : ''}: <strong>${dur} minutos</strong></p></div>
+    ${conEsposa ? `<p>En caso de que su esposa no pueda participar, dispondrá de <strong>${_durTotal} minutos</strong> para compartir el mensaje.</p>` : ''}`;
   }
   cuerpo += `<p><strong>El tema será a su elección</strong>. Los invitamos a que se pueda preparar el mensaje utilizando las escrituras, las palabras de los profetas modernos y ejemplos de la vida del salvador.</p>
 <p>Les invitamos a <strong>estar sentada/o</strong> en el estrado con nosotros <strong>15 minutos antes</strong> del comienzo.</p>
@@ -1940,16 +2167,18 @@ function generarEspecial(){
   const nombreRegistro = conEsposa
     ? `Pte. y Hna.${nombre ? ' ' + nombre : ''}`
     : `${cargoInvitado}${nombre ? ' ' + nombre : ''}`;
-  const _durNum  = parseInt(dur)  || 0;
-  const _dur2Num = parseInt(dur2) || 0;
   addToRegistro({
     nombre: nombreRegistro, asig: 'mensaje', asigLabel: tipoLabel,
-    sesion: _sesMap[sesion] || 'general', fechaEvento: fechaEv, genero: 'o', duracion: _durNum, cartaHTML: _cartaHTML
+    sesion: _sesMap[sesion] || 'general', fechaEvento: fechaEv, genero: 'o',
+    esMatrimonio: conEsposa, duracionIndividual: _durNum, duracion: _durTotal,
+    esCartaEspecial: true, cartaHTML: _cartaHTML
   });
   if(tieneSegunda && fev2){
     addToRegistro({
       nombre: nombreRegistro, asig: 'mensaje', asigLabel: tipoLabel,
-      sesion: _sesMap[ses2] || 'general', fechaEvento: fev2, genero: 'o', duracion: _dur2Num, cartaHTML: _cartaHTML
+      sesion: _sesMap[ses2] || 'general', fechaEvento: fev2, genero: 'o',
+      esMatrimonio: conEsposa, duracionIndividual: _dur2Num, duracion: _dur2Total,
+      esCartaEspecial: true, cartaHTML: _cartaHTML
     });
   }
 }
@@ -2031,13 +2260,43 @@ async function descargar(tipo, btnPdfId='btn-pdf', btnImgId='btn-img', statusId=
 
 
 /* ====== REGISTRO ====== */
+const INFORMATIVAS_ASIG = ['preside','dirige','reconocimientos','agradecimientos','asuntos_estaca','himno_inicial','himno_intermedio','himno_final'];
+const HIMNO_CAMPO = {
+  himno_inicial:'himnoInicial',
+  himno_intermedio:'himnoIntermedio',
+  himno_final:'himnoFinal'
+};
+const MINUTA_TEMPLATE = [
+  ['adultos','preside','Preside'], ['adultos','dirige','Dirige'],
+  ['adultos','director','Director/a de Música'], ['adultos','pianista','Pianista'],
+  ['adultos','reconocimientos','Reconocimientos'], ['adultos','agradecimientos','Agradecimientos'],
+  ['adultos','himno_inicial','Himno inicial'], ['adultos','oracion_inicial','Oración Inicial'],
+  ...Array(4).fill(['adultos','mensaje','Mensaje']),
+  ['adultos','himno_intermedio','Himno intermedio (Congregación de pie)'],
+  ...Array(3).fill(['adultos','mensaje','Mensaje']),
+  ['adultos','himno_final','Himno final'], ['adultos','oracion_final','Oración Final'],
+
+  ['lideres','preside','Preside'], ['lideres','dirige','Dirige'],
+  ['lideres','director','Director/a de Música'], ['lideres','pianista','Pianista'],
+  ['lideres','reconocimientos','Reconocimientos'], ['lideres','agradecimientos','Agradecimientos'],
+  ['lideres','himno_inicial','Himno inicial'], ['lideres','oracion_inicial','Oración Inicial'],
+  ['lideres','capacitacion','Capacitación'], ['lideres','mensaje','Mensaje final'],
+  ['lideres','himno_final','Himno final'], ['lideres','oracion_final','Oración Final'],
+
+  ['general','preside','Preside'], ['general','dirige','Dirige'],
+  ['general','director','Director/a de Música'], ['general','pianista','Pianista'],
+  ['general','reconocimientos','Reconocimientos'], ['general','agradecimientos','Agradecimientos'],
+  ['general','himno_inicial','Himno inicial'], ['general','oracion_inicial','Oración Inicial'],
+  ['general','asuntos_estaca','Asuntos de Estaca'],
+  ...Array(3).fill(['general','mensaje','Mensaje']),
+  ...Array(2).fill(['general','testimonio','Testimonio']),
+  ['general','himno_intermedio','Himno intermedio (Congregación de pie)'],
+  ['general','testimonio','Testimonio'], ['general','mensaje','Mensaje'],
+  ['general','testimonio','Testimonio'], ['general','mensaje','Mensaje final'],
+  ['general','himno_final','Himno final'], ['general','oracion_final','Oración Final']
+];
 const REGISTRO_TEMPLATE = [
-  ['adultos','director','Director/a de Música'], ['adultos','pianista','Pianista'], ['adultos','oracion_inicial','Oración Inicial'],
-  ...Array(6).fill(['adultos','mensaje','Mensaje']), ['adultos','oracion_final','Oración Final'],
-  ['lideres','director','Director/a de Música'], ['lideres','pianista','Pianista'], ['lideres','oracion_inicial','Oración Inicial'],
-  ...Array(2).fill(['lideres','mensaje','Mensaje']), ['lideres','capacitacion','Capacitación'], ['lideres','oracion_final','Oración Final'],
-  ['general','director','Director/a de Música'], ['general','pianista','Pianista'], ['general','oracion_inicial','Oración Inicial'],
-  ...Array(4).fill(['general','testimonio','Testimonio']), ...Array(4).fill(['general','mensaje','Mensaje']), ['general','oracion_final','Oración Final'],
+  ...MINUTA_TEMPLATE,
   ...['lideres','adultos','general'].flatMap(sesion=>[
     [sesion,'asistencia','Asistencia'],
     [sesion,'seguridad','Seguridad'],
@@ -2050,17 +2309,88 @@ const OPERACIONES_ASIG = ['asistencia','seguridad','estacionamiento','bienvenida
 
 function buildDefaultRegistro(){
   return REGISTRO_TEMPLATE.map((t,i) => ({
-    id: 'slot_'+i, sesion: t[0], asig: t[1], asigLabel: t[2], nombre: '', fechaEvento: '',
+    id: INFORMATIVAS_ASIG.includes(t[1]) ? `minuta_${t[0]}_${t[1]}` : 'slot_'+i,
+    sesion: t[0], asig: t[1], asigLabel: t[2], nombre: '', fechaEvento: '', minutaVersion: 3,
+    ...(t[1]==='asuntos_estaca' ? {habilitado:false} : {}),
     cartaAviso: null, cartaEnviada: null, confirmado: null, reconfirmado: null
   }));
 }
 
 function migrateRegistro(reg){
   let changed = false;
+  if(!reg.some(r=>r.minutaVersion===3)){
+    const anterior = reg;
+    const plantilla = buildDefaultRegistro().filter(r=>!OPERACIONES_ASIG.includes(r.asig));
+    const consumidos = new Set();
+    const migrado = [];
+    const normalizarLabel = valor => (valor||'').replace(/\s+/g,' ').trim().toLocaleLowerCase('es');
+    const labelsInformativos = new Set(MINUTA_TEMPLATE
+      .filter(t=>INFORMATIVAS_ASIG.includes(t[1]))
+      .map(t=>normalizarLabel(t[2])));
+    const esInformativaAnterior = r =>
+      INFORMATIVAS_ASIG.includes(r.asig) || labelsInformativos.has(normalizarLabel(r.asigLabel));
+    const tieneDatos = r => !!(
+      (r.nombre||'').trim() || (r.tema||'').trim() || r.cartaHTML || r.fechaGenerada ||
+      r.duracion || r.confirmado !== null && r.confirmado !== undefined ||
+      r.cartaAviso !== null && r.cartaAviso !== undefined ||
+      r.asig==='extra' && (r.asigLabel||'').trim()
+    );
+    for(const base of plantilla){
+      if(INFORMATIVAS_ASIG.includes(base.asig)){
+        const existenteInfo = anterior.find(r=>
+          !consumidos.has(r.id) && r.sesion===base.sesion &&
+          (r.asig===base.asig || normalizarLabel(r.asigLabel)===normalizarLabel(base.asigLabel))
+        );
+        if(existenteInfo){
+          consumidos.add(existenteInfo.id);
+          base.nombre = existenteInfo.nombre || '';
+        }
+        if(HIMNO_CAMPO[base.asig] && !base.nombre){
+          const campo = HIMNO_CAMPO[base.asig];
+          const musico = anterior.find(r=>
+            r.sesion===base.sesion && ['director','pianista'].includes(r.asig) && r[campo]
+          ) || anterior.find(r=>r.sesion===base.sesion && ['director','pianista'].includes(r.asig));
+          base.nombre = musico && musico[HIMNO_CAMPO[base.asig]] || '';
+        }
+        migrado.push(base);
+        continue;
+      }
+      const existente = anterior.find(r=>
+        !consumidos.has(r.id) && r.sesion===base.sesion && r.asig===base.asig &&
+        !OPERACIONES_ASIG.includes(r.asig)
+      );
+      if(existente){
+        consumidos.add(existente.id);
+        migrado.push({...existente, minutaVersion:3});
+      } else {
+        migrado.push(base);
+      }
+    }
+    const sobrantes = anterior.filter(r=>
+      !consumidos.has(r.id) && !esInformativaAnterior(r) &&
+      (OPERACIONES_ASIG.includes(r.asig) || tieneDatos(r))
+    ).map(r=>({...r,minutaVersion:3}));
+    for(const sobrante of sobrantes.filter(r=>!OPERACIONES_ASIG.includes(r.asig))){
+      const antesDelHimnoFinal = migrado.findIndex(r=>r.sesion===sobrante.sesion && r.asig==='himno_final');
+      if(antesDelHimnoFinal>=0) migrado.splice(antesDelHimnoFinal,0,sobrante);
+      else migrado.push(sobrante);
+    }
+    migrado.push(...sobrantes.filter(r=>OPERACIONES_ASIG.includes(r.asig)));
+    reg = migrado;
+    for(const himno of reg.filter(r=>HIMNO_CAMPO[r.asig])){
+      for(const musico of reg.filter(r=>r.sesion===himno.sesion && ['director','pianista'].includes(r.asig))){
+        musico[HIMNO_CAMPO[himno.asig]] = himno.nombre || '';
+      }
+    }
+    changed = true;
+  }
   // Normalizar etiqueta Director/a → Director/a de Música
   for(const r of reg){
     if(r.asig==='director' && r.asigLabel==='Director/a'){
       r.asigLabel = 'Director/a de Música'; changed = true;
+    }
+    if(r.asig==='himno_intermedio' && r.asigLabel!=='Himno intermedio (Congregación de pie)'){
+      r.asigLabel = 'Himno intermedio (Congregación de pie)'; changed = true;
     }
   }
   // Corregir asigLabel para entradas de Mensaje Especial (datos guardados sin la etiqueta correcta)
@@ -2114,14 +2444,25 @@ function saveRegistro(d){
   _saveFs('registro', { items: d });
 }
 
-function addToRegistro({nombre,asig,asigLabel,sesion,fechaEvento,genero,tema,guia,duracion,barrio,discursoTema,himnoInicial,himnoIntermedio,himnoFinal,acompanante,acompananteGenero,cartaHTML}){
+function sincronizarHimnosDesdeMusico(reg, musico){
+  if(!['director','pianista'].includes(musico.asig)) return;
+  for(const [asig,campo] of Object.entries(HIMNO_CAMPO)){
+    const fila = reg.find(r=>r.sesion===musico.sesion && r.asig===asig);
+    if(fila) fila.nombre = musico[campo] || '';
+    for(const otra of reg.filter(r=>r.sesion===musico.sesion && ['director','pianista'].includes(r.asig))){
+      otra[campo] = musico[campo] || '';
+    }
+  }
+}
+
+function addToRegistro({nombre,asig,asigLabel,sesion,fechaEvento,genero,tema,guia,duracion,duracionIndividual,esMatrimonio,esCartaEspecial,barrio,discursoTema,himnoInicial,himnoIntermedio,himnoFinal,acompanante,acompananteGenero,cartaHTML}){
   if(!nombre||nombre==='[Nombre]') return;
   const reg=getRegistro();
   const now=new Date().toISOString();
   let idx = reg.findIndex(r=>r.nombre===nombre && r.asig===asig && r.sesion===sesion);
   if (idx < 0) idx = reg.findIndex(r=>!r.nombre && r.asig===asig && r.sesion===sesion);
 
-  const extra = {genero,tema,guia,duracion,barrio,discursoTema,himnoInicial,himnoIntermedio,himnoFinal,acompanante,acompananteGenero,cartaHTML};
+  const extra = {genero,tema,guia,duracion,duracionIndividual,esMatrimonio,esCartaEspecial,barrio,discursoTema,himnoInicial,himnoIntermedio,himnoFinal,acompanante,acompananteGenero,cartaHTML};
   const clean = Object.fromEntries(Object.entries(extra).filter(([,v])=>v!=null&&v!==undefined));
 
   if(idx>=0){
@@ -2134,6 +2475,7 @@ function addToRegistro({nombre,asig,asigLabel,sesion,fechaEvento,genero,tema,gui
   } else {
     reg.push({id:'extra_'+Date.now(),nombre,asig,asigLabel,sesion,fechaEvento,fechaGenerada:now,...clean,cartaAviso:null,cartaEnviada:null,confirmado:null,reconfirmado:null});
   }
+  if(['director','pianista'].includes(asig)) sincronizarHimnosDesdeMusico(reg, reg[idx>=0 ? idx : reg.length-1]);
   saveRegistro(reg);
   // Re-render si el registro est\u00e1 visible
   if(!document.getElementById('tab-registro').classList.contains('hidden')) renderRegistro();
@@ -2154,7 +2496,23 @@ function _toastRegistro(){
 
 function updateNombre(id, val){
   const r=getRegistro(); const x=r.find(e=>e.id===id);
-  if(x){ x.nombre=val; saveRegistro(r); renderRegistro(); }
+  if(x){
+    x.nombre=val;
+    const campoHimno = HIMNO_CAMPO[x.asig];
+    if(campoHimno){
+      for(const musico of r.filter(e=>e.sesion===x.sesion && ['director','pianista'].includes(e.asig))){
+        musico[campoHimno] = val;
+      }
+    }
+    saveRegistro(r); renderRegistro();
+  }
+}
+function updateMinutaHabilitada(id, habilitado){
+  const r=getRegistro(); const x=r.find(e=>e.id===id);
+  if(x){
+    x.habilitado=habilitado;
+    saveRegistro(r); renderRegistro();
+  }
 }
 function updateFecha(id, val){
   const r=getRegistro(); const x=r.find(e=>e.id===id);
@@ -2165,11 +2523,15 @@ function updateAsistencia(id, val){
   if(x){ const total=parseInt(val); if(total>=0) x.asistenciaTotal=total; else delete x.asistenciaTotal; saveRegistro(r); }
 }
 
+function esCartaEspecialGuardada(entry){
+  return !!(entry.esCartaEspecial || (entry.cartaHTML||'').includes('carta-titulo-especial'));
+}
+
 function irACarta(id){
   const r=getRegistro(); const x=r.find(e=>e.id===id); if(!x) return;
   if(!['director','pianista','mensaje','testimonio','capacitacion','discurso_barrio'].includes(x.asig)) return;
   // Si tiene carta especial almacenada, mostrarla directamente
-  if(x.cartaHTML){
+  if(x.cartaHTML && esCartaEspecialGuardada(x)){
     showTab('carta');
     document.getElementById('carta-contenido').innerHTML = x.cartaHTML;
     ajustarCartaContenido();
@@ -2195,7 +2557,7 @@ function irACarta(id){
     const firstName = x.nombre.trim().split(' ')[0];
     document.getElementById('genero').value = /[aá]$/i.test(firstName) ? 'a' : 'o';
   }
-  if(x.fechaEvento) document.getElementById('fechaEvento').value = x.fechaEvento;
+  if(x.fechaEvento) setDateInputValue('fechaEvento', x.fechaEvento);
   if(['director','pianista'].includes(x.asig)){
     document.getElementById('himno-inicial').value     = x.himnoInicial    || '';
     document.getElementById('himno-intermedio').value  = x.himnoIntermedio || '';
@@ -2219,6 +2581,8 @@ function irACarta(id){
     const _sameAsig = _allReg.filter(e => e.asig === x.asig && e.sesion === x.sesion);
     const _pos = _sameAsig.findIndex(e => e.id === x.id) + 1;
     document.getElementById('msg-num').value = _pos > 0 ? _pos : 1;
+    document.getElementById('msg-dur').value = x.duracionIndividual || x.duracion || (x.asig==='testimonio' ? 3 : 10);
+    document.getElementById('carta-matrimonio').checked = !!x.esMatrimonio;
     document.getElementById('tema').value = x.tema || '';
     document.getElementById('guia').value = x.guia || '';
     document.getElementById('guia-check').checked = !!x.guia;
@@ -2226,7 +2590,7 @@ function irACarta(id){
   }
   if(x.asig==='discurso_barrio'){
     document.getElementById('discurso-barrio').value = x.barrio || '';
-    document.getElementById('discurso-fecha').value = x.fechaEvento || '';
+    setDateInputValue('discurso-fecha', x.fechaEvento || '');
     document.getElementById('discurso-tema').value = x.discursoTema || '';
     document.getElementById('discurso-duracion').value = x.duracion || 20;
   }
@@ -2415,6 +2779,24 @@ async function generarRelevosSostenimientos(tipoDescarga=null){
   }
 }
 
+function etiquetaAsignacionRegistro(r, reg=getRegistro()){
+ const label = ((r.asigLabel || '').replace(/\s*\(\d+\s*min\)/gi,'')).trim();
+ const normalizado = label.replace(/^(Mensaje|Testimonio|Capacitación)\s+\d+$/i,'$1');
+ const genericos = ['Mensaje','Testimonio','Capacitación',''];
+ const ordinales = ['mensaje','testimonio','capacitacion'];
+ const base = r.asig==='mensaje' ? 'mensaje' : r.asig==='testimonio' ? 'testimonio' : 'capacitación';
+ const minuscula = normalizado.toLocaleLowerCase('es');
+ const esOrdinalGuardado = ORDINAL.some(ordinal => minuscula === `${ordinal} ${base}`)
+   || new RegExp(`^\\d+°? ${base}$`,'i').test(normalizado);
+ if(ordinales.includes(r.asig) && (genericos.includes(normalizado) || esOrdinalGuardado)){
+   const mismas = reg.filter(x => x.asig===r.asig && x.sesion===r.sesion);
+   const posicion = mismas.findIndex(x=>x.id===r.id) + 1;
+   const ordinal = ORDINAL[posicion-1] || `${posicion}°`;
+   return `${ordinal.charAt(0).toUpperCase() + ordinal.slice(1)} ${base}`;
+ }
+ return label || r.asig || '';
+}
+
 function renderRegistro(){
   const reg = getRegistro();
   const q   = (document.getElementById('reg-buscar')?.value||'').toLowerCase().trim();
@@ -2423,7 +2805,7 @@ function renderRegistro(){
     : _regVista==='operaciones' ? reg.filter(r=>OPERACIONES_ASIG.includes(r.asig))
     : reg.filter(r=>r.sesion===_regVista && !OPERACIONES_ASIG.includes(r.asig));
   const fil = q ? vistaReg.filter(r=>`${r.nombre||''} ${r.asigLabel||''}`.toLowerCase().includes(q)) : vistaReg;
-  const countConferencia = conferencia.filter(r=>r.nombre&&r.nombre.trim()).length;
+  const countConferencia = conferencia.filter(r=>!INFORMATIVAS_ASIG.includes(r.asig)&&r.nombre&&r.nombre.trim()).length;
   const countOtros = reg.filter(r=>r.sesion==='otros'&&r.nombre&&r.nombre.trim()).length;
   const countOperaciones = reg.filter(r=>OPERACIONES_ASIG.includes(r.asig)&&r.nombre&&r.nombre.trim()).length;
   const countConferenciaEl = document.getElementById('reg-count-conferencia');
@@ -2434,7 +2816,7 @@ function renderRegistro(){
   if(countOperacionesEl) countOperacionesEl.textContent = countOperaciones;
   document.querySelectorAll('.reg-view-btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.view===_regVista));
   const _pCount = r => {
-    if(!r.nombre) return 0;
+    if(INFORMATIVAS_ASIG.includes(r.asig) || !r.nombre) return 0;
     const ayudantes = OPERACIONES_ASIG.includes(r.asig) && r.ayudantes
       ? r.ayudantes.split(/[,\n]+/).map(nombre=>nombre.trim()).filter(Boolean).length
       : 0;
@@ -2489,8 +2871,8 @@ function renderRegistro(){
 
   // Fila del encabezado de columnas (se reutiliza en el sticky header y como referencia de ancho)
   const _theadRow = `<tr>
-    <th style="width:28px;min-width:28px;padding:10px 4px;text-align:center"><input type="checkbox" id="reg-sel-all" onchange="_selAll(this)" title="Seleccionar todo"></th>
-    <th style="width:28px;min-width:28px;padding:10px 2px;text-align:center"></th>
+    <th style="width:28px;min-width:28px;padding:3px 4px;text-align:center"><input type="checkbox" id="reg-sel-all" onchange="_selAll(this)" title="Seleccionar todo"></th>
+    <th style="width:28px;min-width:28px;padding:3px 2px;text-align:center"></th>
     <th style="width:18%">Asignación</th>
     <th style="width:23%">Nombre</th>
     <th style="width:115px;text-align:center">Fecha</th>
@@ -2509,39 +2891,27 @@ function renderRegistro(){
     const items = groups[ses];
     const sesMin = items.reduce((a,r)=>a+_parseDur(r),0);
     const sesPeople  = items.reduce((a,r)=>a+_pCount(r),0);
-    const sesFilled  = items.filter(r=>r.nombre&&r.nombre.trim()).length;
-    const sesConf    = items.filter(r=>r.nombre&&r.nombre.trim()&&r.confirmado===true).length;
-    const sesReconf  = items.filter(r=>r.nombre&&r.nombre.trim()&&r.reconfirmado===true).length;
+    const sesAsignaciones = items.filter(r=>!INFORMATIVAS_ASIG.includes(r.asig)).length;
+    const sesFilled  = items.filter(r=>!INFORMATIVAS_ASIG.includes(r.asig)&&r.nombre&&r.nombre.trim()).length;
+    const sesConf    = items.filter(r=>!INFORMATIVAS_ASIG.includes(r.asig)&&r.nombre&&r.nombre.trim()&&r.confirmado===true).length;
+    const sesReconf  = items.filter(r=>!INFORMATIVAS_ASIG.includes(r.asig)&&r.nombre&&r.nombre.trim()&&r.reconfirmado===true).length;
     const pctConf    = sesFilled>0 ? Math.round(sesConf/sesFilled*100) : 0;
     const pctReconf  = sesFilled>0 ? Math.round(sesReconf/sesFilled*100) : 0;
-    const peopleBadge = `<span style="font-size:10.5px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:2px 9px;margin-left:8px;font-weight:600">👥 ${sesPeople} / ${items.length}</span>`;
+    const peopleBadge = `<span style="font-size:10.5px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:2px 9px;margin-left:8px;font-weight:600">👥 ${sesPeople} / ${sesAsignaciones}</span>`;
     const timeBadge   = sesMin>0 ? `<span style="font-size:10.5px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:2px 9px;margin-left:8px;font-weight:600">⏱ ${sesMin} min</span>` : '';
     const progressBar = sesFilled>0 ? `<div style="width:100%;margin-top:8px"><div style="height:8px;background:#ef4444;border-radius:4px;overflow:hidden;position:relative"><div style="position:absolute;top:0;left:0;height:100%;width:${pctConf}%;background:#f97316;transition:width .6s"></div><div style="position:absolute;top:0;left:0;height:100%;width:${pctReconf}%;background:#22c55e;transition:width .6s"></div></div><div style="display:flex;align-items:center;gap:16px;margin-top:5px;font-size:10px;font-weight:600"><span style="display:flex;align-items:center;gap:4px;color:#fb923c"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#f97316;flex-shrink:0"></span>${sesConf} conf. (${pctConf}%)</span><span style="display:flex;align-items:center;gap:4px;color:#4ade80"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0"></span>${sesReconf} reconf. (${pctReconf}%)</span><span style="margin-left:auto;font-size:11px;font-weight:800;color:${pctReconf===100?'#4ade80':pctReconf>0?'#fb923c':'#f87171'}">${pctReconf}%</span></div></div>` : '';
     html += `<tr><td colspan="10" class="ses-header-td"><div class="ses-hdr-inner" style="flex-direction:column;align-items:stretch;"><div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px"><span class="ses-hdr-name">${sesIcon} ${(SLBL[ses]||ses).toUpperCase()}</span>${peopleBadge}${timeBadge}</div>${progressBar}</div></td></tr>`;
     items.forEach((r, idx) => {
-      const aLbl = (() => {
-        const _lbl = ((r.asigLabel || '').replace(/\s*\(\d+\s*min\)/gi,'')).trim();
-        const _lblNormalizado = _lbl.replace(/^(Mensaje|Testimonio|Capacitación)\s+\d+$/i,'$1');
-        const _GENERICOS = ['Mensaje','Testimonio','Capacitación',''];
-        const _ORD_ASIGS = ['mensaje','testimonio','capacitacion'];
-        // Convierte etiquetas genéricas y numéricas antiguas a ordinales escritos.
-        if(_ORD_ASIGS.includes(r.asig) && _GENERICOS.includes(_lblNormalizado)){
-          const _same = reg.filter(x => x.asig === r.asig && x.sesion === r.sesion);
-          const _pos  = _same.findIndex(x => x.id === r.id) + 1;
-          const _w    = ORDINAL[_pos-1] || `${_pos}°`;
-          const _cap  = _w.charAt(0).toUpperCase() + _w.slice(1);
-          const _base = r.asig==='mensaje' ? 'mensaje' : r.asig==='testimonio' ? 'testimonio' : 'capacitación';
-          return esc(`${_cap} ${_base}`);
-        }
-        return esc(_lbl || r.asig || '');
-      })();
+      const aLbl = esc(etiquetaAsignacionRegistro(r, reg));
+      const isInformativa = INFORMATIVAS_ASIG.includes(r.asig);
       const isFilled = !!(r.nombre && r.nombre.trim());
       const isOperacion = OPERACIONES_ASIG.includes(r.asig);
-      const canGen = isFilled;
+      const canGen = isFilled && !isInformativa;
       const isLast = idx === items.length - 1;
       const rowStyle = isLast ? 'border-bottom:2px solid #E2E8F0;' : '';
       const canIrCarta = ['director','pianista','mensaje','testimonio','capacitacion','discurso_barrio'].includes(r.asig);
-      const rowStatus = r.reconfirmado===true ? 'row-reconf'
+      const rowStatus = isInformativa ? ''
+        : r.reconfirmado===true ? 'row-reconf'
         : r.confirmado===true ? 'row-confirmado'
         : r.cartaAviso===true ? 'row-avisado'
         : isFilled ? 'row-pendiente'
@@ -2551,7 +2921,7 @@ function renderRegistro(){
       const durBadge = (_rDur > 0 && _isSpeaking)
         ? `<span style="font-size:10.5px;color:#64748B;background:#F1F5F9;border:1px solid #E2E8F0;border-radius:6px;padding:1px 6px;margin-left:4px;font-weight:600">${_rDur} min</span>`
         : '';
-      const _evDate   = r.fechaEvento ? (() => { const [_y,_m,_dd]=r.fechaEvento.split('-').map(Number); return new Date(_y,_m-1,_dd); })() : null;
+      const _evDate   = !isInformativa && r.fechaEvento ? (() => { const [_y,_m,_dd]=r.fechaEvento.split('-').map(Number); return new Date(_y,_m-1,_dd); })() : null;
       const _dLeft    = _evDate !== null ? Math.ceil((_evDate - today) / (1000*60*60*24)) : null;
       const _alertBadge = (isFilled && _dLeft !== null)
         ? _dLeft < 0
@@ -2562,13 +2932,27 @@ function renderRegistro(){
               ? `<span class="alerta-badge urgente">⚠️ ${_dLeft} días</span>`
               : ''
         : '';
-      html += `<tr draggable="true" data-id="${r.id}" class="${rowStatus}${r.asig==='asistencia'?' row-asistencia':''} ses-${r.sesion}">
-        <td style="text-align:center;padding:5px 4px;${rowStyle}"><input type="checkbox" class="reg-sel" data-id="${r.id}" onchange="_cntSel()"></td>
-        <td class="drag-handle-cell" style="${rowStyle}" title="Arrastrar">⠿</td>
+      const infoPlaceholder = {
+        preside:'Nombre de quien preside',
+        dirige:'Nombre de quien dirige',
+        reconocimientos:'Separar personas con comas',
+        agradecimientos:'Personas o grupos que serán agradecidos',
+        asuntos_estaca:'Detalle de los asuntos y responsables',
+        himno_inicial:'Número y título del himno',
+        himno_intermedio:'Número y título del himno',
+        himno_final:'Número y título del himno'
+      }[r.asig] || 'Detalle';
+      html += `<tr ${isInformativa?'':'draggable="true"'} data-id="${r.id}" class="${rowStatus}${r.asig==='asistencia'?' row-asistencia':''}${isInformativa?' row-informativa':''} ses-${r.sesion}">
+        <td style="text-align:center;padding:5px 4px;${rowStyle}">${isInformativa?'':`<input type="checkbox" class="reg-sel" data-id="${r.id}" onchange="_cntSel()">`}</td>
+        <td class="drag-handle-cell" style="${rowStyle}" ${isInformativa?'':'title="Arrastrar"'}>${isInformativa?'':'⠿'}</td>
         <td style="font-size:14px;font-weight:600;${rowStyle}${canIrCarta?' color:#0F766E; cursor:pointer;':' color:#334155;'}" ${canIrCarta?`onclick="irACarta('${r.id}')" title="Abrir en Generar carta"`:''}>${
 aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</span>':''}</td>
-        <td style="padding:6px 8px;${rowStyle}" class="${isFilled && !r.cartaAviso ? 'td-sin-avisar' : ''}">
-          ${isFilled
+        <td style="padding:6px 8px;${rowStyle}" class="${!isInformativa && isFilled && !r.cartaAviso ? 'td-sin-avisar' : ''}">
+          ${isInformativa
+            ? r.asig==='asuntos_estaca'
+              ? `<div style="display:flex;align-items:center;gap:8px"><label style="display:flex;align-items:center;gap:5px;margin:0;white-space:nowrap;cursor:pointer"><input type="checkbox" style="width:auto" ${r.habilitado?'checked':''} onchange="updateMinutaHabilitada('${r.id}',this.checked)"> Incluir</label><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="minuta-value" placeholder="${infoPlaceholder}" ${r.habilitado?'':'disabled'}></div>`
+              : `<input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="minuta-value" placeholder="${infoPlaceholder}">`
+            : isFilled
             ? isOperacion
               ? `<div class="operation-team"><div class="operation-principal"><span title="Coordinador">★</span><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${r.nota?`<span class="nota-ico" title="${esc(r.nota)}" onclick="event.stopPropagation();abrirEditModal('${r.id}')">📝</span>`:''}</div><div class="operation-helpers"><span><strong>Equipo de apoyo:</strong> ${r.ayudantes?esc(r.ayudantes).replace(/\n/g,', '):'Sin asignar'}</span><button type="button" class="operation-helper-edit" onclick="abrirEditModal('${r.id}')">${r.ayudantes?'Editar':'Agregar'}</button></div></div>`
               : `<div style="display:flex;align-items:center;gap:4px;"><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${r.esMatrimonio && !['director','pianista','oracion_inicial','oracion_final'].includes(r.asig)?'<span class="badge-matrimonio">👫 Matrimonio</span>':''}${r.nota?`<span class="nota-ico" title="${esc(r.nota)}" onclick="event.stopPropagation();abrirEditModal('${r.id}')">📝</span>`:''}</div>`
@@ -2577,23 +2961,25 @@ aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</spa
           ${r.asig==='asistencia' ? `<div class="attendance-count"><label>Asistencia</label><input type="number" min="0" max="9999" value="${r.asistenciaTotal??''}" placeholder="Total" onchange="updateAsistencia('${r.id}',this.value)"></div>` : ''}
         </td>
         <td data-label="Fecha" style="text-align:center;padding:6px 8px;${rowStyle}">
-          <label class="fecha-wrap" title="Cambiar fecha">
+          ${isInformativa ? '<span class="minuta-empty">—</span>' : `<label class="fecha-wrap" title="Cambiar fecha">
             <span class="fecha-display">${r.fechaEvento ? r.fechaEvento.split('-').reverse().join('/') : '📅 Fecha'}</span>
             <input type="date" value="${r.fechaEvento||''}" onchange="updateFecha('${r.id}',this.value)" class="fecha-input-hidden">
           </label>
-          ${_alertBadge}
+          ${_alertBadge}`}
         </td>
         <td data-label="Carta" style="text-align:center;padding:5px 8px;${rowStyle}">
-          ${r.fechaGenerada
+          ${isInformativa ? '<span class="minuta-empty">—</span>' : r.fechaGenerada
             ? `<span class="pill-lbl pill-carta">✉️ Creada</span>`
             : `<span class="pill-lbl pill-nd" style="font-size:9px;">–</span>`
           }
         </td>
-        ${tCell(r.id,'cartaAviso',r.cartaAviso??null,r.cartaAvisoDate||'','Avisado')}
-        ${tCell(r.id,'confirmado',r.confirmado??null,r.confirmadoDate||'','Confirmado')}
-        ${tCell(r.id,'reconfirmado',r.reconfirmado??null,r.reconfirmadoDate||'','Reconfirmado','pill-reconf','pill-reconf-no')}
+        ${isInformativa ? '<td class="minuta-empty">—</td><td class="minuta-empty">—</td><td class="minuta-empty">—</td>' : `
+          ${tCell(r.id,'cartaAviso',r.cartaAviso??null,r.cartaAvisoDate||'','Avisado')}
+          ${tCell(r.id,'confirmado',r.confirmado??null,r.confirmadoDate||'','Confirmado')}
+          ${tCell(r.id,'reconfirmado',r.reconfirmado??null,r.reconfirmadoDate||'','Reconfirmado','pill-reconf','pill-reconf-no')}
+        `}
         <td style="white-space:nowrap;text-align:center;padding:5px 8px;${rowStyle}">
-          <div class="reg-row-actions">
+          ${isInformativa ? '<span class="minuta-empty">—</span>' : `<div class="reg-row-actions">
             <div class="reg-download-actions">
               <button class="btn-dl pdf" onclick="generarDesdeRegistro('${r.id}','pdf')" title="${canGen?'Descargar asignación en PDF':'Asigne una persona para descargar'}" ${canGen?'':'disabled'}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>PDF</button>
               <button class="btn-dl img" onclick="generarDesdeRegistro('${r.id}','img')" title="${canGen?'Descargar asignación como imagen':'Asigne una persona para descargar'}" ${canGen?'':'disabled'}><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>PNG</button>
@@ -2602,13 +2988,15 @@ aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</spa
               <button class="btn-edit" onclick="abrirEditModal('${r.id}')" title="Editar asignación" aria-label="Editar asignación"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button>
               <button class="btn-del" onclick="eliminarEntrada('${r.id}')" title="Limpiar fila" aria-label="Limpiar fila"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14M10 10v6m4-6v6"/></svg></button>
             </div>
-          </div>
+          </div>`}
         </td>
       </tr>`;
     });
   }
   html += '</tbody></table></div>';
   document.getElementById('reg-tabla').innerHTML = html;
+  _cntSel();
+  initDatePickers(document.getElementById('reg-tabla'));
   setTimeout(_updRegHdrH, 0);
 }
 // Sincroniza el scroll horizontal del header sticky con el cuerpo de la tabla
@@ -2719,7 +3107,7 @@ function abrirEditModal(id){
   const _esOperacion = OPERACIONES_ASIG.includes(x.asig);
   document.getElementById('edit-grupo-matrimonio').classList.toggle('hidden', _esIndividual || _esOperacion);
   document.getElementById('edit-matrimonio').checked = (_esIndividual || _esOperacion) ? false : (x.esMatrimonio || false);
-  document.getElementById('edit-fecha').value = x.fechaEvento || (getFechas()[x.sesion] || '');
+  setDateInputValue('edit-fecha', x.fechaEvento || (getFechas()[x.sesion] || ''));
   document.getElementById('edit-sesion').value = x.sesion || 'general';
   // Show/hide contextual fields
   const esMusica = ['director','pianista'].includes(x.asig);
@@ -2736,7 +3124,10 @@ function abrirEditModal(id){
   document.getElementById('edit-guia-check').checked = false;
   if(esMensaje){
     document.getElementById('edit-tema').value = x.tema || '';
-    document.getElementById('edit-duracion').value = x.duracion || '';
+    document.getElementById('edit-duracion').value = x.duracionIndividual || x.duracion || (x.asig==='testimonio' ? 3 : '');
+    document.getElementById('edit-duracion-label').innerHTML = ['mensaje','testimonio'].includes(x.asig)
+      ? 'Duración por persona (min) <span style="font-weight:400;color:#bbb">(opcional)</span>'
+      : 'Duración del mensaje (min) <span style="font-weight:400;color:#bbb">(opcional)</span>';
     document.getElementById('edit-guia').value = x.guia || '';
     document.getElementById('edit-guia-check').checked = !!x.guia;
     toggleEditGuia();
@@ -2780,13 +3171,13 @@ function abrirAddModal(){
   document.getElementById('add-asig-custom').style.display = 'none';
   document.querySelectorAll('.asig-preset').forEach(b=>b.classList.remove('selected'));
   document.getElementById('add-nombre').value = '';
-  document.getElementById('add-fecha').value = getFechas()['adultos'] || '';
+  setDateInputValue('add-fecha', getFechas()['adultos'] || '');
   document.getElementById('reg-add-modal').classList.remove('hidden');
 }
 function autoFechaAdd(){
   const ses = document.getElementById('add-sesion').value;
   const f = getFechas()[ses];
-  if(f) document.getElementById('add-fecha').value = f;
+  if(f) setDateInputValue('add-fecha', f);
 }
 function _selAsigPreset(btn){
   document.querySelectorAll('.asig-preset').forEach(b=>b.classList.remove('selected'));
@@ -2846,8 +3237,14 @@ function guardarEditModal(){
   x.sesion = document.getElementById('edit-sesion').value;
   if(['mensaje','testimonio','capacitacion'].includes(x.asig)){
     x.tema = document.getElementById('edit-tema').value.trim();
-    const _dur = parseInt(document.getElementById('edit-duracion').value);
-    if(_dur > 0) x.duracion = _dur; else delete x.duracion;
+    const _dur = parseInt(document.getElementById('edit-duracion').value) || (x.asig==='testimonio' ? 3 : 0);
+    if(_dur > 0){
+      x.duracionIndividual = _dur;
+      x.duracion = _dur * (x.esMatrimonio && ['mensaje','testimonio'].includes(x.asig) ? 2 : 1);
+    } else {
+      delete x.duracion;
+      delete x.duracionIndividual;
+    }
     if(x.asig === 'mensaje'){
       const _guia = document.getElementById('edit-guia-check').checked
         ? document.getElementById('edit-guia').value.trim()
@@ -2867,10 +3264,11 @@ function guardarEditModal(){
     const _contraAsigH = x.asig === 'director' ? 'pianista' : 'director';
     const _contraH = r.find(e => e.asig === _contraAsigH && e.sesion === x.sesion);
     if(_contraH){
-      if(x.himnoInicial)    _contraH.himnoInicial    = x.himnoInicial;
-      if(x.himnoIntermedio) _contraH.himnoIntermedio = x.himnoIntermedio;
-      if(x.himnoFinal)      _contraH.himnoFinal      = x.himnoFinal;
+      _contraH.himnoInicial    = x.himnoInicial;
+      _contraH.himnoIntermedio = x.himnoIntermedio;
+      _contraH.himnoFinal      = x.himnoFinal;
     }
+    sincronizarHimnosDesdeMusico(r, x);
     // Auto-completar o crear la fila del acompañante
     if(x.acompanante){
       const contraAsig = x.asig === 'director' ? 'pianista' : 'director';
@@ -2976,7 +3374,7 @@ async function generarDesdeRegistro(id, tipo){
   }
 
   // Las invitaciones especiales ya tienen su redacción final almacenada.
-  if(entry.cartaHTML){
+  if(entry.cartaHTML && esCartaEspecialGuardada(entry)){
     showTab('carta');
     document.getElementById('carta-contenido').innerHTML = entry.cartaHTML;
     ajustarCartaContenido();
@@ -2993,7 +3391,7 @@ async function generarDesdeRegistro(id, tipo){
   document.getElementById('nombre').value      = entry.nombre;
   document.getElementById('asignacion').value  = entry.asig || 'mensaje';
   document.getElementById('sesion').value      = entry.sesion || 'general';
-  if(entry.fechaEvento) document.getElementById('fechaEvento').value = entry.fechaEvento;
+  if(entry.fechaEvento) setDateInputValue('fechaEvento', entry.fechaEvento);
 
   // Pre-rellenar tema e himnos si están guardados
   if(['director','pianista'].includes(entry.asig)){
@@ -3008,15 +3406,19 @@ async function generarDesdeRegistro(id, tipo){
     document.getElementById('acompanante-genero').value = entry.acompananteGenero || (_ac && _ac.genero) || 'o';
   }
   if(['mensaje','testimonio','capacitacion'].includes(entry.asig)){
+    const _intervenciones = getRegistro().filter(r => r.asig === entry.asig && r.sesion === entry.sesion);
+    const _posicion = _intervenciones.findIndex(r => r.id === entry.id) + 1;
+    document.getElementById('msg-num').value = _posicion > 0 ? _posicion : 1;
     document.getElementById('tema').value = entry.tema || '';
-    document.getElementById('msg-dur').value = entry.duracion || (entry.asig==='testimonio' ? 3 : 10);
+    document.getElementById('msg-dur').value = entry.duracionIndividual || entry.duracion || (entry.asig==='testimonio' ? 3 : 10);
+    document.getElementById('carta-matrimonio').checked = !!entry.esMatrimonio;
     document.getElementById('guia').value = entry.guia || '';
     document.getElementById('guia-check').checked = !!entry.guia;
     toggleGuia();
   }
   if(entry.asig==='discurso_barrio'){
     document.getElementById('discurso-barrio').value = entry.barrio || '';
-    document.getElementById('discurso-fecha').value = entry.fechaEvento || '';
+    setDateInputValue('discurso-fecha', entry.fechaEvento || '');
     document.getElementById('discurso-tema').value = entry.discursoTema || '';
     document.getElementById('discurso-duracion').value = entry.duracion || 20;
   }
@@ -3049,7 +3451,9 @@ async function generarDesdeRegistro(id, tipo){
 let _exportTipo = 'pdf';
 function abrirExportModal(tipo){
   _exportTipo = tipo;
-  document.getElementById('exp-confirm-btn').textContent = tipo==='pdf' ? '⬇️ Descargar PDF' : '🖼️ Descargar PNG';
+  document.getElementById('exp-confirm-btn').textContent = tipo==='pdf'
+    ? 'Descargar PDF'
+    : tipo==='img' ? 'Descargar PNG' : 'Imprimir';
   // Reset checkboxes to all selected
   ['lideres','adultos','general'].forEach(s=>{ const el=document.getElementById('exp-sel-'+s); if(el) el.checked=true; });
   document.getElementById('reg-export-modal').classList.remove('hidden');
@@ -3063,50 +3467,98 @@ async function confirmarExport(){
   if(document.getElementById('exp-sel-adultos').checked) ses.push('adultos');
   if(document.getElementById('exp-sel-general').checked) ses.push('general');
   if(!ses.length){ alert('Seleccioná al menos una sesión.'); return; }
+  const printWindow = _exportTipo==='print' ? window.open('','_blank') : null;
+  if(_exportTipo==='print' && !printWindow){
+    alert('El navegador bloqueó la ventana de impresión. Habilitá las ventanas emergentes e intentá nuevamente.');
+    return;
+  }
   cerrarExportModal();
-  await descargarRegistro(_exportTipo, ses);
+  await descargarRegistro(_exportTipo, ses, printWindow);
 }
 
-async function descargarRegistro(tipo, sesionesFiltro){
-  const el = document.getElementById('reg-tabla-inner');
-  if(!el){ alert('No hay tabla para exportar. Abrí el Registro primero.'); return; }
-
-  // Temporarily hide rows from non-selected sessions
-  const hiddenRows = [];
-  if(sesionesFiltro && sesionesFiltro.length < 3){
-    const allSes = ['lideres','adultos','general'];
-    const excluded = allSes.filter(s => !sesionesFiltro.includes(s));
-    const DETECT = { lideres:'LÍDERES', adultos:'ADULTOS', general:'GENERAL' };
-    const tbody = el.querySelector('.reg-table tbody');
-    if(tbody){
-      let skipSes = false;
-      for(const row of Array.from(tbody.rows)){
-        const hdr = row.querySelector('.ses-header-td');
-        if(hdr){
-          const txt = (hdr.querySelector('.ses-hdr-name')?.textContent || '').toUpperCase();
-          skipSes = excluded.some(s => txt.includes(DETECT[s]));
-        }
-        if(skipSes){ row.style.display='none'; hiddenRows.push(row); }
-      }
-    }
+function construirPaginaMinuta(sesion){
+  const reg = getRegistro();
+  const items = reg.filter(r=>r.sesion===sesion && !OPERACIONES_ASIG.includes(r.asig));
+  const porTipo = asig => items.find(r=>r.asig===asig);
+  const valor = asig => esc((porTipo(asig)?.nombre||'').trim());
+  const nombresSesion = {lideres:'Sesión de Líderes',adultos:'Sesión de Adultos',general:'Sesión General'};
+  const excluirAgenda = new Set(['preside','dirige','director','pianista','reconocimientos','agradecimientos']);
+  const agradecimientosGuardados = (porTipo('agradecimientos')?.nombre||'').split(/[\n;]+/).map(v=>v.trim()).filter(Boolean);
+  const agradecimientos = agradecimientosGuardados.length ? agradecimientosGuardados : ['(música)'];
+  if(!agradecimientos.some(v=>/todos los demás/i.test(v))){
+    agradecimientos.push('Todos los demás que participaron en la preparación');
   }
+  const agradecimientosHTML = agradecimientos.map(v=>`<li>${esc(v)}</li>`).join('');
+  const agenda = items.filter(r=>
+    !excluirAgenda.has(r.asig) && (r.asig!=='asuntos_estaca' || r.habilitado)
+  ).map(r=>{
+    const duracion = r.duracion ? Number(r.duracion) : Number(((r.asigLabel||'').match(/\((\d+)\s*min\)/i)||[])[1]||0);
+    const tema = (r.tema||'').trim();
+    const mostrarTema = r.asig==='mensaje' && (sesion==='adultos' || tema);
+    return `<div class="minuta-export-row">
+      <span class="minuta-export-row-label">${esc(etiquetaAsignacionRegistro(r,reg))}:</span>
+      <span class="minuta-export-row-value">${esc((r.nombre||'').trim())}</span>
+      ${duracion>0?`<span class="minuta-export-row-time">(${duracion} min)</span>`:''}
+      ${mostrarTema?`<span class="minuta-export-row-topic">Tema:${tema?' '+esc(tema):''}</span>`:''}
+    </div>`;
+  }).join('');
+  const page = document.createElement('section');
+  page.className = 'minuta-export-page';
+  page.dataset.sesion = sesion;
+  page.innerHTML = `<img class="minuta-export-bg" src="images/fondo.png" alt="">
+    <div class="minuta-export-content">
+      <div class="minuta-export-title">CONFERENCIA DE ESTACA ALDO BONZI</div>
+      <div class="minuta-export-session">${nombresSesion[sesion]||sesion}</div>
+      <div class="minuta-export-meta">
+        <div><span class="minuta-export-label">Preside:</span> ${valor('preside')}</div>
+        <div><span class="minuta-export-label">Dirige:</span> ${valor('dirige')}</div>
+        <div><span class="minuta-export-label">Director/a:</span> ${valor('director')}</div>
+        <div><span class="minuta-export-label">Pianista:</span> ${valor('pianista')}</div>
+      </div>
+      <div class="minuta-export-notes">
+        <div class="minuta-export-note"><span class="minuta-export-label">Reconocimientos:</span> ${valor('reconocimientos')}</div>
+        <div class="minuta-export-note"><span class="minuta-export-label">Agradecimientos:</span><ul class="minuta-export-thanks">${agradecimientosHTML}</ul></div>
+      </div>
+      <div class="minuta-export-agenda">${agenda}</div>
+    </div>`;
+  return page;
+}
 
-  // Ocultar columna Acciones para la captura
-  const _tbl = el.querySelector('.reg-table');
-  const _expHide = [];
-  if(_tbl){
-    const _ths = _tbl.querySelectorAll('thead th');
-    if(_ths.length) _expHide.push(_ths[_ths.length-1]);
-    _tbl.querySelectorAll('tbody tr').forEach(tr => {
-      if(!tr.querySelector('.ses-header-td') && tr.cells.length) _expHide.push(tr.cells[tr.cells.length-1]);
-    });
+async function capturarPaginasMinuta(sesiones){
+  const host = document.createElement('div');
+  host.className = 'minuta-export-host';
+  sesiones.forEach(sesion=>host.appendChild(construirPaginaMinuta(sesion)));
+  document.body.appendChild(host);
+  const imagenes = [...host.querySelectorAll('img')];
+  await Promise.all(imagenes.map(img=>img.complete && img.naturalWidth
+    ? Promise.resolve()
+    : new Promise((resolve,reject)=>{
+        img.addEventListener('load',resolve,{once:true});
+        img.addEventListener('error',()=>reject(new Error(`No se pudo cargar ${img.src}`)),{once:true});
+      })
+  ));
+  if(document.fonts?.ready) await document.fonts.ready;
+  const canvases = [];
+  for(const page of host.querySelectorAll('.minuta-export-page')){
+    canvases.push(await html2canvas(page,{scale:2,useCORS:true,allowTaint:true,backgroundColor:'#fff',logging:false}));
   }
-  _expHide.forEach(c => { c.style.display='none'; });
+  return {host,canvases};
+}
 
+function crearPdfMinutas(canvases){
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  canvases.forEach((canvas,index)=>{
+    if(index>0) pdf.addPage('a4','portrait');
+    pdf.addImage(canvas.toDataURL('image/jpeg',0.92),'JPEG',0,0,210,297,undefined,'FAST');
+  });
+  return pdf;
+}
+
+async function descargarRegistro(tipo, sesionesFiltro, printWindow=null){
   const SNAME = { lideres:'Lideres', adultos:'Adultos', general:'General' };
-  const sfx = (sesionesFiltro && sesionesFiltro.length < 3)
-    ? sesionesFiltro.map(s=>SNAME[s]||s).join('_')
-    : 'Conferencia';
+  const sfx = sesionesFiltro.length===3 ? 'Conferencia' : sesionesFiltro.map(s=>SNAME[s]||s).join('_');
+  let host = null;
 
   const _origGCS = window.getComputedStyle;
   window.getComputedStyle = function(...args){
@@ -3114,25 +3566,37 @@ async function descargarRegistro(tipo, sesionesFiltro){
     return new Proxy(style, { get(t,p){ const v=Reflect.get(t,p); if(typeof v==='string'&&v.includes('oklch')) return 'transparent'; if(typeof v==='function') return v.bind(t); return v; } });
   };
   try{
-    const canvas = await html2canvas(el, { scale:3, useCORS:true, allowTaint:true, backgroundColor:'#fff', logging:false });
+    const captura = await capturarPaginasMinuta(sesionesFiltro);
+    host = captura.host;
+    const canvases = captura.canvases;
     if(tipo==='pdf'){
-      const {jsPDF}=window.jspdf;
-      const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-      const pW=pdf.internal.pageSize.getWidth(), pH=pdf.internal.pageSize.getHeight();
-      const ratio=canvas.width/canvas.height;
-      let w=pW, h=pW/ratio;
-      if(h>pH){h=pH; w=pH*ratio;}
-      pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,w,h);
-      pdf.save(`Registro_${sfx}.pdf`);
+      crearPdfMinutas(canvases).save(`Minutas_${sfx}.pdf`);
+    } else if(tipo==='print'){
+      const pdf = crearPdfMinutas(canvases);
+      if(typeof pdf.autoPrint==='function') pdf.autoPrint();
+      const url = URL.createObjectURL(pdf.output('blob'));
+      printWindow.location.href = url;
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
     } else {
-      const a=document.createElement('a'); a.download=`Registro_${sfx}.png`;
-      a.href=canvas.toDataURL('image/png'); a.click();
+      const gap = canvases.length>1 ? 24 : 0;
+      const combinado = document.createElement('canvas');
+      combinado.width = Math.max(...canvases.map(canvas=>canvas.width));
+      combinado.height = canvases.reduce((total,canvas)=>total+canvas.height,0) + gap*(canvases.length-1);
+      const ctx = combinado.getContext('2d');
+      ctx.fillStyle='#fff'; ctx.fillRect(0,0,combinado.width,combinado.height);
+      let y=0;
+      canvases.forEach(canvas=>{ ctx.drawImage(canvas,0,y); y+=canvas.height+gap; });
+      const a=document.createElement('a'); a.download=`Minutas_${sfx}.png`;
+      a.href=combinado.toDataURL('image/png'); a.click();
     }
-  } catch(e){ alert('Error al exportar.'); console.error(e); }
+  } catch(e){
+    if(printWindow && !printWindow.closed) printWindow.close();
+    alert('Error al generar las minutas. Revisá la consola para más detalles.');
+    console.error(e);
+  }
   finally{
     window.getComputedStyle=_origGCS;
-    hiddenRows.forEach(r=>{ r.style.display=''; });
-    _expHide.forEach(c=>{ c.style.display=''; });
+    if(host) host.remove();
   }
 }
 
@@ -3195,6 +3659,8 @@ document.addEventListener('dragend', function(){
 });
 
 // Inicialización manejada por Firebase Auth (onAuthStateChanged)
+initDatePickers();
+initRegTopTools();
 </script>
 </body>
 </html>

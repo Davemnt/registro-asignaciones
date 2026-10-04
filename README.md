@@ -8,8 +8,11 @@ Permite crear el registro de participantes, generar cartas de invitación person
 ## ✨ Funcionalidades
 
 - **Registro de asignaciones** — Director, Pianista, Mensajes, Testimonios, Capacitaciones, Oraciones, Especiales (Presidente de Misión / Templo)
+- **Minuta por sesión** — Preside, dirige, reconocimientos, agradecimientos, himnos y Asuntos de Estaca opcionales integrados en el programa
+- **Sincronización de himnos** — Los himnos de la minuta se adjuntan automáticamente a las asignaciones del director y pianista
 - **Generación de cartas** — Carta personalizada por asignado con saludo, sesión, himnos y cierre firmado
-- **Exportación** — Descarga en PDF (alta resolución) e imagen PNG
+- **Asignaciones para matrimonios** — Muestra el tiempo individual en la carta y reserva el tiempo total de ambos en el registro
+- **Exportación** — Cartas en PDF/PNG y minutas A4 con descarga o impresión individual/multipágina
 - **Control de seguimiento** — Registro de aviso, confirmación y reconfirmación por participante
 - **Sesiones** — Adultos, Líderes y General, con horarios configurables
 - **Drag & drop** — Reordenamiento de filas en el registro
