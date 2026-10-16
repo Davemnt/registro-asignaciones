@@ -121,8 +121,6 @@ textarea { resize: vertical; min-height: 52px; }
 .minuta-export-notes { margin-top:20px; }
 .minuta-export-note { margin-bottom:25px; }
 .minuta-export-recognition-separator { margin:0 5px; color:#64748B; font-weight:700; }
-.minuta-export-thanks { margin:8px 0 0 24px; padding-left:18px; }
-.minuta-export-thanks li { margin:4px 0; padding-left:5px; }
 .minuta-export-agenda { margin-top:20px; }
 .minuta-export-row { margin-bottom:24px; }
 .minuta-export-row-label { font-weight:700; }
@@ -2085,7 +2083,7 @@ function generarCarta(){
       <div class="carta-fecha">${fmtCarta(fechaCarta,ciudad)}</div>
       <div class="carta-saludo">${esMatrimonio ? 'Estimados hermanos' : `Estimad${suf} ${trat}`} ${esc(nombre)},</div>
       <div class="carta-texto">
-        <p>El <strong>${fmtFecha(fechaEv)}${hora ? ' a las ' + hora + ' Hs' : ''}</strong> se llevará a cabo ${sesLbl} de nuestra Conferencia de Estaca en el centro de estaca (${esc(lugar)}).</p>
+        <p>El <strong>${fmtDia(fechaEv)} ${fmtFecha(fechaEv)}${hora ? ' a las ' + hora + ' Hs' : ''}</strong> se llevará a cabo ${sesLbl} de nuestra Conferencia de Estaca en el centro de estaca (${esc(lugar)}).</p>
         ${asigHTML}${seg}
         ${extra?`<p>${esc(extra)}</p>`:''}
         <p>Favor de confirmar su presencia. De no poder asistir por algún motivo, avísenos con anticipación.</p>
@@ -2192,13 +2190,13 @@ function generarEspecial(){
   const _ext = conEsposa ? 'extenderles' : 'extenderle';
   let cuerpo;
   if(tieneSegunda){
-    cuerpo = `<p>El <strong>${fmtDiaCap(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
-<p>El <strong>${fmtDiaCap(fev2)} ${fmtFecha(fev2)} a las ${hr2} Hs</strong> se llevará a cabo la <strong>${esc(ses2)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
+    cuerpo = `<p>El <strong>${fmtDia(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
+<p>El <strong>${fmtDia(fev2)} ${fmtFecha(fev2)} a las ${hr2} Hs</strong> se llevará a cabo la <strong>${esc(ses2)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
 <p>En esta oportunidad queremos ${_ext} la invitación para participar compartiendo un mensaje en cada una de las sesiones mencionadas.</p>
 <div class="carta-asig-box"><p>Tiempo asignado${conEsposa ? ' a cada uno' : ''} en ${esc(sesion)}: <strong>${dur} minutos</strong></p><p>Tiempo asignado${conEsposa ? ' a cada uno' : ''} en ${esc(ses2)}: <strong>${dur2} minutos</strong></p></div>
 ${conEsposa ? `<p>En caso de que su esposa no pueda participar, dispondrá de <strong>${_durTotal} minutos</strong> en la ${esc(sesion).toLowerCase()} y de <strong>${_dur2Total} minutos</strong> en la ${esc(ses2).toLowerCase()} para compartir el mensaje.</p>` : ''}`;
   } else {
-    cuerpo = `    <p>El <strong>${fmtDiaCap(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
+    cuerpo = `    <p>El <strong>${fmtDia(fechaEv)} ${fmtFecha(fechaEv)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
     <p>En esta oportunidad queremos ${_ext} la invitación para participar compartiendo un mensaje en la ${esc(sesion).toLowerCase()}.</p>
     <div class="carta-asig-box"><p>Tiempo asignado${conEsposa ? ' a cada uno' : ''}: <strong>${dur} minutos</strong></p></div>
     ${conEsposa ? `<p>En caso de que su esposa no pueda participar, dispondrá de <strong>${_durTotal} minutos</strong> para compartir el mensaje.</p>` : ''}`;
@@ -2334,7 +2332,7 @@ async function descargar(tipo, btnPdfId='btn-pdf', btnImgId='btn-img', statusId=
 
 
 /* ====== REGISTRO ====== */
-const INFORMATIVAS_ASIG = ['preside','dirige','reconocimientos','agradecimientos','asuntos_estaca','himno_inicial','himno_intermedio','himno_final'];
+const INFORMATIVAS_ASIG = ['preside','dirige','reconocimientos','asuntos_estaca','himno_inicial','himno_intermedio','himno_final'];
 const HIMNO_CAMPO = {
   himno_inicial:'himnoInicial',
   himno_intermedio:'himnoIntermedio',
@@ -2343,7 +2341,7 @@ const HIMNO_CAMPO = {
 const MINUTA_TEMPLATE = [
   ['adultos','preside','Preside'], ['adultos','dirige','Dirige'],
   ['adultos','director','Director/a de Música'], ['adultos','pianista','Pianista'],
-  ['adultos','reconocimientos','Reconocimientos'], ['adultos','agradecimientos','Agradecimientos'],
+  ['adultos','reconocimientos','Reconocimientos'],
   ['adultos','himno_inicial','Himno inicial'], ['adultos','oracion_inicial','Oración Inicial'],
   ...Array(4).fill(['adultos','mensaje','Mensaje']),
   ['adultos','himno_intermedio','Himno intermedio (Congregación de pie)'],
@@ -2352,14 +2350,14 @@ const MINUTA_TEMPLATE = [
 
   ['lideres','preside','Preside'], ['lideres','dirige','Dirige'],
   ['lideres','director','Director/a de Música'], ['lideres','pianista','Pianista'],
-  ['lideres','reconocimientos','Reconocimientos'], ['lideres','agradecimientos','Agradecimientos'],
+  ['lideres','reconocimientos','Reconocimientos'],
   ['lideres','himno_inicial','Himno inicial'], ['lideres','oracion_inicial','Oración Inicial'],
   ['lideres','capacitacion','Capacitación'], ['lideres','mensaje','Mensaje final'],
   ['lideres','himno_final','Himno final'], ['lideres','oracion_final','Oración Final'],
 
   ['general','preside','Preside'], ['general','dirige','Dirige'],
   ['general','director','Director/a de Música'], ['general','pianista','Pianista'],
-  ['general','reconocimientos','Reconocimientos'], ['general','agradecimientos','Agradecimientos'],
+  ['general','reconocimientos','Reconocimientos'],
   ['general','himno_inicial','Himno inicial'], ['general','oracion_inicial','Oración Inicial'],
   ['general','asuntos_estaca','Asuntos de Estaca'],
   ...Array(3).fill(['general','mensaje','Mensaje']),
@@ -2398,6 +2396,10 @@ function buildDefaultRegistro(){
 
 function migrateRegistro(reg){
   let changed = false;
+  if(reg.some(r=>r.asig==='agradecimientos')){
+    reg = reg.filter(r=>r.asig!=='agradecimientos');
+    changed = true;
+  }
   if(!reg.some(r=>r.minutaVersion===3)){
     const anterior = reg;
     const plantilla = buildDefaultRegistro().filter(r=>!OPERACIONES_ASIG.includes(r.asig));
@@ -2608,18 +2610,17 @@ function _toastRegistro(){
 }
 
 function obtenerElementosMinuta(registro){
-  if(!['reconocimientos','agradecimientos'].includes(registro.asig)) return [];
+  if(registro.asig!=='reconocimientos') return [];
   if(Array.isArray(registro.elementosMinuta)){
     return registro.elementosMinuta.map(elemento=>String(elemento||'').trim());
   }
-  const separador = registro.asig==='reconocimientos' ? /[\n;,]+/ : /[\n;]+/;
-  return (registro.nombre||'').split(separador).map(elemento=>elemento.trim()).filter(Boolean);
+  return (registro.nombre||'').split(/[\n;,]+/).map(elemento=>elemento.trim()).filter(Boolean);
 }
 function renderEditorListaMinuta(registro){
   const elementos=obtenerElementosMinuta(registro);
   if(!elementos.length || elementos[elementos.length-1]) elementos.push('');
-  const etiqueta=registro.asig==='reconocimientos'?'reconocimiento':'agradecimiento';
-  const placeholder=registro.asig==='reconocimientos'?'Agregar reconocimiento...':'Agregar persona o grupo...';
+  const etiqueta='reconocimiento';
+  const placeholder='Agregar reconocimiento...';
   return `<div class="minuta-list-editor" data-minuta-list="${escAtributo(registro.id)}">
     <div class="minuta-list-items">${elementos.map((elemento,indice)=>`<div class="minuta-list-item">
       <input type="text" class="minuta-list-input" data-record-id="${escAtributo(registro.id)}" data-record-index="${indice}" value="${escAtributo(elemento)}" placeholder="${placeholder}" aria-label="${etiqueta} ${indice+1}" autocomplete="off">
@@ -2717,7 +2718,7 @@ function construirCartaEspecialDesdeRegistro(entry){
     <div class="carta-fecha">${fmtCarta(fechaCarta, ciudad)}</div>
     <div class="carta-saludo">Estimados Pte. y Hna.${nombre ? ' ' + esc(nombre) : ''},</div>
     <div class="carta-texto">
-      <p>El <strong>${fmtDiaCap(fecha)} ${fmtFecha(fecha)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
+      <p>El <strong>${fmtDia(fecha)} ${fmtFecha(fecha)} a las ${hora} Hs</strong> se llevará a cabo la <strong>${esc(sesion)}</strong> de nuestra Conferencia de Estaca en ${esc(lugar)}.</p>
       <p>En esta oportunidad queremos extenderles la invitación para participar compartiendo un mensaje en la ${esc(sesion).toLowerCase()}.</p>
       <div class="carta-asig-box"><p>Tiempo asignado a cada uno: <strong>${duracionIndividual} minutos</strong></p></div>
       <p>En caso de que su esposa no pueda participar, dispondrá de <strong>${duracionTotal} minutos</strong> para compartir el mensaje.</p>
@@ -3200,7 +3201,6 @@ function renderRegistro(){
         preside:'Nombre de quien preside',
         dirige:'Nombre de quien dirige',
         reconocimientos:'Agregar reconocimiento...',
-        agradecimientos:'Agregar persona o grupo...',
         asuntos_estaca:'Detalle de los asuntos y responsables',
         himno_inicial:'Número y título del himno',
         himno_intermedio:'Número y título del himno',
@@ -3215,7 +3215,7 @@ aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</spa
           ${isInformativa
             ? r.asig==='asuntos_estaca'
               ? `<div style="display:flex;align-items:center;gap:8px"><label style="display:flex;align-items:center;gap:5px;margin:0;white-space:nowrap;cursor:pointer"><input type="checkbox" style="width:auto" ${r.habilitado?'checked':''} onchange="updateMinutaHabilitada('${r.id}',this.checked)"> Incluir</label><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="minuta-value" placeholder="${infoPlaceholder}" ${r.habilitado?'':'disabled'}></div>`
-              : ['reconocimientos','agradecimientos'].includes(r.asig)
+              : r.asig==='reconocimientos'
                 ? renderEditorListaMinuta(r)
               : `<input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="minuta-value" placeholder="${infoPlaceholder}">`
             : isFilled
@@ -3843,13 +3843,7 @@ function construirPaginaMinuta(sesion, opciones={}){
   const horaFin = horarios[`${sesion}Fin`] || '';
   const fechaTexto = fechaSesion ? `${fmtDiaCap(fechaSesion)} ${fmtFecha(fechaSesion)}` : '';
   const horaTexto = horaInicio ? `${horaInicio}${horaFin ? ` – ${horaFin}` : ''} hs` : '';
-  const excluirAgenda = new Set(['preside','dirige','director','pianista','reconocimientos','agradecimientos']);
-  const agradecimientosGuardados = obtenerElementosMinuta(porTipo('agradecimientos')||{}).filter(Boolean);
-  const agradecimientos = [...agradecimientosGuardados];
-  if(!agradecimientos.some(v=>/todos los demás/i.test(v))){
-    agradecimientos.push('Todos los demás que participaron en la preparación');
-  }
-  const agradecimientosHTML = agradecimientos.map(v=>`<li>${esc(v)}</li>`).join('');
+  const excluirAgenda = new Set(['preside','dirige','director','pianista','reconocimientos']);
   const agenda = items.filter(r=>
     !excluirAgenda.has(r.asig) && (r.asig!=='asuntos_estaca' || r.habilitado)
   ).map(r=>{
@@ -3882,7 +3876,6 @@ function construirPaginaMinuta(sesion, opciones={}){
       </div>
       <div class="minuta-export-notes">
         <div class="minuta-export-note"><span class="minuta-export-label">Reconocimientos:</span> ${reconocimientosHTML}</div>
-        <div class="minuta-export-note"><span class="minuta-export-label">Agradecimientos:</span><ul class="minuta-export-thanks">${agradecimientosHTML}</ul></div>
       </div>
       <div class="minuta-export-agenda">${agenda}</div>
     </div>`;
