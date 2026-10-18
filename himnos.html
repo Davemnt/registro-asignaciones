@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#7b293f">
+<title>Himnos – Conferencia de Estaca Aldo Bonzi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+@font-face {
+  font-family: 'McKayLDS';
+  src: url('font/McKay ldsLat Regular.otf') format('opentype');
+  font-display: swap;
+}
+:root {
+  --ink:#202833; --muted:#69727d; --line:#e2dacd; --paper:#fffefb; --warm:#f6f1e8;
+  --wine:#7b293f; --wine-dark:#5d1f30; --navy:#29384a; --gold:#c8963e;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html { color-scheme:only light; -webkit-text-size-adjust:100%; }
+body { min-height:100vh; min-height:100dvh; background:var(--warm); color:var(--ink); font-family:'DM Sans','Segoe UI',sans-serif; }
+.hidden { display:none !important; }
+.pagina { max-width:520px; min-height:100vh; min-height:100dvh; margin:0 auto; display:flex; flex-direction:column; background:var(--paper); box-shadow:0 0 40px rgba(32,40,51,.06); }
+
+/* Encabezado */
+.cabecera { position:relative; padding:calc(26px + env(safe-area-inset-top,0px)) 24px 26px; text-align:center; background:linear-gradient(180deg,#fffefb 0%, #f8f1e6 100%); border-bottom:1px solid var(--line); }
+.cabecera::after { content:''; position:absolute; left:50%; bottom:-7px; width:14px; height:14px; transform:translateX(-50%) rotate(45deg); background:#f8f1e6; border-right:1px solid var(--line); border-bottom:1px solid var(--line); }
+.logo { height:54px; width:auto; }
+.sobre { margin-top:10px; color:var(--navy); font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; }
+.titulo { margin-top:2px; color:var(--wine); font-family:'McKayLDS','Lora',serif; font-size:52px; font-weight:400; line-height:1.05; }
+.sesion { margin-top:2px; font-family:'Lora',serif; font-size:20px; font-style:italic; }
+.fecha { margin-top:6px; color:var(--muted); font-size:13px; font-weight:600; }
+
+/* Lista de himnos */
+.contenido { flex:1; padding:28px 18px 22px; }
+.instruccion { margin-bottom:14px; color:var(--muted); font-size:13.5px; text-align:center; }
+.himnos { display:flex; flex-direction:column; gap:12px; }
+.himno { position:relative; display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:14px; width:100%; padding:16px 16px 16px 14px; border:1px solid var(--line); border-radius:14px; background:#fff; color:inherit; font:inherit; text-align:left; cursor:pointer; box-shadow:0 2px 0 rgba(32,40,51,.03); transition:transform .12s, box-shadow .12s, border-color .12s; -webkit-tap-highlight-color:transparent; }
+.himno:active { transform:scale(.985); }
+.himno-num { display:grid; place-items:center; min-width:66px; height:66px; padding:0 8px; border-radius:12px; background:var(--warm); color:var(--wine); font-family:'Lora',serif; font-size:24px; font-weight:600; }
+.himno-num small { display:block; margin-bottom:-6px; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:9.5px; font-weight:700; letter-spacing:1px; }
+.himno-txt { min-width:0; }
+.himno-num.coro { font-size:17px; letter-spacing:.5px; }
+.tarjeta-num.coro { font-size:52px; }
+.himno-etiqueta { display:flex; flex-wrap:wrap; align-items:center; gap:4px 6px; color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; }
+.himno-titulo { margin-top:3px; font-family:'Lora',serif; font-size:19px; font-weight:600; line-height:1.25; overflow-wrap:anywhere; }
+.de-pie { white-space:nowrap; padding:2px 7px; border-radius:999px; background:#eef1f4; color:var(--navy); font-size:9.5px; letter-spacing:.3px; text-transform:none; }
+.flecha { color:#b3a99a; font-size:22px; }
+.himno.ahora { border-color:var(--wine); box-shadow:0 0 0 3px rgba(123,41,63,.12), 0 8px 20px rgba(123,41,63,.12); }
+.himno.ahora .himno-num { background:var(--wine); color:#fff; }
+.himno.ahora .himno-num small { color:rgba(255,255,255,.75); }
+.ahora-chip { white-space:nowrap; display:none; align-items:center; gap:6px; padding:3px 9px; border-radius:999px; background:var(--wine); color:#fff; font-size:10px; letter-spacing:.6px; }
+.himno.ahora .ahora-chip { display:inline-flex; }
+.ahora-chip::before { content:''; width:6px; height:6px; border-radius:50%; background:#fff; animation:latido 1.4s infinite; }
+@keyframes latido { 0%,100%{opacity:1} 50%{opacity:.25} }
+.vacio { padding:40px 18px; text-align:center; color:var(--muted); font-size:15px; line-height:1.5; }
+.vacio strong { display:block; margin-bottom:6px; color:var(--ink); font-family:'Lora',serif; font-size:20px; }
+
+/* Elegir sesión */
+.sesiones { display:flex; flex-direction:column; gap:10px; }
+.sesiones a { display:flex; justify-content:space-between; align-items:center; padding:18px; border:1px solid var(--line); border-radius:14px; background:#fff; color:var(--ink); font-family:'Lora',serif; font-size:19px; font-weight:600; text-decoration:none; }
+.sesiones a span { color:var(--wine); font-size:22px; }
+
+/* Detalle de un himno */
+.detalle { flex:1; display:flex; flex-direction:column; padding:20px 18px 24px; }
+.volver { align-self:flex-start; display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 16px 0 12px; border:1px solid var(--line); border-radius:999px; background:#fff; color:var(--navy); font:700 14px 'DM Sans',sans-serif; cursor:pointer; }
+.tarjeta { margin-top:22px; padding:34px 24px 30px; border:1px solid var(--line); border-radius:20px; background:#fff; text-align:center; box-shadow:0 10px 30px rgba(32,40,51,.06); }
+.tarjeta-etiqueta { color:var(--muted); font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; }
+.tarjeta-num { margin-top:14px; color:var(--wine); font-family:'Lora',serif; font-size:76px; font-weight:600; line-height:1; }
+.tarjeta-num small { display:block; margin-bottom:6px; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; letter-spacing:3px; }
+.tarjeta-titulo { margin-top:14px; font-family:'Lora',serif; font-size:26px; font-weight:600; line-height:1.25; }
+.tarjeta-coleccion { margin-top:8px; color:var(--muted); font-size:13px; }
+.tarjeta-pie { margin-top:14px; display:inline-flex; padding:4px 12px; border-radius:999px; background:#eef1f4; color:var(--navy); font-size:12px; font-weight:700; }
+.abrir { display:flex; align-items:center; justify-content:center; gap:10px; margin-top:22px; min-height:56px; border-radius:14px; background:var(--wine); color:#fff; font-size:17px; font-weight:700; text-decoration:none; box-shadow:0 8px 20px rgba(123,41,63,.25); }
+.abrir:active { background:var(--wine-dark); }
+.nota { margin-top:12px; color:var(--muted); font-size:12.5px; line-height:1.45; text-align:center; }
+.otros { margin-top:26px; }
+.otros h3 { margin-bottom:10px; color:var(--muted); font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; text-align:center; }
+.otros .himnos { gap:8px; }
+.otros .himno { padding:10px 12px; }
+.otros .himno-num { min-width:50px; height:50px; font-size:18px; }
+.otros .himno-titulo { font-size:16px; }
+
+.pie { padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px)); text-align:center; color:#8a929c; font-size:11.5px; border-top:1px solid var(--line); }
+.cargando { padding:60px 0; text-align:center; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="pagina">
+  <header class="cabecera">
+    <img class="logo" src="images/logo-estaca.png" alt="Estaca Aldo Bonzi">
+    <div class="sobre">Conferencia de Estaca</div>
+    <h1 class="titulo">Himnos</h1>
+    <div class="sesion" id="sesion-nombre"></div>
+    <div class="fecha" id="sesion-fecha"></div>
+  </header>
+
+  <main class="contenido" id="vista-lista">
+    <div class="cargando" id="cargando">Cargando himnos…</div>
+  </main>
+
+  <section class="detalle hidden" id="vista-detalle" aria-live="polite"></section>
+
+  <footer class="pie">Estaca Buenos Aires Argentina Aldo Bonzi</footer>
+</div>
+
+<script>
+const config = {
+  apiKey: "AIzaSyASRegVlET3dcqe16k2gF12EW7tOOgC7eY",
+  authDomain: "registro-asignaciones-conf.firebaseapp.com",
+  projectId: "registro-asignaciones-conf",
+  storageBucket: "registro-asignaciones-conf.firebasestorage.app",
+  messagingSenderId: "829597625110",
+  appId: "1:829597625110:web:76ba78f57f837c75b03e37"
+};
+firebase.initializeApp(config);
+
+const SESIONES = { lideres:'Sesión de Líderes', adultos:'Sesión de Adultos', general:'Sesión General' };
+const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const params = new URLSearchParams(location.search);
+const sesion = SESIONES[params.get('s')] ? params.get('s') : null;
+let datos = null;
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtFecha(f){
+  if(!f) return '';
+  const [y,m,d] = f.split('-').map(Number);
+  return `${DIAS[new Date(y,m-1,d).getDay()]} ${d} de ${MESES[m-1]}`;
+}
+
+function nombreCancion(h){
+  if(h.coro) return [h.numero ? 'N° '+h.numero : '', h.titulo].filter(Boolean).join(' ') || 'Presentación del coro';
+  return h.titulo || h.texto;
+}
+function himnosSesion(){ return (datos && datos.sesiones && datos.sesiones[sesion] && datos.sesiones[sesion].himnos) || []; }
+function esActual(h){ return !!(datos && datos.actual && datos.actual.sesion===sesion && datos.actual.clave===h.clave); }
+
+function tarjetaHimno(h){
+  return `<button type="button" class="himno ${esActual(h)?'ahora':''}" onclick="abrirHimno('${h.clave}')">
+    <span class="himno-num ${h.coro?'coro':''}">${h.coro ? 'Coro' : (h.numero ? `<span><small>N°</small>${h.numero}</span>` : '♪')}</span>
+    <span class="himno-txt">
+      <span class="himno-etiqueta">${esc(h.etiqueta)}${h.dePie?'<span class="de-pie">De pie</span>':''}<span class="ahora-chip">Ahora</span></span>
+      <span class="himno-titulo">${esc(nombreCancion(h))}</span>
+    </span>
+    <span class="flecha" aria-hidden="true">›</span>
+  </button>`;
+}
+
+function renderLista(){
+  const lista = document.getElementById('vista-lista');
+  if(!sesion){
+    document.getElementById('sesion-nombre').textContent = 'Elegí la sesión';
+    lista.innerHTML = `<div class="sesiones">${Object.entries(SESIONES).map(([k,v])=>`<a href="?s=${k}">${v}<span>›</span></a>`).join('')}</div>`;
+    return;
+  }
+  const info = datos && datos.sesiones ? datos.sesiones[sesion] : null;
+  document.getElementById('sesion-nombre').textContent = SESIONES[sesion];
+  document.getElementById('sesion-fecha').textContent = info ? [fmtFecha(info.fecha), info.hora ? info.hora+' hs' : ''].filter(Boolean).join(' · ') : '';
+  const himnos = himnosSesion();
+  lista.innerHTML = himnos.length
+    ? `<p class="instruccion">Tocá el himno que vamos a cantar</p><div class="himnos">${himnos.map(tarjetaHimno).join('')}</div>`
+    : `<div class="vacio"><strong>Muy pronto</strong>Los himnos de esta sesión todavía no fueron publicados.</div>`;
+}
+
+function renderDetalle(clave){
+  const h = himnosSesion().find(x=>x.clave===clave);
+  if(!h){ mostrarLista(false); return; }
+  const otros = himnosSesion().filter(x=>x.clave!==clave);
+  document.getElementById('vista-detalle').innerHTML = `
+    <button type="button" class="volver" onclick="history.back()">‹ Volver a los himnos</button>
+    <div class="tarjeta">
+      <div class="tarjeta-etiqueta">${esc(h.etiqueta)}</div>
+      ${h.coro ? '<div class="tarjeta-num coro">Coro</div>' : (h.numero ? `<div class="tarjeta-num"><small>HIMNO</small>${h.numero}</div>` : '')}
+      <div class="tarjeta-titulo">${esc(nombreCancion(h))}</div>
+      ${h.coleccion ? `<div class="tarjeta-coleccion">${esc(h.coleccion)}</div>` : ''}
+      ${h.dePie ? '<div class="tarjeta-pie">La congregación canta de pie</div>' : ''}
+    </div>
+    ${h.url
+      ? `<a class="abrir" href="${esc(h.url)}">Ver letra y música</a>
+         <p class="nota">Se abre en la Biblioteca del Evangelio. Para volver, usá el botón “atrás” de tu teléfono.</p>`
+      : `<p class="nota">Buscá este himno en tu himnario o en la aplicación Biblioteca del Evangelio.</p>`}
+    ${otros.length ? `<div class="otros"><h3>¿Te equivocaste de himno?</h3><div class="himnos">${otros.map(tarjetaHimno).join('')}</div></div>` : ''}`;
+}
+
+/* Navegación con historial: el botón "atrás" del teléfono vuelve a la lista */
+function abrirHimno(clave){
+  const actual = history.state && history.state.himno;
+  if(actual) history.replaceState({himno:clave}, '', '#'+clave);
+  else history.pushState({himno:clave}, '', '#'+clave);
+  mostrarDetalle(clave);
+}
+function mostrarDetalle(clave){
+  renderDetalle(clave);
+  document.getElementById('vista-lista').classList.add('hidden');
+  document.getElementById('vista-detalle').classList.remove('hidden');
+  window.scrollTo({top:0});
+}
+function mostrarLista(){
+  document.getElementById('vista-detalle').classList.add('hidden');
+  document.getElementById('vista-lista').classList.remove('hidden');
+  renderLista();
+}
+window.addEventListener('popstate', e=>{
+  if(e.state && e.state.himno) mostrarDetalle(e.state.himno); else mostrarLista();
+});
+
+function actualizar(){
+  const clave = history.state && history.state.himno;
+  if(clave) renderDetalle(clave); else renderLista();
+}
+
+if(!sesion){
+  renderLista();
+} else {
+  firebase.auth().signInAnonymously().catch(e=>console.error(e));
+  firebase.auth().onAuthStateChanged(user=>{
+    if(!user) return;
+    firebase.firestore().collection('datos').doc('himnos-publico').onSnapshot(doc=>{
+      datos = doc.exists ? doc.data() : null;
+      actualizar();
+    }, err=>{
+      console.error(err);
+      document.getElementById('vista-lista').innerHTML = '<div class="vacio"><strong>Sin conexión</strong>No se pudieron cargar los himnos. Revisá tu conexión e intentá de nuevo.</div>';
+    });
+  });
+  // Si se abrió directamente un himno (por ejemplo, al volver desde la Biblioteca del Evangelio)
+  if(history.state && history.state.himno){
+    document.getElementById('vista-lista').classList.add('hidden');
+    document.getElementById('vista-detalle').classList.remove('hidden');
+  }
+}
+</script>
+</body>
+</html>
