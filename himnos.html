@@ -8,9 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="preload" href="images/logo-estaca.png" as="image">
 <style>
 @font-face {
   font-family: 'McKayLDS';
@@ -118,7 +117,8 @@ const config = {
   messagingSenderId: "829597625110",
   appId: "1:829597625110:web:76ba78f57f837c75b03e37"
 };
-firebase.initializeApp(config);
+const URL_REST = `https://firestore.googleapis.com/v1/projects/${config.projectId}/databases/(default)/documents/datos/himnos-publico?key=${config.apiKey}`;
+const CLAVE_CACHE = 'himnos-publico-v1';
 
 const SESIONES = { lideres:'Sesión de Líderes', adultos:'Sesión de Adultos', general:'Sesión General' };
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -215,25 +215,94 @@ function actualizar(){
   if(clave) renderDetalle(clave); else renderLista();
 }
 
+/* ===== CARGA RÁPIDA =====
+   1) Muestra al instante la última copia guardada en el teléfono.
+   2) Pide los himnos con una sola consulta liviana (sin librerías).
+   3) En segundo plano conecta el tiempo real, para marcar el himno "Ahora". */
+
+// Convierte el formato de la API de Firestore a un objeto común
+function desdeFirestore(v){
+  if(!v || typeof v !== 'object') return null;
+  if('stringValue' in v) return v.stringValue;
+  if('integerValue' in v) return Number(v.integerValue);
+  if('doubleValue' in v) return v.doubleValue;
+  if('booleanValue' in v) return v.booleanValue;
+  if('nullValue' in v) return null;
+  if('timestampValue' in v) return v.timestampValue;
+  if('arrayValue' in v) return (v.arrayValue.values || []).map(desdeFirestore);
+  if('mapValue' in v){
+    const o = {};
+    Object.entries(v.mapValue.fields || {}).forEach(([k,x])=>{ o[k] = desdeFirestore(x); });
+    return o;
+  }
+  return null;
+}
+
+function guardarCache(d){ try { localStorage.setItem(CLAVE_CACHE, JSON.stringify(d)); } catch(e){} }
+function leerCache(){ try { return JSON.parse(localStorage.getItem(CLAVE_CACHE) || 'null'); } catch(e){ return null; } }
+
+function aplicarDatos(d){
+  if(!d) return;
+  datos = d;
+  guardarCache(d);
+  actualizar();
+}
+
+function mostrarSinConexion(){
+  if(datos) return; // ya hay himnos en pantalla: no se interrumpe
+  document.getElementById('vista-lista').innerHTML = '<div class="vacio"><strong>Sin conexión</strong>No se pudieron cargar los himnos. Revisá tu conexión e intentá de nuevo.</div>';
+}
+
+async function cargarRapido(){
+  try {
+    const r = await fetch(URL_REST, {cache:'no-store'});
+    if(r.status === 404){ aplicarDatos({sesiones:{}}); return; }
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const doc = await r.json();
+    aplicarDatos(desdeFirestore({mapValue:{fields:doc.fields || {}}}));
+  } catch(e){
+    console.error('Himnos:', e);
+    mostrarSinConexion();
+  }
+}
+
+function cargarScript(src){
+  return new Promise((ok, falla)=>{
+    const sc = document.createElement('script');
+    sc.src = src; sc.async = true;
+    sc.onload = ok; sc.onerror = falla;
+    document.head.appendChild(sc);
+  });
+}
+
+async function conectarTiempoReal(){
+  try {
+    await cargarScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+    await cargarScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js');
+    firebase.initializeApp(config);
+    firebase.firestore().collection('datos').doc('himnos-publico').onSnapshot(doc=>{
+      if(doc.exists) aplicarDatos(doc.data());
+    }, err=>console.error('Tiempo real:', err));
+  } catch(e){
+    console.error('No se pudo conectar el tiempo real:', e);
+  }
+}
+
 if(!sesion){
   renderLista();
 } else {
-  firebase.auth().signInAnonymously().catch(e=>console.error(e));
-  firebase.auth().onAuthStateChanged(user=>{
-    if(!user) return;
-    firebase.firestore().collection('datos').doc('himnos-publico').onSnapshot(doc=>{
-      datos = doc.exists ? doc.data() : null;
-      actualizar();
-    }, err=>{
-      console.error(err);
-      document.getElementById('vista-lista').innerHTML = '<div class="vacio"><strong>Sin conexión</strong>No se pudieron cargar los himnos. Revisá tu conexión e intentá de nuevo.</div>';
-    });
-  });
-  // Si se abrió directamente un himno (por ejemplo, al volver desde la Biblioteca del Evangelio)
+  // Si se volvió desde la Biblioteca del Evangelio con un himno abierto
   if(history.state && history.state.himno){
     document.getElementById('vista-lista').classList.add('hidden');
     document.getElementById('vista-detalle').classList.remove('hidden');
   }
+  const copia = leerCache();
+  if(copia){ datos = copia; actualizar(); }
+  cargarRapido().finally(()=>{
+    // El tiempo real se conecta cuando la página ya está visible
+    const iniciar = ()=>setTimeout(conectarTiempoReal, 800);
+    if(document.readyState === 'complete') iniciar(); else window.addEventListener('load', iniciar, {once:true});
+  });
 }
 </script>
 </body>

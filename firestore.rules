@@ -2,14 +2,23 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Todo lo de la app vive dentro de "datos":
-    //   datos/horarios, datos/fechas, datos/relevos-sostenimientos,
-    //   datos/himnos-publico (lo que lee la página del QR),
-    //   datos/registro/items/{asignación}  (una por documento, en tiempo real)
-    //   datos/registro/respaldos/{copia}   (respaldos automáticos)
-    // La app inicia sesión de forma anónima, así que se exige una sesión activa.
+    // Cuenta de coordinación: se ingresa con el PIN desde la app
+    function esCoordinacion() {
+      return request.auth != null
+        && request.auth.token.email == 'coordinacion@registro-asignaciones-conf.web.app';
+    }
+
+    // Himnos que ve la congregación al escanear el QR: cualquiera puede leerlos,
+    // solo la coordinación puede modificarlos.
+    match /datos/himnos-publico {
+      allow read: if true;
+      allow write: if esCoordinacion();
+    }
+
+    // Todo lo demás (registro, horarios, fechas, relevos, respaldos, títulos de himnos):
+    // solo la coordinación.
     match /datos/{documento=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if esCoordinacion();
     }
   }
 }
