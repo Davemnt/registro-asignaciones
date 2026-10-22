@@ -76,5 +76,6 @@ firebase deploy
 
 ## © Licencia
 
-Copyright © 2025–2026 David Montecinos. Todos los derechos reservados.  
+**Creador y desarrollador:** David Monte  
+Copyright © 2025–2026 David Monte. Todos los derechos reservados.  
 Consultar el archivo [COPYRIGHT](./COPYRIGHT) para más detalles.

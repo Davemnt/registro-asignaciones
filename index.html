@@ -1,9 +1,17 @@
 ﻿<!DOCTYPE html>
+<!--
+  Gestión de Conferencia — Estaca Aldo Bonzi
+  Creador y desarrollador: David Monte
+  Copyright © 2025–2026 David Monte. Todos los derechos reservados.
+  Ver el archivo COPYRIGHT.
+-->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Asignaciones Conferencias – Estaca Aldo Bonzi</title>
+<meta name="author" content="David Monte">
+<meta name="copyright" content="© 2026 David Monte. Todos los derechos reservados.">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@1/dist/html2canvas-pro.min.js"></script>
 <script>window.html2canvas || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>')</script>
@@ -1106,6 +1114,10 @@ body.vivo-abierto { overflow:hidden; }
 .pin-verificando { display:none; }
 .pin-overlay.verificando .pin-verificando { display:block; }
 .pin-overlay.verificando .pin-form { display:none; }
+.pin-creditos { margin-top:18px; padding-top:14px; border-top:1px solid #ece7de; color:#8a929c; font-size:11.5px; line-height:1.5; }
+.pin-creditos strong { color:#4d5763; font-weight:600; }
+.panel-creditos { flex-shrink:0; padding:8px 16px; border-top:1px solid #e6e1d8; color:#8a929c; font-size:11px; text-align:center; }
+.panel-creditos strong { color:#4d5763; font-weight:600; }
 .sesion-barra { display:flex; align-items:center; gap:6px; margin-left:auto; flex-shrink:0; }
 .app.registro-mode .sesion-barra { margin-left:10px; padding-left:10px; border-left:1px solid #d8d4cc; }
 .btn-sesion { display:inline-flex; align-items:center; gap:6px; min-height:34px; padding:0 12px; border:1px solid #d8d4cc; border-radius:4px; background:#fff; color:#29384a; font:600 12px 'DM Sans',sans-serif; white-space:nowrap; cursor:pointer; }
@@ -1142,6 +1154,7 @@ body.vivo-abierto { overflow:hidden; }
       <button type="submit" id="pin-boton">Ingresar</button>
       <div id="pin-error" role="alert"></div>
     </div>
+    <div class="pin-creditos">Creador y desarrollador: <strong>David Monte</strong><br>© 2025–2026 · Todos los derechos reservados</div>
   </form>
 </div>
 
@@ -1837,6 +1850,7 @@ body.vivo-abierto { overflow:hidden; }
     <div class="panel-footer-mobile">
       <a href="#preview-area">👁️ Ver Vista Previa</a>
     </div>
+    <div class="panel-creditos">Creador y desarrollador: <strong>David Monte</strong> · © 2025–2026 · Todos los derechos reservados</div>
   </div><!-- /panel -->
 
   <!-- ====== VISTA PREVIA ====== -->
@@ -1928,9 +1942,40 @@ const EMAIL_COORDINACION = 'coordinacion@registro-asignaciones-conf.web.app';
 
 function _esCoordinacion(user){ return !!(user && user.email === EMAIL_COORDINACION); }
 
+/* ===== CIERRE POR INACTIVIDAD =====
+   La última actividad se guarda en localStorage para que valga entre pestañas y
+   también al volver a abrir el navegador. Con la vista En vivo abierta no se cierra. */
+const INACTIVIDAD_MAX_MS = 30 * 60 * 1000;
+const CLAVE_ACTIVIDAD = 'ultima-actividad';
+let _ultimaMarca = 0;
+
+function _marcarActividad(){
+  const ahora = Date.now();
+  if(ahora - _ultimaMarca < 5000) return;
+  _ultimaMarca = ahora;
+  try { localStorage.setItem(CLAVE_ACTIVIDAD, String(ahora)); } catch(e){}
+}
+function _sesionVencida(){
+  if(_vivo.abierto){ _marcarActividad(); return false; }
+  let ultima = 0;
+  try { ultima = Number(localStorage.getItem(CLAVE_ACTIVIDAD)) || 0; } catch(e){}
+  return !!ultima && Date.now() - ultima > INACTIVIDAD_MAX_MS;
+}
+function _revisarInactividad(){
+  if(!_currentUser || !_sesionVencida()) return;
+  try { sessionStorage.setItem('cierre-inactividad', '1'); } catch(e){}
+  _auth.signOut();
+}
+['pointerdown','keydown','wheel','touchstart'].forEach(ev=>document.addEventListener(ev, _marcarActividad, {passive:true}));
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) _revisarInactividad(); });
+setInterval(_revisarInactividad, 30000);
+
 _auth.onAuthStateChanged(async function(user){
   if(_esCoordinacion(user)){
     _currentUser = user;
+    if(_sesionVencida()){ _revisarInactividad(); return; }
+    _ultimaMarca = 0;
+    _marcarActividad();
     _ocultarPin();
     if(!_iniciado){
       _iniciado = true;
@@ -1955,6 +2000,12 @@ function _mostrarPin(){
   const capa = document.getElementById('pin-overlay');
   capa.classList.remove('hidden');
   capa.classList.remove('verificando');
+  try {
+    if(sessionStorage.getItem('cierre-inactividad')){
+      sessionStorage.removeItem('cierre-inactividad');
+      document.getElementById('pin-error').textContent = 'La sesión se cerró por inactividad.';
+    }
+  } catch(e){}
   setTimeout(()=>document.getElementById('pin-input').focus(), 50);
 }
 function _ocultarPin(){
@@ -1985,6 +2036,9 @@ async function ingresarConPin(ev){
   boton.disabled = true;
   boton.textContent = 'Verificando…';
   error.textContent = '';
+  // Se marca antes de entrar para que una actividad vieja no cierre la sesión nueva
+  _ultimaMarca = 0;
+  _marcarActividad();
   try {
     await _auth.signInWithEmailAndPassword(EMAIL_COORDINACION, pin);
   } catch(e){
