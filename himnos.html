@@ -6,15 +6,20 @@
 <meta name="theme-color" content="#7b293f">
 <title>Himnos – Conferencia de Estaca Aldo Bonzi</title>
 <meta name="author" content="David Monte">
+<!-- Lo primero: conectar con Firestore, que es de donde vienen los himnos -->
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
-<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
-<link rel="preload" href="images/logo-estaca.png" as="image">
+<!-- Las fuentes de Google no bloquean la primera pintura: mientras llegan se usa la del sistema -->
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet"></noscript>
 <style>
+/* Versión recortada de McKay con solo las letras de "Himnos" (3 KB en vez de 750 KB).
+   Si se cambia el texto del título, regenerar con:
+   pyftsubset "font/McKay ldsLat Regular.otf" --text="Himnos" --flavor=woff --output-file=font/mckay-himnos.woff */
 @font-face {
   font-family: 'McKayLDS';
-  src: url('font/McKay ldsLat Regular.otf') format('opentype');
+  src: url('font/mckay-himnos.woff') format('woff');
   font-display: swap;
 }
 :root {
@@ -30,7 +35,7 @@ body { min-height:100vh; min-height:100dvh; background:var(--warm); color:var(--
 /* Encabezado */
 .cabecera { position:relative; padding:calc(26px + env(safe-area-inset-top,0px)) 24px 26px; text-align:center; background:linear-gradient(180deg,#fffefb 0%, #f8f1e6 100%); border-bottom:1px solid var(--line); }
 .cabecera::after { content:''; position:absolute; left:50%; bottom:-7px; width:14px; height:14px; transform:translateX(-50%) rotate(45deg); background:#f8f1e6; border-right:1px solid var(--line); border-bottom:1px solid var(--line); }
-.logo { height:54px; width:auto; }
+.logo { height:54px; width:auto; mix-blend-mode:multiply; } /* el logo tiene fondo blanco: así se funde con el crema */
 .sobre { margin-top:10px; color:var(--navy); font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; }
 .titulo { margin-top:2px; color:var(--wine); font-family:'McKayLDS','Lora',serif; font-size:52px; font-weight:400; line-height:1.05; }
 .sesion { margin-top:2px; font-family:'Lora',serif; font-size:20px; font-style:italic; }
@@ -93,7 +98,10 @@ body { min-height:100vh; min-height:100dvh; background:var(--warm); color:var(--
 <body>
 <div class="pagina">
   <header class="cabecera">
-    <img class="logo" src="images/logo-estaca.png" alt="Estaca Aldo Bonzi">
+    <picture>
+      <source srcset="images/logo-estaca-web.webp" type="image/webp">
+      <img class="logo" src="images/logo-estaca-web.png" width="108" height="54" alt="Estaca Aldo Bonzi">
+    </picture>
     <div class="sobre">Conferencia de Estaca</div>
     <h1 class="titulo">Himnos</h1>
     <div class="sesion" id="sesion-nombre"></div>

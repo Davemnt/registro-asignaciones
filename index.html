@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Asignaciones Conferencias – Estaca Aldo Bonzi</title>
 <meta name="author" content="David Monte">
-<meta name="copyright" content="© 2026 David Monte. Todos los derechos reservados.">
+<meta name="copyright" content="© 2025–2026 David Monte. Todos los derechos reservados.">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@1/dist/html2canvas-pro.min.js"></script>
 <script>window.html2canvas || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>')</script>
@@ -121,24 +121,25 @@ textarea { resize: vertical; min-height: 52px; }
 .minuta-export-host { position:fixed; left:-10000px; top:0; width:794px; z-index:-1; }
 .minuta-export-page { width:794px; height:1123px; position:relative; overflow:hidden; background:#fff; color:#111; font-family:'Times New Roman',serif; }
 .minuta-export-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
-.minuta-export-content { position:relative; z-index:1; padding:100px 112px 100px; height:100%; font-size:13.5px; line-height:1.2; }
-.minuta-export-title { text-align:center; font-size:13.5px; font-weight:400; }
-.minuta-export-session { text-align:center; font-size:13.5px; font-weight:700; margin-top:2px; text-transform:uppercase; }
+/* --fs (tamaño de letra) y --gap (separación entre bloques) los ajusta ajustarMinutaAlContenido()
+   para que la minuta llene la hoja sin pisar las franjas del fondo */
+.minuta-export-content { --fs:13.5px; --gap:24px; --extra:0px; position:relative; z-index:1; padding:100px 112px 0; font-size:var(--fs); line-height:1.25; }
+.minuta-export-title { text-align:center; font-size:var(--fs); font-weight:400; letter-spacing:.4px; }
+.minuta-export-session { text-align:center; font-size:calc(var(--fs) * 1.2); font-weight:700; margin-top:3px; text-transform:uppercase; letter-spacing:.6px; }
 .minuta-export-date, .minuta-export-time { text-align:center; font-weight:700; margin-top:3px; }
 .minuta-export-time { margin-top:1px; }
-.minuta-export-meta { display:grid; grid-template-columns:1fr 1fr; column-gap:70px; row-gap:26px; margin-top:18px; }
+.minuta-export-meta { display:grid; grid-template-columns:1fr 1fr; column-gap:70px; row-gap:calc(var(--gap) * .8); margin-top:calc(var(--gap) * 1.1 + var(--extra, 0px)); padding-top:calc(var(--gap) * .7); border-top:1px solid rgba(0,0,0,.25); }
 .minuta-export-label { font-weight:700; }
-.minuta-export-notes { margin-top:20px; }
-.minuta-export-note { margin-bottom:25px; }
+.minuta-export-notes { margin-top:var(--gap); }
+.minuta-export-note { margin-bottom:var(--gap); }
 .minuta-export-recognition-separator { margin:0 5px; color:#64748B; font-weight:700; }
-.minuta-export-agenda { margin-top:20px; }
-.minuta-export-row { margin-bottom:24px; }
+.minuta-export-agenda { margin-top:0; }
+.minuta-export-row { margin-bottom:var(--gap); }
+.minuta-export-row:last-child { margin-bottom:0; }
 .minuta-export-row-label { font-weight:700; }
 .minuta-export-row-value { margin-left:3px; }
 .minuta-export-row-time { margin-left:4px; white-space:nowrap; }
 .minuta-export-row-topic { display:block; margin-top:3px; }
-.minuta-export-page[data-sesion="general"] .minuta-export-row { margin-bottom:22px; }
-.minuta-export-page[data-sesion="lideres"] .minuta-export-row { margin-bottom:25px; }
 
 
 
@@ -165,7 +166,6 @@ textarea { resize: vertical; min-height: 52px; }
 .reg-table thead th { background: #1E293B; color: #e2e8f0; padding: 11px 12px; text-align: left; font-size: 11px; letter-spacing: .5px; font-weight: 600; text-transform: uppercase; white-space: nowrap; }
 .reg-table thead th:first-child { border-radius: 11px 0 0 0; }
 .reg-table thead th:last-child  { border-radius: 0 11px 0 0; text-align:center; }
-.reg-table tbody tr:hover td:not(.td-toggle):not(.ses-header-td) { filter: brightness(0.97); }
 .reg-table td { padding: 9px 12px; border-bottom: 1px solid #F1F5F9; vertical-align: middle; background: #fff; }
 .reg-table tbody tr:last-child td { border-bottom: none; }
 /* Session group header row */
@@ -214,6 +214,7 @@ textarea { resize: vertical; min-height: 52px; }
 details[open].horarios-cfg summary::before { transform:rotate(90deg); }
 .horarios-cfg-body { display:flex; gap:16px; flex-wrap:wrap; padding:8px 14px 12px; border-top:1px solid #F1F5F9; }
 .horarios-cfg-body label { display:flex; align-items:center; gap:6px; font-weight:500; color:#374151; }
+.horarios-cfg-ayuda { flex-basis:100%; margin:2px 0 0; color:#69727d; font-size:10.5px; line-height:1.4; }
 .horarios-cfg-body input[type=time] { padding:4px 8px; border:1px solid #E2E8F0; border-radius:7px; font-size:12px; background:#fff; }
 /* Fecha cell */
 .fecha-empty { font-size:13px; color:#cbd5e1; }
@@ -230,14 +231,17 @@ details[open].horarios-cfg summary::before { transform:rotate(90deg); }
 .reg-table tr.reg-dragging > td { background:#f0fdf9 !important; opacity:.45; }
 .reg-table tr.reg-drag-over > td { border-top:3px solid #0F766E !important; }
 /* ---- Evolución de estado por fila ---- */
-tr.row-pendiente  td:not(.ses-header-td) { background: #fffbeb !important; }
-tr.row-avisado    td:not(.ses-header-td) { background: #fff7ed !important; }
-tr.row-confirmado td:not(.ses-header-td) { background: #f0fdf4 !important; }
-tr.row-reconf     td:not(.ses-header-td) { background: #dcfce7 !important; }
+/* Solo lo que requiere acción lleva fondo de color; lo confirmado queda neutro y se distingue por la barra izquierda */
+tr.row-pendiente  td:not(.ses-header-td) { background: #fffaeb !important; }
+tr.row-avisado    td:not(.ses-header-td) { background: #fff8f1 !important; }
+tr.row-confirmado td:not(.ses-header-td) { background: #fffefb !important; }
+tr.row-reconf     td:not(.ses-header-td) { background: #fffefb !important; }
 tr.row-pendiente  > td:first-child { box-shadow: inset 4px 0 0 #F59E0B; }
 tr.row-avisado    > td:first-child { box-shadow: inset 4px 0 0 #f97316; }
-tr.row-confirmado > td:first-child { box-shadow: inset 4px 0 0 #16A34A; }
-tr.row-reconf     > td:first-child { box-shadow: inset 4px 0 0 #059669; }
+tr.row-confirmado > td:first-child { box-shadow: inset 4px 0 0 #86c49b; }
+tr.row-reconf     > td:first-child { box-shadow: inset 4px 0 0 #2f8a57; }
+/* Checkboxes de fila: evitar que hereden el min-height/padding de los inputs de texto */
+.reg-table tbody input[type=checkbox].reg-sel { display:block; width:16px; height:16px; min-height:0; margin:auto; padding:0; box-shadow:none; cursor:pointer; }
 /* ---- Asistencia ---- */
 tr.row-asistencia td:not(.ses-header-td) { background: #fdf4ff !important; }
 tr.row-asistencia > td:first-child { box-shadow: inset 4px 0 0 #9333ea !important; }
@@ -273,9 +277,10 @@ tr.row-asistencia > td:first-child { box-shadow: inset 4px 0 0 #9333ea !importan
 .td-sin-avisar { box-shadow: inset 0 0 0 2px #F59E0B !important; border-radius: 6px; }
 .td-sin-avisar .name-filled-input { color: #92400e !important; font-weight: 700 !important; }
 /* ---- Diferenciación por sesión (columna drag-handle) ---- */
-tr.ses-lideres .drag-handle-cell { background: rgba(30,41,59,0.1) !important; color: #475569 !important; border-right: 1px solid rgba(30,41,59,0.12); }
-tr.ses-adultos .drag-handle-cell { background: rgba(30,41,59,0.1) !important; color: #475569 !important; border-right: 1px solid rgba(30,41,59,0.12); }
-tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; color: #475569 !important; border-right: 1px solid rgba(30,41,59,0.12); }
+tr.ses-lideres .drag-handle-cell,
+tr.ses-adultos .drag-handle-cell,
+tr.ses-general .drag-handle-cell { color: #b8b2a8 !important; }
+tr[data-id] .drag-handle-cell:hover { color: #7b293f !important; }
 .btn-del, .btn-edit { width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; padding:0; cursor:pointer; transition:all .15s; line-height:1; }
 .btn-del { background:#fff; color:#B42318; border:1px solid #FDA29B; }
 .btn-del:hover  { background:#fee2e2; color:#B42318; border-color:#B42318; }
@@ -288,6 +293,59 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
 .btn-dl.pdf { background:#DC2626; color:#fff; }
 .btn-dl.img { background:#15803d; color:#fff; }
 .reg-row-actions { display:flex; align-items:center; justify-content:center; gap:6px; max-width:100%; }
+.btn-mas { width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; padding:0 0 4px; border:1px solid #CBD5E1; border-radius:2px; background:#fff; color:#475569; font-size:18px; font-weight:700; line-height:1; cursor:pointer; transition:all .15s; }
+.btn-mas:hover, .btn-mas[aria-expanded="true"] { color:#7b293f; border-color:#7b293f; background:#fbf5f6; }
+.reg-acc-menu { position:fixed; z-index:1500; min-width:210px; padding:5px; border:1px solid #d8d4cc; border-radius:4px; background:#fffefb; box-shadow:0 12px 30px rgba(32,40,51,.18); }
+.reg-acc-menu button { display:flex; align-items:center; gap:9px; width:100%; min-height:36px; padding:7px 10px; border:0; border-radius:3px; background:transparent; color:#202833; font:600 12px 'DM Sans','Segoe UI',sans-serif; text-align:left; cursor:pointer; }
+.reg-acc-menu button:hover:not(:disabled), .reg-acc-menu button:focus-visible { background:#f3f0ea; outline:none; }
+.reg-acc-menu button:disabled { opacity:.45; cursor:not-allowed; }
+.reg-acc-menu button.peligro { color:#B42318; }
+.reg-acc-menu button.peligro:hover { background:#fff1f2; }
+.reg-acc-menu svg { width:15px; height:15px; flex-shrink:0; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.reg-acc-menu hr { margin:4px 2px; border:0; border-top:1px solid #e8e3dc; }
+/* Menús desplegables del encabezado (Minutas, Más, Coordinación) */
+.menu-desp { position:relative; }
+.menu-desp > summary { list-style:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer; user-select:none; }
+.menu-desp > summary::-webkit-details-marker { display:none; }
+.menu-flecha { width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; transition:transform .15s; }
+.menu-desp[open] > summary .menu-flecha { transform:rotate(180deg); }
+.menu-desp[open] > summary { border-color:#7b293f; color:#7b293f; background:#fbf5f6; }
+.menu-desp-panel { position:absolute; top:calc(100% + 6px); right:0; z-index:120; min-width:220px; padding:5px; border:1px solid #d8d4cc; border-radius:4px; background:#fffefb; box-shadow:0 12px 30px rgba(32,40,51,.18); }
+.menu-desp-panel button { display:flex; align-items:center; gap:9px; width:100%; min-height:36px; padding:7px 10px; border:0; border-radius:3px; background:transparent; color:#202833; font:600 12px 'DM Sans','Segoe UI',sans-serif; text-align:left; white-space:nowrap; cursor:pointer; }
+.menu-desp-panel button:hover, .menu-desp-panel button:focus-visible { background:#f3f0ea; outline:none; }
+.menu-desp-panel button.peligro { color:#B42318; }
+.menu-desp-panel button.peligro:hover { background:#fff1f2; }
+.menu-desp-panel svg { width:15px; height:15px; flex-shrink:0; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.menu-desp-panel hr { margin:4px 2px; border:0; border-top:1px solid #e8e3dc; }
+/* Horarios y Fechas: misma flecha hacia abajo que los menús desplegables */
+.reg-top-tools .horarios-cfg summary::before { content:none; }
+.reg-top-tools .horarios-cfg summary::after { content:''; width:6px; height:6px; margin:-3px 0 0 4px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg); transition:transform .15s; }
+.reg-top-tools details[open].horarios-cfg summary::after { margin-top:3px; transform:rotate(-135deg); }
+.btn-vivo .vivo-punto { display:inline-block; width:7px; height:7px; margin-right:7px; border-radius:50%; background:#e24a4a; box-shadow:0 0 0 3px rgba(226,74,74,.25); }
+@media (max-width:768px) {
+  .reg-header-btns .menu-desp { flex:1 1 auto; }
+  .reg-header-btns .menu-desp > summary { width:100%; justify-content:center; }
+  .reg-header-btns .menu-desp:last-child .menu-desp-panel { right:0; }
+  .reg-header-btns .menu-desp:not(:last-child) .menu-desp-panel { right:auto; left:0; }
+}
+/* Estado: Avisado → Confirmado → Reconfirmado */
+.td-estado { padding:5px 6px !important; }
+.estado-pasos { display:grid; grid-template-columns:repeat(3,1fr); }
+.paso { position:relative; display:flex; flex-direction:column; align-items:center; gap:2px; min-width:0; padding:3px 2px; border:0; border-radius:3px; background:transparent; font-family:inherit; cursor:pointer; }
+.paso:hover { background:rgba(41,56,74,.06); }
+.paso + .paso::before { content:''; position:absolute; top:13px; right:calc(50% + 12px); width:calc(100% - 24px); height:2px; background:#ddd7cd; }
+.paso.paso-si + .paso.paso-si::before { background:#2f8a57; }
+.paso-dot { position:relative; z-index:1; width:20px; height:20px; display:grid; place-items:center; border:2px solid #cfc9bf; border-radius:50%; background:#fff; color:#fff; font-size:11px; font-weight:800; line-height:1; }
+.paso-si .paso-dot { border-color:#2f8a57; background:#2f8a57; }
+.paso-no .paso-dot { border-color:#c62828; background:#c62828; }
+.paso-lbl { font-size:10px; font-weight:600; color:#8a929c; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+.paso-si .paso-lbl { color:#24613d; }
+.paso-no .paso-lbl { color:#a32020; }
+.paso-dt { min-height:12px; font-size:9.5px; color:#9aa1a9; font-variant-numeric:tabular-nums; }
+.paso-no .paso-dt { color:#a32020; font-weight:600; }
+/* Carta creada: ícono junto al nombre */
+.carta-ico { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; flex-shrink:0; border-radius:50%; background:#eef3fb; border:1px solid #c9d8ee; color:#29538a; cursor:help; }
+.carta-ico svg { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .reg-download-actions, .reg-edit-actions { display:flex; align-items:center; gap:4px; }
 .reg-empty { text-align:center; padding:40px 10px; color:#94a3b8; font-size:13px; }
 .reg-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; position:sticky; top:0; z-index:30; background:rgba(255,255,255,.97); margin:-16px -18px 0; padding:13px 18px; border-bottom:1px solid #D7DEE7; box-shadow:0 3px 12px rgba(15,23,42,.06); backdrop-filter:blur(8px); }
@@ -308,7 +366,7 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
 .btn-reg-add:hover { background:#115E59 !important; }
 
 /* Segunda pasada visual: una superficie administrativa más sobria */
-#tab-registro { background:#F6F8FA; }
+#tab-registro { background:#ffffff; }
 #tab-registro > .form-group { max-width:520px; margin-top:14px; }
 #reg-buscar { background:#fff; border-color:#CBD5E1; border-radius:6px; padding:9px 12px; }
 .horarios-cfg { display:inline-block; width:calc(50% - 6px); vertical-align:top; margin:14px 8px 0 0; border-radius:6px; box-shadow:none; }
@@ -485,86 +543,6 @@ tr.ses-general .drag-handle-cell { background: rgba(30,41,59,0.1) !important; co
   .panel { max-width: 420px; }
 }
 
-/* ===================================================================
-   MODO TARJETAS — tabla de Registro en pantallas chicas/medianas (≤900px)
-   En vez de una tabla angosta con scroll horizontal, cada asignación
-   se muestra como una tarjeta apilada que ocupa todo el ancho.
-=================================================================== */
-@media (max-width: 900px) {
-  #reg-tabla, .reg-tabla-wrap, #reg-tabla-inner { width: 100% !important; max-width: 100%; box-sizing: border-box; }
-  .reg-tabla-head-fixed { display: none !important; } /* el header de columnas no aplica en tarjetas */
-  .reg-tabla-wrap { overflow-x: hidden !important; }
-  #reg-tabla-inner > table {
-    display: block !important; table-layout: auto !important;
-    width: 100% !important; max-width: 100%;
-  }
-  #reg-tabla-inner colgroup { display: none; }
-
-  .reg-table tbody { display: block !important; width: 100%; max-width: 100%; }
-  .reg-table tbody tr { display: block !important; width: 100%; max-width: 100%; box-sizing: border-box; }
-  .reg-table tbody tr td.ses-header-td { display: block !important; width: 100% !important; padding: 0 !important; box-sizing: border-box; }
-
-  /* Cada fila de asignación = tarjeta */
-  .reg-table tbody tr[data-id] {
-    display: flex !important; flex-wrap: wrap; align-items: center; gap: 8px 10px;
-    background: #fff; border: 1px solid #E2E8F0; border-radius: 12px;
-    padding: 12px 14px; margin: 10px 0; box-shadow: 0 1px 3px rgba(0,0,0,.04);
-    width: 100%; max-width: 100%; box-sizing: border-box; overflow: hidden;
-  }
-  .reg-table tbody tr[data-id] td {
-    display: flex !important; align-items: center; gap: 6px;
-    padding: 0 !important; border: none !important; width: auto; flex: 1 1 auto;
-    min-width: 0; max-width: 100%; box-sizing: border-box; overflow: hidden;
-  }
-  .reg-table tbody tr[data-id] td[data-label]::before {
-    content: attr(data-label); font-size: 9px; font-weight: 700; text-transform: uppercase;
-    color: #94a3b8; letter-spacing: .4px; flex: 0 0 auto;
-  }
-
-  /* checkbox: arriba a la izquierda */
-  .reg-table tbody tr[data-id] td:nth-child(1) { order: -2; flex: 0 0 auto; }
-  /* drag handle: no sirve en táctil, se oculta */
-  .reg-table tbody tr[data-id] .drag-handle-cell { display: none !important; }
-
-  /* Asignación: título de la tarjeta, ancho completo */
-  .reg-table tbody tr[data-id] td:nth-child(3) {
-    order: -1; flex: 1 1 100%; width: 100%; font-size: 14.5px !important; font-weight: 700 !important;
-    white-space: normal;
-  }
-
-  /* Nombre: ancho completo */
-  .reg-table tbody tr[data-id] td:nth-child(4) { flex: 1 1 100%; width: 100%; }
-  .reg-table tbody tr[data-id] td:nth-child(4) > * { max-width: 100%; }
-  .reg-table tbody tr[data-id] td:nth-child(4) .name-assign,
-  .reg-table tbody tr[data-id] td:nth-child(4) > div { width: 100%; box-sizing: border-box; }
-  .reg-table tbody tr[data-id] .attendance-count { margin-top:7px; padding:8px 0 0; border-left:0; border-top:1px solid #E2E8F0; }
-  .reg-table tbody tr[data-id] .attendance-count input { width:96px; }
-
-  /* Fecha / Carta / Avisado / Confirmado / Reconfirmado: chips en fila, ajustables sin desbordar */
-  .reg-table tbody tr[data-id] td:nth-child(5),
-  .reg-table tbody tr[data-id] td.td-toggle {
-    flex: 1 1 130px; justify-content: flex-start; padding: 4px 0 !important;
-  }
-
-  /* Acciones: ancho completo al final, separadas con línea divisoria */
-  .reg-table tbody tr[data-id] td:last-child {
-    flex: 1 1 100%; width: 100%; order: 99; border-top: 1px solid #F1F5F9 !important;
-    padding-top: 10px !important; margin-top: 6px;
-  }
-  .reg-table tbody tr[data-id] td:last-child > div { width: 100%; justify-content: flex-end; display: flex; flex-wrap: wrap; }
-  .reg-table tbody tr[data-id] .reg-row-actions { align-items:stretch; gap:8px; }
-  .reg-table tbody tr[data-id] .reg-download-actions { display:grid; grid-template-columns:1fr 1fr; flex:1 1 100%; gap:6px; }
-  .reg-table tbody tr[data-id] .reg-download-actions .btn-dl { display:inline-flex !important; align-items:center; justify-content:center; min-height:42px; padding:8px 10px; font-size:11px; }
-  .reg-table tbody tr[data-id] .reg-edit-actions { margin-left:auto; }
-
-  /* Encabezado de sesión: separación clara entre tarjetas de distintas sesiones */
-  .ses-header-td { margin-top: 18px; }
-}
-
-@media (max-width: 420px) {
-  .reg-table tbody tr[data-id] td:nth-child(5),
-  .reg-table tbody tr[data-id] td.td-toggle { flex: 1 1 100%; }
-}
 
 /* ===================================================================
    VERSIÓN EDITORIAL INSTITUCIONAL
@@ -709,7 +687,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 .app.registro-mode { background:#f3f1ec; }
 .app.registro-mode .app-brand { padding:3px 22px; }
 .app.registro-mode .panel { box-shadow:none; }
-#tab-registro { padding: 0 28px 40px; background:#f3f1ec; }
+#tab-registro { padding: 0 28px 40px; background:#ffffff; }
 .reg-header { margin:-20px -28px 0; padding:5px 28px; gap:16px; background:rgba(255,254,251,.97); border-bottom:1px solid #d8d4cc; box-shadow:none; }
 .reg-header h2 { font-family:'Lora',serif; font-size:21px; font-weight:600; color:var(--ink); }
 .reg-stats { justify-content:flex-start; }
@@ -735,7 +713,6 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 .ses-hdr-inner { padding:11px 14px 12px; background:var(--paper); border:1px solid #cbc5bb; border-left:4px solid var(--wine); border-radius:2px; color:var(--ink); }
 .ses-hdr-name { color:var(--ink) !important; border-left:0; padding:0 5px; font-family:'Lora',serif; font-size:12px; letter-spacing:.5px; }
 .ses-hdr-inner span[style*="color:rgba(255,255,255"] { color:#69727d !important; background:#f3f0ea !important; border-color:#ddd7cd !important; }
-.ses-hdr-inner div[style*="background:#ef4444"] { background:#ddd7cd !important; }
 .name-assign { border-radius:3px; background:#faf9f6; }
 .name-assign:focus-within { border-color:var(--wine); background:#fff; }
 .name-assign-input { color:var(--wine); }
@@ -745,6 +722,128 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 .btn-edit:hover { color:var(--wine); border-color:var(--wine); background:#fbf5f6; }
 .btn-dl.pdf { background:var(--navy); }
 .btn-dl.img { color:var(--ink); background:#dcd7cf; }
+
+/* ===================================================================
+   LISTA DE ASIGNACIONES EN TARJETAS
+   Cada asignación es una tarjeta: asignación + nombre a la izquierda,
+   fecha, estado y acciones a la derecha. La minuta va en líneas finas.
+=================================================================== */
+#reg-view-nav, #reg-tabla { max-width:1240px; margin-left:auto; margin-right:auto; }
+.reg-list-bar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 16px; margin:14px 2px 0; }
+.reg-list-selall { display:flex; align-items:center; gap:7px; margin:0; color:#59626e; font-size:11px; font-weight:600; letter-spacing:0; text-transform:none; cursor:pointer; }
+.reg-list-selall input { width:16px; height:16px; min-height:0; margin:0; padding:0; box-shadow:none; }
+.reg-leyenda { display:flex; flex-wrap:wrap; gap:4px 14px; color:#69727d; font-size:10.5px; font-weight:600; }
+.reg-leyenda span { display:inline-flex; align-items:center; gap:6px; }
+.reg-leyenda span::before { content:''; width:4px; height:13px; border-radius:2px; background:var(--lg); }
+.lg-pendiente { --lg:#e0a028; } .lg-avisado { --lg:#e8803a; } .lg-confirmado { --lg:#86c49b; } .lg-reconf { --lg:#2f8a57; }
+
+.reg-lista { display:flex; flex-direction:column; gap:8px; }
+.reg-lista .ses-header-td { padding:22px 0 4px !important; }
+
+.asig-card {
+  --estado:#d8d4cc;
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr) 128px 236px auto;
+  grid-template-areas:"lead main fecha estado acc";
+  align-items:center;
+  column-gap:18px;
+  padding:12px 16px 12px 0;
+  background:#fff;
+  border:1px solid #e3ded6;
+  border-left:5px solid var(--estado);
+  border-radius:8px;
+  box-shadow:0 1px 2px rgba(32,40,51,.04);
+  transition:box-shadow .15s, border-color .15s;
+}
+.asig-card:hover { border-color:#cfc9bf; border-left-color:var(--estado); box-shadow:0 4px 14px rgba(32,40,51,.08); }
+.asig-card.row-pendiente  { --estado:#e0a028; background:#fffcf3; }
+.asig-card.row-avisado    { --estado:#e8803a; }
+.asig-card.row-confirmado { --estado:#86c49b; }
+.asig-card.row-reconf     { --estado:#2f8a57; }
+.asig-card.row-asistencia { --estado:#9333ea; }
+.asig-card.reg-dragging { opacity:.45; }
+.asig-card.reg-drag-over { box-shadow:0 -3px 0 var(--wine); }
+
+.ac-lead { grid-area:lead; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.ac-lead .reg-sel { width:16px; height:16px; min-height:0; margin:0; padding:0; box-shadow:none; cursor:pointer; }
+.ac-drag { color:#c4beb4; font-size:16px; line-height:1; cursor:grab; user-select:none; }
+.ac-drag:hover { color:var(--wine); }
+.ac-main { grid-area:main; min-width:0; display:flex; flex-direction:column; gap:3px; }
+.ac-asig { display:flex; align-items:center; flex-wrap:wrap; gap:6px; color:#69727d; font-size:10.5px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; }
+.ac-asig-link { padding:0; border:0; background:none; color:#0F766E; font:inherit; letter-spacing:inherit; text-transform:inherit; cursor:pointer; }
+.ac-asig-link span { opacity:.5; }
+.ac-asig-link:hover { text-decoration:underline; }
+.ac-dur { padding:1px 6px; border-radius:3px; background:#f3f0ea; color:#59626e; font-size:10px; letter-spacing:0; text-transform:none; }
+.ac-sin-avisar { padding:1px 6px; border-radius:3px; background:#fdf0d5; color:#8a5a00; font-size:10px; letter-spacing:0; text-transform:none; }
+.ac-nombre { min-width:0; }
+.ac-nombre > div:not(.operation-team) { display:flex; align-items:center; gap:6px; min-width:0; }
+.ac-nombre .name-filled-input { padding:2px 0; font-size:15.5px; font-weight:600; color:var(--ink); }
+.ac-nombre .name-filled-input:focus { padding:2px 6px; background:#faf8f4; }
+.ac-nombre .name-assign { max-width:340px; }
+@supports (field-sizing: content) {
+  .ac-nombre .name-filled-input { field-sizing:content; width:auto; min-width:6ch; max-width:100%; }
+}
+.ac-fecha { grid-area:fecha; display:flex; flex-direction:column; align-items:center; gap:3px; }
+.ac-dia { color:#69727d; font-size:10.5px; text-transform:capitalize; }
+.ac-fecha .alerta-badge { margin-top:0; }
+.ac-estado { grid-area:estado; }
+.ac-acciones { grid-area:acc; display:flex; align-items:center; gap:6px; }
+
+.info-row { display:grid; grid-template-columns:44px minmax(110px,190px) minmax(0,1fr); grid-template-areas:". lbl val"; align-items:center; column-gap:18px; padding:4px 16px 4px 5px; border-left:1px dashed #d8d1c7; margin-left:22px; }
+.info-lbl { grid-area:lbl; color:#69727d; font-size:11.5px; font-weight:600; }
+.info-val { grid-area:val; min-width:0; }
+.info-row .minuta-value { min-height:34px; padding:6px 10px; background:transparent; border-color:#e3ded6; font-weight:600; }
+.info-row .minuta-value:hover, .info-row .minuta-value:focus { background:#fff; }
+.himno-fila { display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; }
+.himno-fila .himno-hint { order:3; flex-basis:100%; margin-top:0; } /* la ayuda del himno va en su propia línea, debajo */
+.himno-fila .minuta-value { flex:1 1 200px; width:auto; min-width:0; }
+.himno-min { display:flex; align-items:center; gap:5px; flex:0 0 auto; margin:0; color:#69727d; font-size:11px; font-weight:600; letter-spacing:0; text-transform:none; cursor:text; }
+.himno-min input { width:58px; min-height:34px; padding:5px 6px; text-align:center; background:transparent; border-color:#e3ded6; color:#8a929c; font-weight:600; }
+.himno-min input.editado { color:var(--ink); border-color:#c8c2b9; background:#fff; }
+.himno-min input:hover, .himno-min input:focus { background:#fff; color:var(--ink); }
+
+/* ---- Cada sesión en su propio bloque, con un color que la identifica ---- */
+.ses-lideres { --ses:#29384a; --ses-tinte:rgba(41,56,74,.055); }
+.ses-adultos { --ses:#7b293f; --ses-tinte:rgba(123,41,63,.05); }
+.ses-general { --ses:#2c6e63; --ses-tinte:rgba(44,110,99,.06); }
+.ses-jovenes { --ses:#9a6a12; --ses-tinte:rgba(154,106,18,.06); }
+.ses-otros   { --ses:#69727d; --ses-tinte:rgba(105,114,125,.06); }
+.ses-bloque { display:flex; flex-direction:column; gap:8px; margin-top:26px; padding:0 14px 16px; background:var(--ses-tinte, transparent); border:1px solid #e3ded6; border-top:5px solid var(--ses, #69727d); border-radius:10px; scroll-margin-top:calc(var(--reg-hdr-h, 78px) + var(--reg-nav-h, 46px) + 12px); }
+.ses-bloque:first-child { margin-top:12px; }
+.reg-lista .ses-bloque > .ses-header-td { padding:14px 0 6px !important; }
+.ses-bloque .ses-hdr-inner { padding:0; background:transparent; border:0; border-radius:0; }
+.ses-bloque .ses-hdr-name { padding:0; color:var(--ses) !important; font-size:17px; font-weight:700; letter-spacing:.8px; }
+.ses-bloque .ses-hdr-inner span[style*="color:rgba(255,255,255"] { background:#fff !important; }
+
+/* Barra de secciones: color de cada sesión y marca de la sesión que se está viendo */
+.reg-view-btn[data-view="lideres"] { --ses:#29384a; }
+.reg-view-btn[data-view="adultos"] { --ses:#7b293f; }
+.reg-view-btn[data-view="general"] { --ses:#2c6e63; }
+.reg-view-btn[data-view="lideres"]::before,
+.reg-view-btn[data-view="adultos"]::before,
+.reg-view-btn[data-view="general"]::before { content:''; display:inline-block; width:8px; height:8px; margin-right:6px; border-radius:50%; background:var(--ses); vertical-align:1px; }
+.reg-view-btn[data-view="lideres"].active,
+.reg-view-btn[data-view="adultos"].active,
+.reg-view-btn[data-view="general"].active { background:var(--ses); border-color:var(--ses); }
+.reg-view-btn[data-view="lideres"].active::before,
+.reg-view-btn[data-view="adultos"].active::before,
+.reg-view-btn[data-view="general"].active::before { background:#fff; }
+.reg-view-btn.en-vista { color:var(--ses); background:#fff; border-color:var(--ses); box-shadow:inset 0 -3px 0 var(--ses); transition:background .2s, color .2s, box-shadow .2s; }
+
+@media (max-width:900px) {
+  .asig-card {
+    grid-template-columns:36px minmax(0,1fr) auto;
+    grid-template-areas:"lead main main" "lead fecha acc" "estado estado estado";
+    row-gap:10px; padding:12px 12px 10px 0;
+  }
+  .ac-drag { display:none; }
+  .ac-lead { align-self:start; padding-top:3px; }
+  .ac-fecha { flex-direction:row; flex-wrap:wrap; justify-content:flex-start; gap:6px; }
+  .ac-estado { margin-left:12px; padding-top:8px; border-top:1px solid #eee9e2; }
+  .ac-acciones .btn-edit, .ac-acciones .btn-mas { width:40px; height:40px; }
+  .ac-estado .paso { min-height:52px; }
+  .info-row { grid-template-columns:minmax(0,1fr); grid-template-areas:"lbl" "val"; row-gap:4px; margin-left:8px; padding:4px 8px 6px 12px; }
+}
 
 /* Modales */
 .reg-modal-overlay { background:rgba(32,40,51,.72); }
@@ -1178,6 +1277,7 @@ body.vivo-abierto { overflow:hidden; }
             <label>Fin <input type="time" id="cfg-hora-fin-adultos" onchange="saveHorarios()"></label>
             <label>General inicio <input type="time" id="cfg-hora-general" value="10:00" onchange="saveHorarios()"></label>
             <label>Fin <input type="time" id="cfg-hora-fin-general" onchange="saveHorarios()"></label>
+            <p class="horarios-cfg-ayuda">Si dejás el fin vacío, se calcula solo: sábado 1:30 h, domingo 2 h.</p>
           </div>
         </details>
         <details class="horarios-cfg" id="fechas-cfg">
@@ -1191,14 +1291,17 @@ body.vivo-abierto { overflow:hidden; }
         <input type="search" id="reg-buscar" placeholder="Buscar asignación o nombre" aria-label="Buscar por asignación o nombre" oninput="renderRegistro()">
       </div>
       <div class="sesion-barra">
-        <button type="button" class="btn-sesion" onclick="cambiarPin()" title="Cambiar el PIN de coordinación">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-          <span>Cambiar PIN</span>
-        </button>
-        <button type="button" class="btn-sesion btn-salir" onclick="cerrarSesion()" title="Cerrar sesión en este dispositivo">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          <span>Cerrar sesión</span>
-        </button>
+        <details class="menu-desp menu-cuenta">
+          <summary class="btn-sesion" title="Opciones de la cuenta de coordinación">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+            <span>Coordinación</span><svg class="menu-flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="menu-desp-panel" role="menu">
+            <button type="button" role="menuitem" onclick="cambiarPin()"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Cambiar PIN</button>
+            <hr>
+            <button type="button" role="menuitem" class="peligro" onclick="cerrarSesion()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Cerrar sesión</button>
+          </div>
+        </details>
       </div>
     </div>
     <div class="panel-tabs">
@@ -1554,15 +1657,27 @@ body.vivo-abierto { overflow:hidden; }
         <div class="reg-titulo-sync"><h2>Registro de Asignaciones</h2><span id="sync-estado" class="sync-estado" data-tipo="pendiente">Conectando…</span></div>
         <div id="reg-stats" class="reg-stats"></div>
         <div class="reg-header-btns">
-          <button class="btn-reg-exp btn-reg-add" onclick="abrirAddModal()">+ Nueva asignación</button>
-          <button class="btn-reg-exp btn-vivo" onclick="abrirVivo()">En vivo</button>
-          <button class="btn-reg-exp" onclick="abrirAfiches()">Afiches QR</button>
-          <button class="btn-reg-exp" onclick="abrirRespaldos()">Respaldos</button>
           <button id="btn-del-sel" class="btn-reg-exp" style="display:none;background:#dc2626;color:#fff" onclick="eliminarSeleccionados()">Eliminar (0)</button>
-          <button class="btn-reg-exp pdf" onclick="abrirExportModal('pdf')">Minuta PDF</button>
-          <button class="btn-reg-exp img" onclick="abrirExportModal('img')">Minuta PNG</button>
-          <button class="btn-reg-exp" onclick="abrirExportModal('print')">Imprimir minutas</button>
-          <button class="btn-clr" onclick="limpiarRegistro()">Limpiar registro</button>
+          <button class="btn-reg-exp btn-reg-add" onclick="abrirAddModal()">+ Nueva asignación</button>
+          <button class="btn-reg-exp btn-vivo" onclick="abrirVivo()"><span class="vivo-punto" aria-hidden="true"></span>En vivo</button>
+          <!-- Menús desplegables: agrupan las acciones que se usan pocas veces -->
+          <details class="menu-desp">
+            <summary class="btn-reg-exp">Minutas<svg class="menu-flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+            <div class="menu-desp-panel" role="menu">
+              <button type="button" role="menuitem" onclick="abrirExportModal('pdf')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>Descargar PDF</button>
+              <button type="button" role="menuitem" onclick="abrirExportModal('img')"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>Descargar imagen (PNG)</button>
+              <button type="button" role="menuitem" onclick="abrirExportModal('print')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v7H6z"/></svg>Imprimir</button>
+            </div>
+          </details>
+          <details class="menu-desp">
+            <summary class="btn-reg-exp">Más<svg class="menu-flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+            <div class="menu-desp-panel" role="menu">
+              <button type="button" role="menuitem" onclick="abrirAfiches()"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>Afiches con QR</button>
+              <button type="button" role="menuitem" onclick="abrirRespaldos()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>Respaldos</button>
+              <hr>
+              <button type="button" role="menuitem" class="peligro" onclick="limpiarRegistro()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14"/></svg>Limpiar registro…</button>
+            </div>
+          </details>
         </div>
       </div>
       <nav class="reg-view-nav" id="reg-view-nav" aria-label="Sección del registro">
@@ -1945,7 +2060,7 @@ function _esCoordinacion(user){ return !!(user && user.email === EMAIL_COORDINAC
 /* ===== CIERRE POR INACTIVIDAD =====
    La última actividad se guarda en localStorage para que valga entre pestañas y
    también al volver a abrir el navegador. Con la vista En vivo abierta no se cierra. */
-const INACTIVIDAD_MAX_MS = 30 * 60 * 1000;
+const INACTIVIDAD_MAX_MS = 15 * 60 * 1000;
 const CLAVE_ACTIVIDAD = 'ultima-actividad';
 let _ultimaMarca = 0;
 
@@ -2209,6 +2324,27 @@ function loadHorariosUI(){
   if(flFin) flFin.value = h.lideresFin||'';
   if(faFin) faFin.value = h.adultosFin||'';
   if(fgFin) fgFin.value = h.generalFin||'';
+}
+/* Duración habitual: las sesiones del sábado duran 1:30 h y la del domingo 2 h.
+   Sin fecha cargada se asume que la Sesión General es la del domingo. */
+const DURACION_SABADO_MIN = 90;
+const DURACION_DOMINGO_MIN = 120;
+function duracionSesionMin(sesion){
+  const fecha = getFechas()[sesion];
+  if(fecha){
+    const [y,m,d] = fecha.split('-').map(Number);
+    if(y && m && d) return new Date(y,m-1,d).getDay()===0 ? DURACION_DOMINGO_MIN : DURACION_SABADO_MIN;
+  }
+  return sesion==='general' ? DURACION_DOMINGO_MIN : DURACION_SABADO_MIN;
+}
+/* Hora de fin configurada a mano o, si no hay, inicio + duración habitual ("HH:MM") */
+function horaFinSesion(sesion){
+  const H = getHorarios();
+  if(H[`${sesion}Fin`]) return H[`${sesion}Fin`];
+  const [h,m] = (H[sesion]||'').split(':').map(Number);
+  if(isNaN(h)) return '';
+  const fin = (h*60 + (m||0) + duracionSesionMin(sesion)) % (24*60);
+  return `${String(Math.floor(fin/60)).padStart(2,'0')}:${String(fin%60).padStart(2,'0')}`;
 }
 function getFechas(){
   if(_fechasCache) return _fechasCache;
@@ -2738,9 +2874,12 @@ async function descargar(tipo, btnPdfId='btn-pdf', btnImgId='btn-img', statusId=
       const {jsPDF}=window.jspdf;
       const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
       const pW=pdf.internal.pageSize.getWidth(), pH=pdf.internal.pageSize.getHeight();
-      const imgH=pW*(canvas.height/canvas.width);
       const imgData = canvas.toDataURL('image/jpeg',0.97);
-      if(imgH<=pH) pdf.addImage(imgData,'JPEG',0,0,pW,imgH,undefined,'FAST');
+      // La carta es A4 (595×842 px): se coloca a hoja completa para que el fondo llegue a los bordes.
+      // Solo si el contenido la estiró de más se escala manteniendo la proporción.
+      const imgH=pW*(canvas.height/canvas.width);
+      if(Math.abs(imgH-pH)/pH < 0.02) pdf.addImage(imgData,'JPEG',0,0,pW,pH,undefined,'FAST');
+      else if(imgH<pH) pdf.addImage(imgData,'JPEG',0,0,pW,imgH,undefined,'FAST');
       else pdf.addImage(imgData,'JPEG',0,0,pW*(pH/imgH),pH,undefined,'FAST');
       const blob = pdf.output('blob');
       const url = URL.createObjectURL(blob);
@@ -3564,33 +3703,27 @@ function renderRegistro(){
   const SES_COLOR = { lideres:'#1E293B', adultos:'#1E293B', general:'#1E293B', jovenes:'#1E293B' };
   const SES_ICON  = { lideres:'🔑', adultos:'🎙️', general:'✨', jovenes:'🌟', otros:'▣' };
 
-  function tCell(id, field, v, date, label, trueClass, falseClass){
-    const cls = v===true?(trueClass||'pill-si'):v===false?(falseClass||'pill-no'):'pill-nd';
-    const txt = v===true?'Sí':v===false?'No':'–';
-    return `<td class="td-toggle" data-label="${label}" onclick="toggleField('${id}','${field}')">
-      <div class="pill"><span class="pill-lbl ${cls}">${txt}</span>${v===true&&date?`<span class="pill-dt">${date}</span>`:''}</div>
-    </td>`;
+  // Avisado → Confirmado → Reconfirmado en un solo bloque; cada paso alterna Sí / No / sin marcar
+  function estadoCell(r){
+    const pasos = [['cartaAviso','Avisado'],['confirmado','Confirmado'],['reconfirmado','Reconfirmado']];
+    return `<div class="ac-estado"><div class="estado-pasos">${pasos.map(([field,label])=>{
+      const v = r[field]??null, date = r[field+'Date']||'';
+      const cls = v===true?'paso-si':v===false?'paso-no':'paso-nd';
+      const ico = v===true?'✓':v===false?'✕':'';
+      const est = v===true?`Sí${date?' · '+date:''}`:v===false?'No':'Sin marcar';
+      return `<button type="button" class="paso ${cls}" onclick="toggleField('${r.id}','${field}')" title="${label}: ${est} — clic para cambiar"><span class="paso-dot">${ico}</span><span class="paso-lbl">${label}</span><span class="paso-dt">${v===true&&date?date:v===false?'No':''}</span></button>`;
+    }).join('')}</div></div>`;
   }
 
   const groups = {};
   for(const r of fil){ const s=r.sesion||'otro'; if(!groups[s]) groups[s]=[]; groups[s].push(r); }
   const sesKeys = SES_ORDER.filter(s=>groups[s]).concat(Object.keys(groups).filter(s=>!SES_ORDER.includes(s)));
 
-  // Fila del encabezado de columnas (se reutiliza en el sticky header y como referencia de ancho)
-  const _theadRow = `<tr>
-    <th style="width:28px;min-width:28px;padding:3px 4px;text-align:center"><input type="checkbox" id="reg-sel-all" onchange="_selAll(this)" title="Seleccionar todo"></th>
-    <th style="width:28px;min-width:28px;padding:3px 2px;text-align:center"></th>
-    <th style="width:18%">Asignación</th>
-    <th style="width:23%">Nombre</th>
-    <th style="width:115px;text-align:center">Fecha</th>
-    <th style="text-align:center;width:75px">Carta</th>
-    <th style="text-align:center;width:95px">Avisado</th>
-    <th style="text-align:center;width:105px">Confirmado</th>
-    <th style="text-align:center;width:115px">Reconfirmado</th>
-    <th style="width:210px;text-align:center">Acciones</th>
-  </tr>`;
-  // Sticky header (FUERA del overflow-x) + body con scroll horizontal separado
-  let html=`<div class="reg-tabla-head-fixed" id="reg-thead-fixed"><table class="reg-table" id="reg-thead-table" style="table-layout:fixed;width:100%;margin:0"><thead>${_theadRow}</thead></table></div><div class="reg-tabla-wrap" id="reg-tabla-inner" onscroll="_syncTheadScroll(this)"><table class="reg-table" style="table-layout:fixed;width:100%"><colgroup><col style="width:28px;min-width:28px"><col style="width:28px;min-width:28px"><col style="width:18%"><col style="width:23%"><col style="width:115px"><col style="width:75px"><col style="width:95px"><col style="width:105px"><col style="width:115px"><col style="width:210px"></colgroup><tbody>`;
+  // Barra superior de la lista: seleccionar todo + leyenda de colores de estado
+  let html=`<div class="reg-list-bar">
+    <label class="reg-list-selall"><input type="checkbox" id="reg-sel-all" onchange="_selAll(this)"> Seleccionar todo</label>
+    <div class="reg-leyenda" aria-label="Colores de estado"><span class="lg-pendiente">Sin avisar</span><span class="lg-avisado">Avisado</span><span class="lg-confirmado">Confirmado</span><span class="lg-reconf">Reconfirmado</span></div>
+  </div><div class="reg-lista">`;
 
   for(const ses of sesKeys){
     const col = SES_COLOR[ses]||'#1E293B';
@@ -3606,16 +3739,16 @@ function renderRegistro(){
     const pctReconf  = sesFilled>0 ? Math.round(sesReconf/sesFilled*100) : 0;
     const peopleBadge = `<span style="font-size:10.5px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:2px 9px;margin-left:8px;font-weight:600">👥 ${sesPeople} / ${sesAsignaciones}</span>`;
     const timeBadge   = NOMBRE_SESION[ses] ? _badgeTiempoSesion(ses) : (sesMin>0 ? `<span class="badge-tiempo sin-fin">⏱ ${sesMin} min</span>` : '');
-    const progressBar = sesFilled>0 ? `<div style="width:100%;margin-top:8px"><div style="height:8px;background:#ef4444;border-radius:4px;overflow:hidden;position:relative"><div style="position:absolute;top:0;left:0;height:100%;width:${pctConf}%;background:#f97316;transition:width .6s"></div><div style="position:absolute;top:0;left:0;height:100%;width:${pctReconf}%;background:#22c55e;transition:width .6s"></div></div><div style="display:flex;align-items:center;gap:16px;margin-top:5px;font-size:10px;font-weight:600"><span style="display:flex;align-items:center;gap:4px;color:#fb923c"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#f97316;flex-shrink:0"></span>${sesConf} conf. (${pctConf}%)</span><span style="display:flex;align-items:center;gap:4px;color:#4ade80"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0"></span>${sesReconf} reconf. (${pctReconf}%)</span><span style="margin-left:auto;font-size:11px;font-weight:800;color:${pctReconf===100?'#4ade80':pctReconf>0?'#fb923c':'#f87171'}">${pctReconf}%</span></div></div>` : '';
-    html += `<tr><td colspan="10" class="ses-header-td"><div class="ses-hdr-inner" style="flex-direction:column;align-items:stretch;"><div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px"><span class="ses-hdr-name">${sesIcon} ${(SLBL[ses]||ses).toUpperCase()}</span>${peopleBadge}${timeBadge}</div>${progressBar}</div></td></tr>`;
+    const sesPend    = sesFilled - sesConf;
+    const progressBar = sesFilled>0 ? `<div style="width:100%;margin-top:8px"><div style="height:6px;background:#e8e3dc;border-radius:3px;overflow:hidden;position:relative"><div style="position:absolute;top:0;left:0;height:100%;width:${pctConf}%;background:#a9d4b7;transition:width .6s"></div><div style="position:absolute;top:0;left:0;height:100%;width:${pctReconf}%;background:#2f8a57;transition:width .6s"></div></div><div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;margin-top:6px;font-size:10.5px;font-weight:600;color:#59626e"><span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#2f8a57;flex-shrink:0"></span>${sesReconf} reconfirmados</span><span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#a9d4b7;flex-shrink:0"></span>${sesConf} confirmados</span>${sesPend>0?`<span style="display:flex;align-items:center;gap:5px;color:#8a5a00"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#e8e3dc;border:1px solid #d8d1c7;flex-shrink:0"></span>${sesPend} sin confirmar</span>`:''}<span style="margin-left:auto;font-size:11px;font-weight:800;color:${pctReconf===100?'#24613d':pctReconf>0?'#8a5a00':'#a32020'}">${pctReconf}% listo</span></div></div>` : '';
+    html += `<section class="ses-bloque ses-${ses}" data-ses="${ses}" aria-label="${SLBL[ses]||ses}"><div class="ses-header-td"><div class="ses-hdr-inner" style="flex-direction:column;align-items:stretch;"><div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px"><span class="ses-hdr-name">${sesIcon} ${(SLBL[ses]||ses).toUpperCase()}</span>${peopleBadge}${timeBadge}</div>${progressBar}</div></div>`;
     items.forEach((r, idx) => {
       const aLbl = esc(etiquetaAsignacionRegistro(r, reg));
       const isInformativa = INFORMATIVAS_ASIG.includes(r.asig);
       const isFilled = !!(r.nombre && r.nombre.trim());
       const isOperacion = OPERACIONES_ASIG.includes(r.asig);
       const canGen = isFilled && !isInformativa;
-      const isLast = idx === items.length - 1;
-      const rowStyle = isLast ? 'border-bottom:2px solid #E2E8F0;' : '';
+      const cartaIco = r.fechaGenerada ? `<span class="carta-ico" title="Carta creada${(()=>{ const d=new Date(r.fechaGenerada); return isNaN(d) ? '' : ' el '+d.toLocaleDateString('es-AR'); })()}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>` : '';
       const canIrCarta = ['director','pianista','mensaje','testimonio','capacitacion','tiempo_instruccion','discurso_barrio'].includes(r.asig);
       const rowStatus = isInformativa ? ''
         : r.reconfirmado===true ? 'row-reconf'
@@ -3626,7 +3759,7 @@ function renderRegistro(){
       const _rDur = _parseDur(r);
       const _isSpeaking = [...INTERVENCIONES_ASIG,'discurso_barrio','extra'].includes(r.asig);
       const durBadge = (_rDur > 0 && _isSpeaking)
-        ? `<span style="font-size:10.5px;color:#64748B;background:#F1F5F9;border:1px solid #E2E8F0;border-radius:6px;padding:1px 6px;margin-left:4px;font-weight:600">${_rDur} min</span>`
+        ? `<span class="ac-dur">${_rDur} min</span>`
         : '';
       const _evDate   = !isInformativa && r.fechaEvento ? (() => { const [_y,_m,_dd]=r.fechaEvento.split('-').map(Number); return new Date(_y,_m-1,_dd); })() : null;
       const _dLeft    = _evDate !== null ? Math.ceil((_evDate - today) / (1000*60*60*24)) : null;
@@ -3648,60 +3781,56 @@ function renderRegistro(){
         himno_intermedio:'Número del himno, ej: 161',
         himno_final:'Número del himno, ej: 161'
       }[r.asig] || 'Detalle';
-      html += `<tr ${isInformativa?'':'draggable="true"'} data-id="${r.id}" class="${rowStatus}${r.asig==='asistencia'?' row-asistencia':''}${isInformativa?' row-informativa':''} ses-${r.sesion}">
-        <td style="text-align:center;padding:5px 4px;${rowStyle}">${isInformativa?'':`<input type="checkbox" class="reg-sel" data-id="${r.id}" onchange="_cntSel()">`}</td>
-        <td class="drag-handle-cell" style="${rowStyle}" ${isInformativa?'':'title="Arrastrar"'}>${isInformativa?'':'⠿'}</td>
-        <td style="font-size:14px;font-weight:600;${rowStyle}${canIrCarta?' color:#0F766E; cursor:pointer;':' color:#334155;'}" ${canIrCarta?`onclick="irACarta('${r.id}')" title="Abrir en Generar carta"`:''}>${
-aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</span>':''}</td>
-        <td style="padding:6px 8px;${rowStyle}" class="${!isInformativa && isFilled && !r.cartaAviso ? 'td-sin-avisar' : ''}">
-          ${isInformativa
-            ? r.asig==='asuntos_estaca'
+      // Filas de la minuta (preside, himnos, reconocimientos…): línea fina, sin estado ni acciones
+      if(isInformativa){
+        html += `<div class="reg-item info-row" data-id="${r.id}">
+          <div class="info-lbl">${aLbl}</div>
+          <div class="info-val">${r.asig==='asuntos_estaca'
               ? `<div style="display:flex;align-items:center;gap:8px"><label style="display:flex;align-items:center;gap:5px;margin:0;white-space:nowrap;cursor:pointer"><input type="checkbox" style="width:auto" ${r.habilitado?'checked':''} onchange="updateMinutaHabilitada('${r.id}',this.checked)"> Incluir</label><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="minuta-value" placeholder="${infoPlaceholder}" ${r.habilitado?'':'disabled'}></div>`
               : r.asig==='reconocimientos'
                 ? renderEditorListaMinuta(r)
-              : `<input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="minuta-value" placeholder="${infoPlaceholder}"${HIMNO_CAMPO[r.asig] ? ' data-himno list="himnos-lista" autocomplete="off"' : ''}>`
-            : isFilled
+              : HIMNO_CAMPO[r.asig]
+                ? `<div class="himno-fila"><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="minuta-value" placeholder="${infoPlaceholder}" data-himno list="himnos-lista" autocomplete="off"><label class="himno-min" title="Duración aproximada del himno (${MIN_HIMNO} min si no se cambia)"><input type="number" min="0.5" max="20" step="0.5" value="${duracionHimno(r)}" onchange="updateDuracionHimno('${r.id}',this.value)" aria-label="Minutos del ${esc(aLbl)}"${r.duracionHimno?' class="editado"':''}><span>min</span></label></div>`
+                : `<input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="minuta-value" placeholder="${infoPlaceholder}">`}</div>
+        </div>`;
+        return;
+      }
+      const _diaSemana = _evDate ? _evDate.toLocaleDateString('es-AR',{weekday:'long'}) : '';
+      html += `<div draggable="true" data-id="${r.id}" class="reg-item asig-card ${rowStatus}${r.asig==='asistencia'?' row-asistencia':''}">
+        <div class="ac-lead">
+          <input type="checkbox" class="reg-sel" data-id="${r.id}" onchange="_cntSel()" aria-label="Seleccionar ${aLbl}">
+          <span class="ac-drag" title="Arrastrar para reordenar" aria-hidden="true">⠿</span>
+        </div>
+        <div class="ac-main">
+          <div class="ac-asig">${canIrCarta
+            ? `<button type="button" class="ac-asig-link" onclick="irACarta('${r.id}')" title="Abrir en Generar carta">${aLbl} <span aria-hidden="true">↗</span></button>`
+            : `<span>${aLbl}</span>`}${durBadge}${!isFilled?'':!r.cartaAviso?'<span class="ac-sin-avisar">Sin avisar</span>':''}</div>
+          <div class="ac-nombre">${isFilled
             ? isOperacion
-              ? `<div class="operation-team"><div class="operation-principal"><span title="Coordinador">★</span><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${_badgeConflicto(_conflictos, r.id)}${r.nota?`<span class="nota-ico" title="${esc(r.nota)}" onclick="event.stopPropagation();abrirEditModal('${r.id}')">📝</span>`:''}</div><div class="operation-helpers"><span><strong>Equipo de apoyo:</strong> ${r.ayudantes?esc(r.ayudantes).replace(/\n/g,', '):'Sin asignar'}</span><button type="button" class="operation-helper-edit" onclick="abrirEditModal('${r.id}')">${r.ayudantes?'Editar':'Agregar'}</button></div></div>`
-              : `<div style="display:flex;align-items:center;gap:4px;"><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${_badgeConflicto(_conflictos, r.id)}${r.esMatrimonio && !['director','pianista','oracion_inicial','oracion_final'].includes(r.asig)?'<span class="badge-matrimonio">👫 Matrimonio</span>':''}${r.nota?`<span class="nota-ico" title="${esc(r.nota)}" onclick="event.stopPropagation();abrirEditModal('${r.id}')">📝</span>`:''}</div>`
+              ? `<div class="operation-team"><div class="operation-principal"><span title="Coordinador">★</span><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${_badgeConflicto(_conflictos, r.id)}${cartaIco}${r.nota?`<span class="nota-ico" title="${esc(r.nota)}" onclick="event.stopPropagation();abrirEditModal('${r.id}')">📝</span>`:''}</div><div class="operation-helpers"><span><strong>Equipo de apoyo:</strong> ${r.ayudantes?esc(r.ayudantes).replace(/\n/g,', '):'Sin asignar'}</span><button type="button" class="operation-helper-edit" onclick="abrirEditModal('${r.id}')">${r.ayudantes?'Editar':'Agregar'}</button></div></div>`
+              : `<div style="display:flex;align-items:center;gap:4px;"><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${_badgeConflicto(_conflictos, r.id)}${r.esMatrimonio && !['director','pianista','oracion_inicial','oracion_final'].includes(r.asig)?'<span class="badge-matrimonio">👫 Matrimonio</span>':''}${cartaIco}${r.nota?`<span class="nota-ico" title="${esc(r.nota)}" onclick="event.stopPropagation();abrirEditModal('${r.id}')">📝</span>`:''}</div>`
             : `<button type="button" class="name-assign" onclick="abrirEditModal('${r.id}',true)" title="Extender asignación" aria-label="Extender asignación: ${esc(aLbl)}"><span style="font-size:13px;flex-shrink:0" aria-hidden="true">👤</span><span class="name-assign-input name-assign-placeholder">${isOperacion?'Asignar coordinador...':'Asignar encargado...'}</span><span class="name-assign-plus" aria-hidden="true">+</span></button>`
-          }
+          }</div>
           ${r.asig==='asistencia' ? `<div class="attendance-count"><label>Asistencia</label><input type="number" min="0" max="9999" value="${r.asistenciaTotal??''}" placeholder="Total" onchange="updateAsistencia('${r.id}',this.value)"></div>` : ''}
-        </td>
-        <td data-label="Fecha" style="text-align:center;padding:6px 8px;${rowStyle}">
-          ${isInformativa ? '<span class="minuta-empty">—</span>' : `<label class="fecha-wrap" title="Cambiar fecha">
+        </div>
+        <div class="ac-fecha">
+          <label class="fecha-wrap" title="Cambiar fecha">
             <span class="fecha-display">${r.fechaEvento ? r.fechaEvento.split('-').reverse().join('/') : '📅 Fecha'}</span>
             <input type="date" value="${r.fechaEvento||''}" onchange="updateFecha('${r.id}',this.value)" class="fecha-input-hidden">
           </label>
-          ${_alertBadge}`}
-        </td>
-        <td data-label="Carta" style="text-align:center;padding:5px 8px;${rowStyle}">
-          ${isInformativa ? '<span class="minuta-empty">—</span>' : r.fechaGenerada
-            ? `<span class="pill-lbl pill-carta">✉️ Creada</span>`
-            : `<span class="pill-lbl pill-nd" style="font-size:9px;">–</span>`
-          }
-        </td>
-        ${isInformativa ? '<td class="minuta-empty">—</td><td class="minuta-empty">—</td><td class="minuta-empty">—</td>' : `
-          ${tCell(r.id,'cartaAviso',r.cartaAviso??null,r.cartaAvisoDate||'','Avisado')}
-          ${tCell(r.id,'confirmado',r.confirmado??null,r.confirmadoDate||'','Confirmado')}
-          ${tCell(r.id,'reconfirmado',r.reconfirmado??null,r.reconfirmadoDate||'','Reconfirmado','pill-reconf','pill-reconf-no')}
-        `}
-        <td style="white-space:nowrap;text-align:center;padding:5px 8px;${rowStyle}">
-          ${isInformativa ? '<span class="minuta-empty">—</span>' : `<div class="reg-row-actions">
-            <div class="reg-download-actions">
-              <button class="btn-dl pdf" onclick="generarDesdeRegistro('${r.id}','pdf')" title="${canGen?'Descargar asignación en PDF':'Asigne una persona para descargar'}" ${canGen?'':'disabled'}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>PDF</button>
-              <button class="btn-dl img" onclick="generarDesdeRegistro('${r.id}','img')" title="${canGen?'Descargar asignación como imagen':'Asigne una persona para descargar'}" ${canGen?'':'disabled'}><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>PNG</button>
-            </div>
-            <div class="reg-edit-actions">
-              <button class="btn-edit" onclick="abrirEditModal('${r.id}')" title="Editar asignación" aria-label="Editar asignación"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button>
-              <button class="btn-del" onclick="eliminarEntrada('${r.id}')" title="Limpiar fila" aria-label="Limpiar fila"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14M10 10v6m4-6v6"/></svg></button>
-            </div>
-          </div>`}
-        </td>
-      </tr>`;
+          ${_diaSemana ? `<span class="ac-dia">${_diaSemana}</span>` : ''}
+          ${_alertBadge}
+        </div>
+        ${estadoCell(r)}
+        <div class="ac-acciones">
+          <button class="btn-edit" onclick="abrirEditModal('${r.id}')" title="Editar asignación" aria-label="Editar asignación"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button>
+          <button class="btn-mas" onclick="_abrirMenuAcciones(event,'${r.id}',${canGen})" title="Más acciones" aria-label="Más acciones" aria-haspopup="menu">⋯</button>
+        </div>
+      </div>`;
     });
+    html += '</section>';
   }
-  html += '</tbody></table></div>';
+  html += '</div>';
   const regTabla=document.getElementById('reg-tabla');
   destruirDatePickers(regTabla);
   regTabla.innerHTML = html;
@@ -3727,7 +3856,94 @@ aLbl}${durBadge}${canIrCarta?' <span style="font-size:9px;opacity:.45;">↗</spa
   _cntSel();
   initDatePickers(document.getElementById('reg-tabla'));
   setTimeout(_updRegHdrH, 0);
+  setTimeout(_marcarSesionEnVista, 0);
 }
+
+/* ---- Barra de secciones: marca la sesión que se está viendo al desplazarse ----
+   Solo en la vista "Conferencia", donde se ven las tres sesiones juntas. */
+let _sesionEnVista = null, _rafSesionVista = 0;
+function _marcarSesionEnVista(){
+  _rafSesionVista = 0;
+  const nav = document.getElementById('reg-view-nav');
+  if(!nav) return;
+  const bloques = _regVista==='conferencia' ? [...document.querySelectorAll('#reg-tabla .ses-bloque')] : [];
+  let actual = null;
+  if(bloques.length && nav.offsetParent){
+    // La sesión actual es la última cuyo comienzo ya pasó por debajo de la barra fija
+    const limite = nav.getBoundingClientRect().bottom + 24;
+    actual = bloques[0].dataset.ses;
+    for(const b of bloques){ if(b.getBoundingClientRect().top <= limite) actual = b.dataset.ses; }
+  }
+  if(actual === _sesionEnVista) return;
+  _sesionEnVista = actual;
+  nav.querySelectorAll('.reg-view-btn').forEach(btn=>btn.classList.toggle('en-vista', btn.dataset.view===actual));
+  const btn = actual && nav.querySelector(`.reg-view-btn[data-view="${actual}"]`);
+  // En pantallas angostas la barra se desplaza sola para que se vea la sesión marcada
+  if(btn && nav.scrollWidth > nav.clientWidth){
+    nav.scrollTo({left: btn.offsetLeft - (nav.clientWidth - btn.offsetWidth)/2, behavior:'smooth'});
+  }
+}
+// En captura: así también se detecta el desplazamiento del panel, no solo el de la ventana
+document.addEventListener('scroll', ()=>{
+  if(!_rafSesionVista) _rafSesionVista = requestAnimationFrame(_marcarSesionEnVista);
+}, {capture:true, passive:true});
+window.addEventListener('resize', ()=>{ _sesionEnVista = null; _marcarSesionEnVista(); });
+/* ---- Menú "⋯" de acciones por fila (flotante, fuera del contenedor con scroll) ---- */
+function _cerrarMenuAcciones(){
+  const m = document.getElementById('reg-acc-menu');
+  if(m) m.remove();
+  document.querySelectorAll('.btn-mas[aria-expanded="true"]').forEach(b=>b.setAttribute('aria-expanded','false'));
+}
+function _abrirMenuAcciones(event, id, canGen){
+  event.stopPropagation();
+  const btn = event.currentTarget;
+  const yaAbierto = btn.getAttribute('aria-expanded')==='true';
+  _cerrarMenuAcciones();
+  if(yaAbierto) return;
+  const sinPersona = canGen ? '' : ' disabled title="Asigne una persona para descargar"';
+  const menu = document.createElement('div');
+  menu.id = 'reg-acc-menu';
+  menu.className = 'reg-acc-menu';
+  menu.setAttribute('role','menu');
+  menu.innerHTML = `
+    <button type="button" role="menuitem" data-acc="pdf"${sinPersona}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>Descargar PDF</button>
+    <button type="button" role="menuitem" data-acc="img"${sinPersona}><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>Descargar imagen (PNG)</button>
+    <hr>
+    <button type="button" role="menuitem" data-acc="limpiar" class="peligro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14M10 10v6m4-6v6"/></svg>Limpiar fila</button>`;
+  menu.onclick = e=>{
+    const b = e.target.closest('button[data-acc]'); if(!b || b.disabled) return;
+    _cerrarMenuAcciones();
+    if(b.dataset.acc==='limpiar') eliminarEntrada(id);
+    else generarDesdeRegistro(id, b.dataset.acc);
+  };
+  document.body.appendChild(menu);
+  btn.setAttribute('aria-expanded','true');
+  const r = btn.getBoundingClientRect(), mw = menu.offsetWidth, mh = menu.offsetHeight;
+  const top = r.bottom + 4 + mh > window.innerHeight ? r.top - mh - 4 : r.bottom + 4;
+  menu.style.top  = Math.max(8, top) + 'px';
+  menu.style.left = Math.max(8, Math.min(r.right - mw, window.innerWidth - mw - 8)) + 'px';
+  menu.querySelector('button:not([disabled])')?.focus();
+}
+document.addEventListener('click', e=>{ if(!e.target.closest('#reg-acc-menu')) _cerrarMenuAcciones(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') _cerrarMenuAcciones(); });
+
+/* Menús desplegables del encabezado: uno abierto a la vez; se cierran al elegir,
+   al hacer clic afuera o con Esc */
+function _cerrarMenusDesp(excepto){
+  document.querySelectorAll('details.menu-desp[open]').forEach(d=>{ if(d!==excepto) d.open = false; });
+}
+document.addEventListener('click', e=>{
+  const menu = e.target.closest('details.menu-desp');
+  if(menu && e.target.closest('.menu-desp-panel button')){ menu.open = false; return; }
+  _cerrarMenusDesp(menu);
+});
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Escape') return;
+  const abierto = document.querySelector('details.menu-desp[open]');
+  if(abierto){ abierto.open = false; abierto.querySelector('summary')?.focus(); }
+});
+window.addEventListener('scroll', _cerrarMenuAcciones, true);
+window.addEventListener('resize', _cerrarMenuAcciones);
 // Sincroniza el scroll horizontal del header sticky con el cuerpo de la tabla
 function _syncTheadScroll(wrap) {
   const t = document.getElementById('reg-thead-table');
@@ -4284,7 +4500,7 @@ function construirPaginaMinuta(sesion, opciones={}){
   const fechaSesion = getFechas()[sesion] || '';
   const horarios = getHorarios();
   const horaInicio = horarios[sesion] || '';
-  const horaFin = horarios[`${sesion}Fin`] || '';
+  const horaFin = horaFinSesion(sesion);
   const fechaTexto = fechaSesion ? `${fmtDiaCap(fechaSesion)} ${fmtFecha(fechaSesion)}` : '';
   const horaTexto = horaInicio ? `${horaInicio}${horaFin ? ` – ${horaFin}` : ''} hs` : '';
   const excluirAgenda = new Set(['preside','dirige','director','pianista','reconocimientos']);
@@ -4326,6 +4542,30 @@ function construirPaginaMinuta(sesion, opciones={}){
   return page;
 }
 
+/* Elige el tamaño de letra y la separación más amplios con los que la minuta
+   termina antes de las franjas de color del pie de la hoja.
+   Poco contenido → más aire entre líneas; mucho contenido → más compacta. */
+const MINUTA_LIMITE_INFERIOR = 935; // px de la hoja (alto total 1123) donde empiezan las franjas oscuras
+const MINUTA_NIVELES = [
+  {fs:15,   gap:44}, {fs:15,   gap:38}, {fs:14.5, gap:33}, {fs:14,   gap:29},
+  {fs:14,   gap:25}, {fs:13.5, gap:22}, {fs:13,   gap:18}, {fs:12.5, gap:14},
+  {fs:12,   gap:11}, {fs:11.5, gap:8}
+];
+function ajustarMinutaAlContenido(page){
+  const contenido = page.querySelector('.minuta-export-content');
+  if(!contenido) return;
+  contenido.style.setProperty('--extra', '0px');
+  for(const [i, nivel] of MINUTA_NIVELES.entries()){
+    contenido.style.setProperty('--fs', nivel.fs+'px');
+    contenido.style.setProperty('--gap', nivel.gap+'px');
+    const sobra = MINUTA_LIMITE_INFERIOR - contenido.offsetHeight;
+    if(sobra < 0) continue;
+    // Si incluso con el máximo aire sobra lugar, el cuerpo baja para no quedar pegado arriba
+    if(i===0 && sobra > 0) contenido.style.setProperty('--extra', Math.round(sobra*0.6)+'px');
+    return;
+  }
+}
+
 async function capturarPaginasMinuta(sesiones, opciones={}){
   const host = document.createElement('div');
   host.className = 'minuta-export-host';
@@ -4340,12 +4580,38 @@ async function capturarPaginasMinuta(sesiones, opciones={}){
       })
   ));
   if(document.fonts?.ready) await document.fonts.ready;
+  host.querySelectorAll('.minuta-export-page').forEach(ajustarMinutaAlContenido);
   const canvases = [];
   for(const page of host.querySelectorAll('.minuta-export-page')){
     canvases.push(await html2canvas(page,{scale:_escalaCaptura(),useCORS:true,backgroundColor:'#fff',logging:false,ignoreElements:_ignorarEnCaptura}));
     await _darRespiro();
   }
   return {host,canvases};
+}
+
+/* Imprime páginas A4 desde una página HTML con @page margin:0. Si se imprime un PDF,
+   el visor lo achica al área imprimible y agrega márgenes blancos alrededor del fondo.
+   Las etiquetas de cierre de body/head/html van escapadas con barra invertida: Live Server
+   inserta su script antes del primer cierre de body del archivo y, si lo encuentra acá
+   adentro, rompe todo el script de la app. */
+function imprimirPaginasA4(printWindow, canvases, titulo){
+  const paginas = canvases.map(canvas=>`<img src="${canvas.toDataURL('image/jpeg',0.95)}" alt="">`).join('');
+  printWindow.document.open();
+  printWindow.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${esc(titulo)}</title>
+<style>
+@page { size:A4 portrait; margin:0; }
+html, body { margin:0; padding:0; background:#fff; }
+@media print {
+  /* Cada hoja ocupa el 100% del área que la impresora puede imprimir. Si el driver impone
+     márgenes, el fondo se estira hasta ellos en vez de achicarse y dejar más blanco. */
+  img { display:block; width:100%; height:100vh; object-fit:fill; break-after:page; page-break-after:always; }
+  img:last-child { break-after:auto; page-break-after:auto; }
+}
+@media screen { body { background:#e9eceb; } img { display:block; width:min(794px,100%); margin:12px auto; box-shadow:0 4px 18px rgba(0,0,0,.15); } }
+</style><\/head><body>${paginas}
+<script>window.addEventListener('load',()=>setTimeout(()=>{ window.focus(); window.print(); },250));<\/script>
+<\/body><\/html>`);
+  printWindow.document.close();
 }
 
 function crearPdfMinutas(canvases){
@@ -4369,11 +4635,7 @@ async function descargarRegistro(tipo, sesionesFiltro, printWindow=null, opcione
     if(tipo==='pdf'){
       crearPdfMinutas(canvases).save(`Minutas_${sfx}.pdf`);
     } else if(tipo==='print'){
-      const pdf = crearPdfMinutas(canvases);
-      if(typeof pdf.autoPrint==='function') pdf.autoPrint();
-      const url = URL.createObjectURL(pdf.output('blob'));
-      printWindow.location.href = url;
-      setTimeout(()=>URL.revokeObjectURL(url),60000);
+      imprimirPaginasA4(printWindow, canvases, `Minutas ${sfx}`);
     } else {
       const gap = canvases.length>1 ? 24 : 0;
       const combinado = document.createElement('canvas');
@@ -4428,19 +4690,19 @@ function eliminarSeleccionados(){
 let _dragId = null;
 window.addEventListener('resize', _updRegHdrH);
 document.addEventListener('dragstart', function(e){
-  const tr = e.target.closest('tr[data-id]'); if(!tr) return;
+  const tr = e.target.closest('.asig-card[data-id]'); if(!tr) return;
   _dragId = tr.dataset.id;
   tr.classList.add('reg-dragging');
   e.dataTransfer.effectAllowed = 'move';
 });
 document.addEventListener('dragover', function(e){
-  const tr = e.target.closest('tr[data-id]'); if(!tr) return;
+  const tr = e.target.closest('.asig-card[data-id]'); if(!tr) return;
   e.preventDefault();
   document.querySelectorAll('.reg-drag-over').forEach(r=>r.classList.remove('reg-drag-over'));
   if(tr.dataset.id !== _dragId) tr.classList.add('reg-drag-over');
 });
 document.addEventListener('drop', function(e){
-  const tr = e.target.closest('tr[data-id]'); if(!tr || !_dragId) return;
+  const tr = e.target.closest('.asig-card[data-id]'); if(!tr || !_dragId) return;
   e.preventDefault();
   const tgtId = tr.dataset.id; if(tgtId === _dragId) return;
   const reg = getRegistro();
@@ -4913,11 +5175,24 @@ function _toastMensaje(texto){
    CONTROL DE TIEMPO POR SESIÓN
    Estimación de los momentos sin duración propia
 ===================================================================== */
-const MIN_HIMNO = 4;
+const MIN_HIMNO = 3; // duración habitual de un himno; se puede corregir en cada uno
 const MIN_ORACION = 2;
 const MIN_RECONOCIMIENTOS = 2;
 const MIN_ASUNTOS = 5;
 const NOMBRE_SESION = { lideres:'Sesión de Líderes', adultos:'Sesión de Adultos', general:'Sesión General' };
+
+/* Minutos de un himno: el cargado a mano en la fila o, si no hay, el habitual.
+   Se guarda en "duracionHimno" (no en "duracion") para que no aparezca en la minuta impresa. */
+function duracionHimno(r){
+  return Number(r.duracionHimno) > 0 ? Number(r.duracionHimno) : MIN_HIMNO;
+}
+function updateDuracionHimno(id, val){
+  const r=getRegistro(); const x=r.find(e=>e.id===id);
+  if(!x) return;
+  const min = Math.round(Number(String(val).replace(',','.'))*2)/2; // permite medios minutos (2,5)
+  if(min > 0 && min !== MIN_HIMNO) x.duracionHimno = min; else delete x.duracionHimno;
+  saveRegistro(r); renderRegistro();
+}
 
 function _aMinutos(hora){
   if(!hora) return null;
@@ -4928,7 +5203,7 @@ function _aMinutos(hora){
 function _estimarTiempoSesion(sesion, reg=getRegistro()){
   let discursos = 0, programa = 0;
   reg.filter(r=>r.sesion===sesion && !OPERACIONES_ASIG.includes(r.asig)).forEach(r=>{
-    if(HIMNO_CAMPO[r.asig]) programa += MIN_HIMNO;
+    if(HIMNO_CAMPO[r.asig]) programa += duracionHimno(r);
     else if(r.asig==='oracion_inicial' || r.asig==='oracion_final') programa += MIN_ORACION;
     else if(r.asig==='reconocimientos') programa += MIN_RECONOCIMIENTOS;
     else if(r.asig==='asuntos_estaca'){ if(r.habilitado) programa += MIN_ASUNTOS; }
@@ -4936,14 +5211,14 @@ function _estimarTiempoSesion(sesion, reg=getRegistro()){
   });
   const H = getHorarios();
   const inicio = _aMinutos(H[sesion]);
-  const fin = _aMinutos(H[sesion+'Fin']);
+  const fin = _aMinutos(horaFinSesion(sesion));
   const disponible = (inicio!=null && fin!=null && fin>inicio) ? fin-inicio : null;
   return { discursos, programa, total:discursos+programa, disponible };
 }
 
 function _infoTiempoSesion(sesion){
   const t = _estimarTiempoSesion(sesion);
-  const detalle = `Discursos y mensajes: ${t.discursos} min · Himnos, oraciones y otros momentos: ${t.programa} min (estimado: ${MIN_HIMNO} min por himno, ${MIN_ORACION} por oración)`;
+  const detalle = `Discursos y mensajes: ${t.discursos} min · Himnos, oraciones y otros momentos: ${t.programa} min (himnos según los minutos cargados en cada uno, ${MIN_HIMNO} por defecto; ${MIN_ORACION} min por oración)`;
   if(!t.disponible){
     return { clase:'sin-fin', texto:`⏱ ${t.total} min estimados · configurá la hora de fin`, detalle };
   }
@@ -5351,11 +5626,7 @@ async function exportarAfiches(tipo){
     if(tipo==='pdf'){
       crearPdfMinutas(canvases).save(`Afiche_himnos_${nombre}.pdf`);
     } else if(tipo==='print'){
-      const pdf = crearPdfMinutas(canvases);
-      if(typeof pdf.autoPrint==='function') pdf.autoPrint();
-      const url = URL.createObjectURL(pdf.output('blob'));
-      printWindow.location.href = url;
-      setTimeout(()=>URL.revokeObjectURL(url), 60000);
+      imprimirPaginasA4(printWindow, canvases, `Afiche himnos ${nombre}`);
     } else {
       for(let i=0; i<canvases.length; i++){
         const blob = await new Promise(res=>canvases[i].toBlob(res,'image/png'));
@@ -5390,7 +5661,7 @@ function _programaVivo(sesion){
 }
 
 function _duracionVivo(r){
-  if(HIMNO_CAMPO[r.asig]) return MIN_HIMNO;
+  if(HIMNO_CAMPO[r.asig]) return duracionHimno(r);
   if(r.asig==='oracion_inicial' || r.asig==='oracion_final') return MIN_ORACION;
   if(r.asig==='reconocimientos') return MIN_RECONOCIMIENTOS;
   if(r.asig==='asuntos_estaca') return MIN_ASUNTOS;
