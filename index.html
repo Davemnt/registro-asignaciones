@@ -728,7 +728,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
    Cada asignación es una tarjeta: asignación + nombre a la izquierda,
    fecha, estado y acciones a la derecha. La minuta va en líneas finas.
 =================================================================== */
-#reg-view-nav, #reg-tabla { max-width:1240px; margin-left:auto; margin-right:auto; }
+#reg-view-nav, #reg-tabla { max-width:1480px; margin-left:auto; margin-right:auto; }
 .reg-list-bar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 16px; margin:14px 2px 0; }
 .reg-list-selall { display:flex; align-items:center; gap:7px; margin:0; color:#59626e; font-size:11px; font-weight:600; letter-spacing:0; text-transform:none; cursor:pointer; }
 .reg-list-selall input { width:16px; height:16px; min-height:0; margin:0; padding:0; box-shadow:none; }
@@ -743,8 +743,8 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 .asig-card {
   --estado:#d8d4cc;
   display:grid;
-  grid-template-columns:44px minmax(0,1fr) 128px 236px auto;
-  grid-template-areas:"lead main fecha estado acc";
+  grid-template-columns:44px minmax(180px,1fr) minmax(0,1.2fr) 128px 236px auto;
+  grid-template-areas:"lead main info fecha estado acc";
   align-items:center;
   column-gap:18px;
   padding:12px 16px 12px 0;
@@ -787,7 +787,23 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 .ac-dia { color:#69727d; font-size:10.5px; text-transform:capitalize; }
 .ac-fecha .alerta-badge { margin-top:0; }
 .ac-estado { grid-area:estado; }
+.ac-info { grid-area:info; min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:5px; }
+.ac-tema { max-width:100%; padding:0; border:0; background:none; color:#3d4651; font:italic 500 13px 'Lora',serif; text-align:left; line-height:1.35; cursor:pointer; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.ac-tema:hover { color:var(--wine); text-decoration:underline; }
+.ac-tema.sin-tema { padding:2px 8px; border:1px dashed #e0a028; border-radius:3px; background:#fffcf3; color:#8a5a00; font:600 11px 'DM Sans',sans-serif; text-decoration:none; }
+.ac-tema.sin-tema:hover { background:#fdf0d5; }
+.ac-aviso { padding:2px 8px; border-radius:3px; font-size:10.5px; font-weight:700; white-space:nowrap; }
+.ac-aviso.espera   { background:#f3f0ea; color:#59626e; }
+.ac-aviso.atencion { background:#fdeee0; color:#a4521a; }
+.ac-aviso.info     { background:#e6eef7; color:#2b4f7a; }
+.ac-aviso.critico  { background:#fde8e8; color:#a32020; }
 .ac-acciones { grid-area:acc; display:flex; align-items:center; gap:6px; }
+/* Descargas a la vista en computadora; en el celular siguen dentro del menú ⋯ */
+.ac-dl { display:inline-flex; align-items:center; gap:5px; height:30px; padding:0 10px; border:1px solid #CBD5E1; border-radius:2px; background:#fff; color:#475569; font:700 11px 'DM Sans',sans-serif; letter-spacing:.3px; cursor:pointer; transition:all .15s; }
+.ac-dl svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.ac-dl:hover:not(:disabled) { color:var(--wine); border-color:var(--wine); background:#fbf5f6; }
+.ac-dl:disabled { opacity:.4; cursor:not-allowed; }
+@media (min-width:901px){ .ac-acciones .btn-mas { display:none; } }
 
 .info-row { display:grid; grid-template-columns:44px minmax(110px,190px) minmax(0,1fr); grid-template-areas:". lbl val"; align-items:center; column-gap:18px; padding:4px 16px 4px 5px; border-left:1px dashed #d8d1c7; margin-left:22px; }
 .info-lbl { grid-area:lbl; color:#69727d; font-size:11.5px; font-weight:600; }
@@ -833,14 +849,17 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 @media (max-width:900px) {
   .asig-card {
     grid-template-columns:36px minmax(0,1fr) auto;
-    grid-template-areas:"lead main main" "lead fecha acc" "estado estado estado";
+    grid-template-areas:"lead main main" "lead info info" "lead fecha acc" "estado estado estado";
     row-gap:10px; padding:12px 12px 10px 0;
   }
   .ac-drag { display:none; }
+  .ac-info:empty { display:none; }
+  .ac-aviso { white-space:normal; }
   .ac-lead { align-self:start; padding-top:3px; }
   .ac-fecha { flex-direction:row; flex-wrap:wrap; justify-content:flex-start; gap:6px; }
   .ac-estado { margin-left:12px; padding-top:8px; border-top:1px solid #eee9e2; }
   .ac-acciones .btn-edit, .ac-acciones .btn-mas { width:40px; height:40px; }
+  .ac-dl, .ac-limpiar { display:none; }
   .ac-estado .paso { min-height:52px; }
   .info-row { grid-template-columns:minmax(0,1fr); grid-template-areas:"lbl" "val"; row-gap:4px; margin-left:8px; padding:4px 8px 6px 12px; }
 }
@@ -1060,6 +1079,7 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 .badge-conflicto { display:inline-flex; align-items:center; flex-shrink:0; padding:2px 8px; border-radius:2px; background:#fff4e0; color:#9a5200; border:1px solid #f5cf8f; font-size:10.5px; font-weight:700; white-space:nowrap; cursor:help; }
 .btn-vivo { color:#fff !important; background:#29384a !important; border-color:#29384a !important; }
 .btn-vivo:hover { background:#1d2938 !important; }
+.btn-afiches svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 
 /* Himnos: ayuda al escribir el número */
 .himno-hint { margin-top:4px; font-size:10.5px; line-height:1.35; color:#69727d; }
@@ -1660,6 +1680,7 @@ body.vivo-abierto { overflow:hidden; }
           <button id="btn-del-sel" class="btn-reg-exp" style="display:none;background:#dc2626;color:#fff" onclick="eliminarSeleccionados()">Eliminar (0)</button>
           <button class="btn-reg-exp btn-reg-add" onclick="abrirAddModal()">+ Nueva asignación</button>
           <button class="btn-reg-exp btn-vivo" onclick="abrirVivo()"><span class="vivo-punto" aria-hidden="true"></span>En vivo</button>
+          <button type="button" class="btn-reg-exp btn-afiches" onclick="abrirAfiches()" title="Afiches con QR para los himnos"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>Afiches QR</button>
           <!-- Menús desplegables: agrupan las acciones que se usan pocas veces -->
           <details class="menu-desp">
             <summary class="btn-reg-exp">Minutas<svg class="menu-flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
@@ -1672,7 +1693,6 @@ body.vivo-abierto { overflow:hidden; }
           <details class="menu-desp">
             <summary class="btn-reg-exp">Más<svg class="menu-flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
             <div class="menu-desp-panel" role="menu">
-              <button type="button" role="menuitem" onclick="abrirAfiches()"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>Afiches con QR</button>
               <button type="button" role="menuitem" onclick="abrirRespaldos()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>Respaldos</button>
               <hr>
               <button type="button" role="menuitem" class="peligro" onclick="limpiarRegistro()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14"/></svg>Limpiar registro…</button>
@@ -2212,6 +2232,15 @@ const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto'
 const DIAS  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const ORDINAL = ['primer','segundo','tercer','cuarto','quinto','sexto','séptimo','octavo','noveno','décimo','undécimo','duodécimo'];
 const INTERVENCIONES_ASIG = ['mensaje','testimonio','capacitacion','tiempo_instruccion'];
+// Días transcurridos desde una fecha guardada como dd/mm/aa (null si no se puede leer)
+function _diasDesde(txt){
+  const m = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/.exec(String(txt||'').trim());
+  if(!m) return null;
+  const anio = Number(m[3]) < 100 ? 2000 + Number(m[3]) : Number(m[3]);
+  const d = new Date(anio, Number(m[2])-1, Number(m[1]));
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  return Math.max(0, Math.round((hoy - d) / 86400000));
+}
 const SESION_LABEL = { adultos:'la Sesión de Adultos', lideres:'la Sesión de Líderes', general:'la Sesión General', jovenes:'la Sesión de Jóvenes' };
 
 (function init(){
@@ -3715,6 +3744,31 @@ function renderRegistro(){
     }).join('')}</div></div>`;
   }
 
+  // Columna central: tema de la intervención y aviso de lo que falta hacer
+  function infoCell(r, dLeft){
+    const esBarrio = r.asig==='discurso_barrio';
+    const llevaTema = esBarrio || INTERVENCIONES_ASIG.includes(r.asig);
+    const tema = llevaTema ? ((esBarrio ? r.discursoTema : r.tema)||'').trim() : '';
+    const temaRequerido = ['capacitacion','tiempo_instruccion'].includes(r.asig) || (r.asig==='mensaje' && r.sesion==='adultos');
+    let temaHTML = '';
+    if(tema) temaHTML = `<button type="button" class="ac-tema" onclick="abrirEditModal('${r.id}')" title="Tema: ${esc(tema)} — clic para editar">«${esc(tema)}»</button>`;
+    else if(temaRequerido) temaHTML = `<button type="button" class="ac-tema sin-tema" onclick="abrirEditModal('${r.id}')" title="Agregar el tema">Sin tema</button>`;
+
+    let aviso = '';
+    if(dLeft === null || dLeft >= 0){
+      if(r.confirmado===false) aviso = ['critico','No acepto la asignación · buscar reemplazo'];
+      else if(r.reconfirmado===false) aviso = ['critico','No reconfirmó · volver a llamar'];
+      else if(r.cartaAviso===true && r.confirmado!==true){
+        const dias = _diasDesde(r.cartaAvisoDate);
+        const hace = dias===null ? '' : dias===0 ? ' · avisado hoy' : ` · avisado hace ${dias} día${dias===1?'':'s'}`;
+        aviso = [dias!==null && dias>=3 ? 'atencion' : 'espera', 'Sin confirmar'+hace];
+      }
+      else if(r.confirmado===true && r.reconfirmado!==true && dLeft!==null && dLeft<=7) aviso = ['info','Falta reconfirmar'];
+    }
+    if(!temaHTML && !aviso) return '<div class="ac-info"></div>';
+    return `<div class="ac-info">${temaHTML}${aviso?`<span class="ac-aviso ${aviso[0]}">${aviso[1]}</span>`:''}</div>`;
+  }
+
   const groups = {};
   for(const r of fil){ const s=r.sesion||'otro'; if(!groups[s]) groups[s]=[]; groups[s].push(r); }
   const sesKeys = SES_ORDER.filter(s=>groups[s]).concat(Object.keys(groups).filter(s=>!SES_ORDER.includes(s)));
@@ -3821,9 +3875,13 @@ function renderRegistro(){
           ${_diaSemana ? `<span class="ac-dia">${_diaSemana}</span>` : ''}
           ${_alertBadge}
         </div>
+        ${infoCell(r, isFilled ? _dLeft : null)}
         ${estadoCell(r)}
         <div class="ac-acciones">
+          <button type="button" class="ac-dl" onclick="generarDesdeRegistro('${r.id}','pdf')" title="${canGen?'Descargar la carta en PDF':'Asigne una persona para descargar'}"${canGen?'':' disabled'}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>PDF</button>
+          <button type="button" class="ac-dl" onclick="generarDesdeRegistro('${r.id}','img')" title="${canGen?'Descargar la carta como imagen PNG':'Asigne una persona para descargar'}"${canGen?'':' disabled'}><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>PNG</button>
           <button class="btn-edit" onclick="abrirEditModal('${r.id}')" title="Editar asignación" aria-label="Editar asignación"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button>
+          <button type="button" class="btn-del ac-limpiar" onclick="eliminarEntrada('${r.id}')" title="Limpiar fila" aria-label="Limpiar fila"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14M10 10v6m4-6v6"/></svg></button>
           <button class="btn-mas" onclick="_abrirMenuAcciones(event,'${r.id}',${canGen})" title="Más acciones" aria-label="Más acciones" aria-haspopup="menu">⋯</button>
         </div>
       </div>`;
