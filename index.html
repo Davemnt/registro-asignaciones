@@ -864,6 +864,45 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
   .info-row { grid-template-columns:minmax(0,1fr); grid-template-areas:"lbl" "val"; row-gap:4px; margin-left:8px; padding:4px 8px 6px 12px; }
 }
 
+/* ---- Reordenar con ▲▼ (pantallas chicas; en computadora se arrastra) ---- */
+.ac-mover { display:none; }
+.asig-card.recien-movida { animation:tarjeta-movida 1.2s ease-out; }
+@keyframes tarjeta-movida { 0% { box-shadow:0 0 0 3px rgba(123,41,63,.5); } 100% { box-shadow:0 1px 2px rgba(32,40,51,.04); } }
+@media (max-width:900px) {
+  .ac-lead { gap:6px; }
+  .ac-mover { display:grid; place-items:center; width:34px; height:34px; padding:0; border:1px solid #d8d4cc; border-radius:6px; background:#fff; color:#475569; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .ac-mover svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
+  .ac-mover:active:not(:disabled) { background:#f3f0ea; color:var(--wine); border-color:var(--wine); }
+  .ac-mover:disabled { opacity:.3; cursor:default; }
+}
+
+/* ---- Celular: más lugar para las asignaciones ---- */
+.solo-pc { display:inline; }
+@media (max-width:768px) {
+  .solo-pc { display:none; }
+  /* Solo queda fija la barra de sesiones; el encabezado y las pestañas se van al bajar */
+  .panel-tabs { position:static; }
+  .reg-header { position:static; margin:-16px -16px 0; padding:12px 16px 10px; gap:10px; }
+  .reg-header h2 { font-size:18px; }
+  .reg-stats .stat-ico { display:none; }
+  .reg-stats .stat { padding:2px 10px; }
+  .reg-view-nav { top:0 !important; margin:8px -16px 6px; border-radius:0; border-left:0; border-right:0; }
+  .ses-bloque { scroll-margin-top:64px; padding:0 8px 10px; }
+  /* Botones del encabezado en una sola fila */
+  .reg-header-btns { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; }
+  .reg-header-btns > * { min-width:0; }
+  .reg-header-btns .btn-reg-exp, .reg-header-btns .menu-desp > summary { width:100%; min-height:40px; justify-content:center; padding:6px 4px; font-size:11.5px; white-space:nowrap; }
+  .reg-header-btns .btn-reg-exp svg:not(.menu-flecha) { display:none; }
+  .reg-header-btns .menu-desp .menu-desp-panel { left:auto; right:0; }
+  #btn-del-sel { grid-column:1 / -1; }
+  /* Tarjetas más compactas */
+  .asig-card { grid-template-columns:44px minmax(0,1fr) auto; row-gap:8px; padding:10px 10px 8px 0; }
+  .ac-nombre .name-filled-input { font-size:15px; }
+  .ac-estado { padding-top:6px; }
+  .ac-estado .paso { min-height:44px; }
+  .ac-acciones .btn-edit, .ac-acciones .btn-mas { width:38px; height:38px; }
+}
+
 /* Modales */
 .reg-modal-overlay { background:rgba(32,40,51,.72); }
 .reg-modal { border:0; border-radius:4px; background:var(--paper); box-shadow:0 28px 80px rgba(15,20,27,.3); }
@@ -1678,9 +1717,9 @@ body.vivo-abierto { overflow:hidden; }
         <div id="reg-stats" class="reg-stats"></div>
         <div class="reg-header-btns">
           <button id="btn-del-sel" class="btn-reg-exp" style="display:none;background:#dc2626;color:#fff" onclick="eliminarSeleccionados()">Eliminar (0)</button>
-          <button class="btn-reg-exp btn-reg-add" onclick="abrirAddModal()">+ Nueva asignación</button>
+          <button class="btn-reg-exp btn-reg-add" onclick="abrirAddModal()">+ Nueva<span class="solo-pc"> asignación</span></button>
           <button class="btn-reg-exp btn-vivo" onclick="abrirVivo()"><span class="vivo-punto" aria-hidden="true"></span>En vivo</button>
-          <button type="button" class="btn-reg-exp btn-afiches" onclick="abrirAfiches()" title="Afiches con QR para los himnos"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>Afiches QR</button>
+          <button type="button" class="btn-reg-exp btn-afiches" onclick="abrirAfiches()" title="Afiches con QR para los himnos"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg><span class="solo-pc">Afiches </span>QR</button>
           <!-- Menús desplegables: agrupan las acciones que se usan pocas veces -->
           <details class="menu-desp">
             <summary class="btn-reg-exp">Minutas<svg class="menu-flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
@@ -3854,6 +3893,8 @@ function renderRegistro(){
         <div class="ac-lead">
           <input type="checkbox" class="reg-sel" data-id="${r.id}" onchange="_cntSel()" aria-label="Seleccionar ${aLbl}">
           <span class="ac-drag" title="Arrastrar para reordenar" aria-hidden="true">⠿</span>
+          <button type="button" class="ac-mover" onclick="moverAsignacion('${r.id}',-1)" aria-label="Subir ${aLbl}"${_vecinoParaMover(reg, reg.indexOf(r), -1)<0?' disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>
+          <button type="button" class="ac-mover" onclick="moverAsignacion('${r.id}',1)" aria-label="Bajar ${aLbl}"${_vecinoParaMover(reg, reg.indexOf(r), 1)<0?' disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
         </div>
         <div class="ac-main">
           <div class="ac-asig">${canIrCarta
@@ -3952,6 +3993,31 @@ function _cerrarMenuAcciones(){
   if(m) m.remove();
   document.querySelectorAll('.btn-mas[aria-expanded="true"]').forEach(b=>b.setAttribute('aria-expanded','false'));
 }
+/* ---- Reordenar sin arrastrar (en el celular arrastrar y soltar no funciona) ----
+   Intercambia la fila con la anterior/siguiente de la misma sesión y del mismo grupo
+   (conferencia u operaciones), incluidas las líneas de la minuta como himnos. */
+function _vecinoParaMover(reg, i, dir){
+  const x = reg[i], esOp = OPERACIONES_ASIG.includes(x.asig);
+  for(let j=i+dir; j>=0 && j<reg.length; j+=dir){
+    if(reg[j].sesion===x.sesion && OPERACIONES_ASIG.includes(reg[j].asig)===esOp) return j;
+  }
+  return -1;
+}
+function moverAsignacion(id, dir){
+  const reg = getRegistro();
+  const i = reg.findIndex(r=>r.id===id);
+  const j = i<0 ? -1 : _vecinoParaMover(reg, i, dir);
+  if(j<0) return;
+  [reg[i], reg[j]] = [reg[j], reg[i]];
+  saveRegistro(reg); renderRegistro();
+  // Mantener a la vista la tarjeta movida y marcarla un instante para no perderla
+  const card = document.querySelector(`.asig-card[data-id="${CSS.escape(id)}"]`);
+  if(card){
+    card.scrollIntoView({block:'nearest', behavior:'smooth'});
+    card.classList.remove('recien-movida'); void card.offsetWidth; card.classList.add('recien-movida');
+  }
+}
+
 function _abrirMenuAcciones(event, id, canGen){
   event.stopPropagation();
   const btn = event.currentTarget;
@@ -3959,11 +4025,17 @@ function _abrirMenuAcciones(event, id, canGen){
   _cerrarMenuAcciones();
   if(yaAbierto) return;
   const sinPersona = canGen ? '' : ' disabled title="Asigne una persona para descargar"';
+  const reg = getRegistro(), pos = reg.findIndex(r=>r.id===id);
+  const noSube = pos<0 || _vecinoParaMover(reg, pos, -1)<0 ? ' disabled' : '';
+  const noBaja = pos<0 || _vecinoParaMover(reg, pos, 1)<0 ? ' disabled' : '';
   const menu = document.createElement('div');
   menu.id = 'reg-acc-menu';
   menu.className = 'reg-acc-menu';
   menu.setAttribute('role','menu');
   menu.innerHTML = `
+    <button type="button" role="menuitem" data-acc="subir"${noSube}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg>Subir</button>
+    <button type="button" role="menuitem" data-acc="bajar"${noBaja}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>Bajar</button>
+    <hr>
     <button type="button" role="menuitem" data-acc="pdf"${sinPersona}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>Descargar PDF</button>
     <button type="button" role="menuitem" data-acc="img"${sinPersona}><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>Descargar imagen (PNG)</button>
     <hr>
@@ -3972,6 +4044,8 @@ function _abrirMenuAcciones(event, id, canGen){
     const b = e.target.closest('button[data-acc]'); if(!b || b.disabled) return;
     _cerrarMenuAcciones();
     if(b.dataset.acc==='limpiar') eliminarEntrada(id);
+    else if(b.dataset.acc==='subir') moverAsignacion(id, -1);
+    else if(b.dataset.acc==='bajar') moverAsignacion(id, 1);
     else generarDesdeRegistro(id, b.dataset.acc);
   };
   document.body.appendChild(menu);
