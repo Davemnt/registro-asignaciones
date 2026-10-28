@@ -797,6 +797,95 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 .ac-aviso.atencion { background:#fdeee0; color:#a4521a; }
 .ac-aviso.info     { background:#e6eef7; color:#2b4f7a; }
 .ac-aviso.critico  { background:#fde8e8; color:#a32020; }
+.ac-aviso.ok       { background:#edf6f0; color:#2f6b45; }
+.ac-aviso.listo    { background:#d9eee0; color:#1d5535; }
+
+/* ---- Asistencia: comparación con la conferencia anterior ---- */
+.asis-panel { --asis-ant:#4f86c6; --asis-act:#a8435c; }
+.asis-datos { display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:14px; }
+.asis-conf { min-width:0; padding:12px; border:1px solid #ebe7df; border-radius:6px; background:#fffefb; }
+.asis-conf-titulo { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin-bottom:8px; }
+.asis-conf-titulo input { flex:1 1 210px; min-width:0; height:34px; padding:0 8px; border:1px solid transparent; border-radius:4px; background:transparent; font:600 14px 'Lora',serif; color:var(--ink); }
+.asis-conf-titulo input:hover, .asis-conf-titulo input:focus { border-color:var(--line); background:#fff; }
+.asis-muestra { width:10px; height:10px; flex-shrink:0; border-radius:2px; }
+.asis-anterior .asis-muestra { background:var(--asis-ant); }
+.asis-actual .asis-muestra { background:var(--asis-act); }
+.asis-tabla { width:100%; border-collapse:collapse; font-size:12px; }
+.asis-tabla th, .asis-tabla td { padding:5px 4px; text-align:left; vertical-align:middle; border-top:1px solid #f0ece5; }
+.asis-tabla thead th { border-top:0; color:#69727d; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; }
+.asis-tabla tbody th { font-weight:600; color:var(--ink); line-height:1.3; }
+.asis-tabla tbody th small { display:block; color:#8a929c; font-size:10.5px; font-weight:500; }
+.asis-tabla input { width:76px; height:32px; padding:0 6px; border:1px solid var(--line); border-radius:4px; font:600 13px 'DM Sans',sans-serif; text-align:right; }
+.asis-tabla .asis-pct { width:44px; text-align:right; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; }
+.asis-subtitulo { margin:22px 0 10px; font:600 15px 'Lora',serif; color:var(--ink); }
+.asis-kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; }
+.asis-kpi { display:flex; flex-direction:column; align-items:stretch; gap:3px; padding:12px 14px; border:1px solid #ebe7df; border-left:3px solid var(--asis-act); border-radius:6px; background:#fffefb; font:inherit; text-align:left; cursor:pointer; transition:box-shadow .15s, border-color .15s; }
+.asis-kpi:hover { box-shadow:0 4px 14px rgba(32,40,51,.08); }
+.asis-kpi:focus-visible { outline:2px solid var(--asis-act); outline-offset:2px; }
+.asis-kpi.total { border-left-color:var(--ink); background:#f6f3ed; }
+.asis-kpi.abierta { border-color:var(--asis-act); box-shadow:0 0 0 1px var(--asis-act); }
+.asis-kpi-ver { margin-top:4px; color:var(--wine); font-size:11px; font-weight:700; }
+.asis-acciones { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:8px; }
+.asis-ver { display:flex; align-items:center; gap:6px; color:#59626e; font-size:11.5px; font-weight:700; }
+.asis-ver select { height:34px; max-width:300px; padding:0 8px; border:1px solid var(--line); border-radius:4px; background:#fff; font:600 12px 'DM Sans',sans-serif; color:var(--ink); }
+.asis-panel .asis-mes { flex:0 0 150px; width:150px; height:30px; margin:0; padding:0 6px; border:1px solid var(--line); border-radius:4px; background:#fff; color:#59626e; font:600 11px 'DM Sans',sans-serif; }
+.asis-borrar, .asis-cerrar { width:30px; height:30px; flex-shrink:0; border:0; border-radius:4px; background:transparent; color:#8a929c; font-size:13px; cursor:pointer; }
+.asis-borrar:hover, .asis-cerrar:hover { background:#f3efe7; color:#a32020; }
+.asis-sin-anterior { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:10px; color:#69727d; font-size:12.5px; }
+.asis-agregar { margin-top:8px; padding:4px 0; border:0; background:transparent; color:var(--wine); font:700 11.5px 'DM Sans',sans-serif; cursor:pointer; }
+.asis-ayuda { margin:-4px 0 10px; color:#69727d; font-size:11.5px; }
+.asis-informe { margin-top:12px; padding:16px 18px; border:1px solid #e3d7da; border-left:3px solid var(--asis-act); border-radius:6px; background:#fffefb; color:var(--ink); font-size:13px; line-height:1.55; }
+.asis-informe-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:6px; }
+.asis-informe h5 { font:600 15px 'Lora',serif; }
+.asis-informe p { margin-top:4px; }
+.asis-cambios { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:8px; margin:12px 0; }
+.asis-cambios div { padding:8px 10px; border-radius:4px; background:#f6f3ed; }
+.asis-cambios dt { color:#69727d; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; }
+.asis-cambios dd { margin:2px 0 0; font-weight:700; font-variant-numeric:tabular-nums; }
+.asis-lectura { padding:10px 12px; border-radius:4px; background:#f3f6fa; }
+.asis-lectura strong { display:block; color:#2b4f7a; font-size:11px; text-transform:uppercase; letter-spacing:.3px; }
+.asis-sugerencia { color:#69727d; font-size:12px; }
+.asis-notas { display:block; margin-top:12px; color:#59626e; font-size:11.5px; font-weight:700; }
+.asis-notas textarea { display:block; width:100%; margin-top:4px; padding:8px; border:1px solid var(--line); border-radius:4px; font:400 12.5px/1.45 'DM Sans',sans-serif; color:var(--ink); resize:vertical; }
+.asis-nota-ant { color:#59626e; font-size:12px; }
+.asis-historial { margin-top:14px; padding:10px 14px; border:1px solid #ebe7df; border-radius:6px; background:#fffefb; }
+.asis-historial summary { color:var(--ink); font-size:12.5px; font-weight:700; cursor:pointer; }
+.asis-historial-scroll { overflow-x:auto; margin-top:8px; }
+.asis-historial td { text-align:right; font-weight:700; font-variant-numeric:tabular-nums; }
+.asis-historial tr.sel th, .asis-historial tr.sel td { color:var(--wine); }
+.asis-kpi-lbl { color:#59626e; font-size:11px; font-weight:700; }
+.asis-kpi-n { font:600 28px/1.1 'Lora',serif; color:var(--ink); font-variant-numeric:tabular-nums; }
+.asis-kpi-ant { display:flex; flex-wrap:wrap; align-items:center; gap:6px; color:#69727d; font-size:11.5px; }
+.asis-kpi-pers { color:#69727d; font-size:11px; }
+.asis-delta { padding:1px 6px; border-radius:3px; font-size:10.5px; font-weight:700; white-space:nowrap; }
+.asis-delta.sube  { background:#e3f1e7; color:#1d5535; }
+.asis-delta.baja  { background:#fde8e8; color:#a32020; }
+.asis-delta.igual { background:#f0ede7; color:#59626e; }
+.asis-grafico { margin:16px 0 0; padding:14px; border:1px solid #ebe7df; border-radius:6px; background:#fffefb; }
+.asis-grafico figcaption { display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px 14px; margin-bottom:10px; color:var(--ink); font-size:12.5px; font-weight:700; }
+.asis-leyenda { display:flex; flex-wrap:wrap; gap:4px 14px; color:#59626e; font-size:11.5px; font-weight:600; }
+.asis-leyenda span::before { content:''; display:inline-block; width:10px; height:10px; margin-right:6px; border-radius:2px; vertical-align:-1px; }
+.asis-leyenda .anterior::before { background:var(--asis-ant); }
+.asis-leyenda .actual::before { background:var(--asis-act); }
+.asis-escala { display:flex; justify-content:space-between; margin-left:170px; padding-right:40px; color:#8a929c; font-size:10px; }
+.asis-grupo { display:grid; grid-template-columns:160px 1fr; align-items:center; gap:10px; padding:8px 0; border-top:1px solid #f0ece5; }
+.asis-grupo-lbl { color:var(--ink); font-size:12px; font-weight:600; }
+.asis-grupo-barras { display:flex; flex-direction:column; gap:2px; padding-right:40px;
+  background:repeating-linear-gradient(to right, #ece8e1 0 1px, transparent 1px 25%) left / calc(100% - 40px) 100% no-repeat; }
+.asis-barra-fila { position:relative; display:flex; align-items:center; height:16px; cursor:default; }
+.asis-barra { height:14px; min-width:2px; border-radius:0 4px 4px 0; transition:width .5s, opacity .15s; }
+.asis-barra-fila.anterior .asis-barra { background:var(--asis-ant); }
+.asis-barra-fila.actual .asis-barra { background:var(--asis-act); }
+.asis-grupo-barras:hover .asis-barra { opacity:.55; }
+.asis-grupo-barras .asis-barra-fila:hover .asis-barra { opacity:1; }
+.asis-barra-val { margin-left:6px; color:var(--ink); font-size:11px; font-weight:700; font-variant-numeric:tabular-nums; }
+.asis-barra-vacia { color:#8a929c; font-size:10.5px; font-style:italic; }
+@media (max-width:600px){
+  .asis-datos { grid-template-columns:1fr; }
+  .asis-tabla input { width:64px; }
+  .asis-escala { margin-left:0; }
+  .asis-grupo { grid-template-columns:1fr; gap:4px; }
+}
 .ac-acciones { grid-area:acc; display:flex; align-items:center; gap:6px; }
 /* Descargas a la vista en computadora; en el celular siguen dentro del menú ⋯ */
 .ac-dl { display:inline-flex; align-items:center; gap:5px; height:30px; padding:0 10px; border:1px solid #CBD5E1; border-radius:2px; background:#fff; color:#475569; font:700 11px 'DM Sans',sans-serif; letter-spacing:.3px; cursor:pointer; transition:all .15s; }
@@ -1745,6 +1834,7 @@ body.vivo-abierto { overflow:hidden; }
         <button class="reg-view-btn" data-view="adultos" onclick="setRegVista('adultos')">Adultos</button>
         <button class="reg-view-btn" data-view="general" onclick="setRegVista('general')">General</button>
         <button class="reg-view-btn" data-view="operaciones" onclick="setRegVista('operaciones')">Operaciones <span class="reg-view-count" id="reg-count-operaciones">0</span></button>
+        <button class="reg-view-btn" data-view="asistencia" onclick="setRegVista('asistencia')">Asistencia</button>
         <button class="reg-view-btn otros" data-view="otros" onclick="setRegVista('otros')">Otros eventos <span class="reg-view-count" id="reg-count-otros">0</span></button>
       </nav>
       <section class="otros-documento hidden" id="cartas-barrios-form" aria-labelledby="cartas-barrios-title">
@@ -1775,6 +1865,7 @@ body.vivo-abierto { overflow:hidden; }
           <button type="button" class="btn-reg-exp" onclick="reiniciarRelSost()">Limpiar formulario</button>
         </div>
       </section>
+      <section class="otros-documento asis-panel hidden" id="asistencia-panel" aria-labelledby="asistencia-title"></section>
       <div id="reg-tabla"></div>
     </div><!-- /tab-registro -->
 
@@ -2102,11 +2193,15 @@ const _fbConfig = {
 };
 firebase.initializeApp(_fbConfig);
 const _auth = firebase.auth();
+// La sesión vive solo mientras el navegador (o la pestaña) esté abierto: al cerrarlo se pide el PIN de nuevo
+const _persistenciaLista = _auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
+  .catch(e=>console.error('Persistencia:', e));
 const _db   = firebase.firestore();
 let _regCache      = null;
 let _horariosCache = null;
 let _fechasCache   = null;
 let _relevosCache  = null;
+let _asistenciaCache = null;
 let _currentUser   = null;
 
 /* ===== ACCESO CON PIN =====
@@ -2117,8 +2212,9 @@ const EMAIL_COORDINACION = 'coordinacion@registro-asignaciones-conf.web.app';
 function _esCoordinacion(user){ return !!(user && user.email === EMAIL_COORDINACION); }
 
 /* ===== CIERRE POR INACTIVIDAD =====
-   La última actividad se guarda en localStorage para que valga entre pestañas y
-   también al volver a abrir el navegador. Con la vista En vivo abierta no se cierra. */
+   Tras 15 minutos sin actividad se cierra la sesión y se vuelve a pedir el PIN.
+   La última actividad se guarda en localStorage para que valga entre pestañas.
+   Con la vista En vivo abierta no se cierra. */
 const INACTIVIDAD_MAX_MS = 15 * 60 * 1000;
 const CLAVE_ACTIVIDAD = 'ultima-actividad';
 let _ultimaMarca = 0;
@@ -2214,6 +2310,7 @@ async function ingresarConPin(ev){
   _ultimaMarca = 0;
   _marcarActividad();
   try {
+    await _persistenciaLista;
     await _auth.signInWithEmailAndPassword(EMAIL_COORDINACION, pin);
   } catch(e){
     console.error('Ingreso:', e);
@@ -3340,7 +3437,403 @@ function updateFecha(id, val){
 }
 function updateAsistencia(id, val){
   const r=getRegistro(); const x=r.find(e=>e.id===id);
-  if(x){ const total=parseInt(val); if(total>=0) x.asistenciaTotal=total; else delete x.asistenciaTotal; saveRegistro(r); }
+  if(x){
+    const total=parseInt(val);
+    if(total>=0) x.asistenciaTotal=total; else delete x.asistenciaTotal;
+    saveRegistro(r);
+    _asistenciaDesdeFicha(x.sesion, total>=0 ? total : null);
+  }
+}
+
+/* ===== ASISTENCIA: HISTORIAL DE CONFERENCIAS =====
+   Cada conferencia (una cada 6 meses) guarda su propio informe con las mismas reuniones
+   que el informe oficial, y se compara con la anterior. El historial vive en su propio
+   documento, así que limpiar el registro no lo borra. Lo que asistió en la conferencia
+   actual también se puede anotar en la ficha de Asistencia de cada sesión (Operaciones). */
+const ASIS_REUNIONES = [
+  ['presidencia','Reunión de la presidencia de estaca','Incluye al secretario y al secretario ejecutivo'],
+  ['lideres','Reunión de líderes del sacerdocio de estaca',''],
+  ['adultos','Sesión del sábado por la tarde para adultos',''],
+  ['general','Sesiones generales del domingo','Asistencia total']
+];
+const ASIS_CORTO = {presidencia:'Presidencia de estaca', lideres:'Líderes del sacerdocio', adultos:'Adultos (sábado)', general:'Generales (domingo)', total:'Total'};
+// Informe de la conferencia anterior, tal como se presentó
+const _ASIS_SEMILLA = {
+  presidencia:{invitados:5, asistieron:5},
+  lideres:{invitados:201, asistieron:105},
+  adultos:{invitados:1888, asistieron:185},
+  general:{invitados:2280, asistieron:510}
+};
+let _asisSel = null;      // mes (AAAA-MM) de la conferencia que se está viendo
+let _asisDetalle = null;  // reunión cuyo informe está abierto
+
+function _mesConferenciaActual(){
+  const f = getFechas();
+  const m = /^(\d{4})-(\d{2})/.exec(f.general || f.adultos || f.lideres || '');
+  return m ? `${m[1]}-${m[2]}` : null;
+}
+function _mesDesplazado(mes, meses){
+  let [y,m] = mes.split('-').map(Number);
+  m += meses;
+  while(m<1){ m+=12; y--; }
+  while(m>12){ m-=12; y++; }
+  return `${y}-${String(m).padStart(2,'0')}`;
+}
+function _tituloMes(mes){
+  const [y,m] = mes.split('-').map(Number);
+  return `Conferencia de ${MESES[m-1]} ${y}`;
+}
+
+function getConferenciasAsistencia(){
+  const d = _asistenciaCache || {};
+  const actual = _mesConferenciaActual();
+  let lista = Array.isArray(d.conferencias) ? JSON.parse(JSON.stringify(d.conferencias)) : [];
+  if(!lista.length){
+    // Primera vez: se arranca con el informe de la conferencia anterior
+    const base = actual || new Date().toISOString().slice(0,7);
+    const mesAnt = _mesDesplazado(base, -6);
+    const ant = {..._ASIS_SEMILLA, ...(d.anterior||{})};
+    lista.push({...ant, mes:mesAnt, titulo:_tituloMes(mesAnt)});
+    if(d.actual) lista.push({...d.actual, mes:base, titulo:_tituloMes(base)});
+  }
+  if(actual && !lista.some(c=>c.mes===actual)) lista.push({mes:actual, titulo:_tituloMes(actual)});
+  return lista.sort((a,b)=>a.mes.localeCompare(b.mes));
+}
+function _guardarConferencias(lista){
+  _asistenciaCache = {conferencias: JSON.parse(JSON.stringify(lista))};
+  _saveFs('asistencia', _asistenciaCache);
+}
+function _editarConferencia(mes, cambiar){
+  const lista = getConferenciasAsistencia();
+  const conf = lista.find(c=>c.mes===mes);
+  if(!conf) return null;
+  cambiar(conf);
+  _guardarConferencias(lista);
+  return conf;
+}
+
+function _fichaAsistencia(k){
+  return k==='presidencia' ? null : getRegistro().find(r=>r.asig==='asistencia' && r.sesion===k) || null;
+}
+function _asistenciaDesdeFicha(sesion, total){
+  const actual = _mesConferenciaActual();
+  if(!actual || !ASIS_REUNIONES.some(([k])=>k===sesion)) return;
+  _editarConferencia(actual, conf=>{
+    conf[sesion] = {...(conf[sesion]||{})};
+    if(total===null) delete conf[sesion].asistieron; else conf[sesion].asistieron = total;
+  });
+  if(_regVista==='asistencia' && !_focoDentro('asistencia-panel')) renderAsistencia();
+}
+function _valoresAsistencia(conf, k){
+  const v = (conf && conf[k]) || {};
+  let asis = v.asistieron;
+  // Datos anotados en la ficha antes de que existiera el historial
+  if(!Number.isFinite(asis) && conf && conf.mes===_mesConferenciaActual()){
+    const ficha = _fichaAsistencia(k);
+    if(ficha) asis = ficha.asistenciaTotal;
+  }
+  const num = n => Number.isFinite(n) ? n : null;
+  return { inv:num(v.invitados), asis:num(asis) };
+}
+// Se trunca igual que en el informe oficial (185 de 1888 = 9%)
+function _pctAsistencia(v){ return v.inv>0 && v.asis!==null ? Math.floor(v.asis/v.inv*100) : null; }
+function _numAR(n){ return n===null ? '—' : n.toLocaleString('es-AR'); }
+function _conSigno(n, sufijo=''){ return (n>0?'+':n<0?'−':'')+Math.abs(n).toLocaleString('es-AR',{maximumFractionDigits:1})+sufijo; }
+
+function cambiarAsistencia(mes, k, campo, val){
+  const n = val==='' ? null : parseInt(val,10);
+  const valido = n!==null && !isNaN(n) && n>=0;
+  const conf = _editarConferencia(mes, c=>{
+    c[k] = {...(c[k]||{})};
+    if(valido) c[k][campo] = n; else delete c[k][campo];
+  });
+  // En la conferencia actual, la ficha de Asistencia de la sesión muestra el mismo número
+  const ficha = campo==='asistieron' && mes===_mesConferenciaActual() ? _fichaAsistencia(k) : null;
+  if(ficha){
+    const reg = getRegistro(); const x = reg.find(r=>r.id===ficha.id);
+    if(valido) x.asistenciaTotal = n; else delete x.asistenciaTotal;
+    saveRegistro(reg);
+  }
+  const pct = _pctAsistencia(_valoresAsistencia(conf, k));
+  const celda = document.getElementById(`asis-pct-${mes}-${k}`);
+  if(celda) celda.textContent = pct===null ? '—' : pct+'%';
+  _renderResultadosAsistencia();
+}
+function cambiarTituloConferencia(mes, val){
+  _editarConferencia(mes, c=>{ c.titulo = val.trim() || _tituloMes(mes); });
+  renderAsistencia();
+}
+function cambiarMesConferencia(mes, nuevo){
+  if(!/^\d{4}-\d{2}$/.test(nuevo) || nuevo===mes){ renderAsistencia(); return; }
+  const lista = getConferenciasAsistencia();
+  if(lista.some(c=>c.mes===nuevo)){ alert('Ya hay una conferencia cargada en ese mes.'); renderAsistencia(); return; }
+  const conf = lista.find(c=>c.mes===mes);
+  if(conf.titulo===_tituloMes(mes)) conf.titulo = _tituloMes(nuevo);
+  conf.mes = nuevo;
+  _guardarConferencias(lista);
+  if(_asisSel===mes) _asisSel = nuevo;
+  renderAsistencia();
+}
+function cambiarNotaAsistencia(mes, k, val){
+  _editarConferencia(mes, c=>{
+    c.notas = {...(c.notas||{})};
+    if(val.trim()) c.notas[k] = val.trim(); else delete c.notas[k];
+  });
+}
+function verConferenciaAsistencia(mes){ _asisSel = mes; _asisDetalle = null; renderAsistencia(); }
+function agregarConferenciaAsistencia(){
+  const lista = getConferenciasAsistencia();
+  const mes = _mesDesplazado(lista.length ? lista[0].mes : new Date().toISOString().slice(0,7), -6);
+  lista.push({mes, titulo:_tituloMes(mes)});
+  _guardarConferencias(lista);
+  _asisSel = _mesDesplazado(mes, 6);
+  renderAsistencia();
+}
+function eliminarConferenciaAsistencia(mes){
+  const lista = getConferenciasAsistencia();
+  const conf = lista.find(c=>c.mes===mes);
+  if(!conf || !confirm(`¿Borrar el informe de asistencia de "${conf.titulo}"?`)) return;
+  _guardarConferencias(lista.filter(c=>c.mes!==mes));
+  if(_asisSel===mes) _asisSel = null;
+  renderAsistencia();
+}
+function verInformeAsistencia(k){
+  _asisDetalle = _asisDetalle===k ? null : k;
+  _renderResultadosAsistencia();
+  if(_asisDetalle) document.getElementById('asis-informe')?.scrollIntoView({block:'nearest', behavior:'smooth'});
+}
+
+// La conferencia que se ve y la anterior a ella en el historial
+function _paresAsistencia(){
+  const lista = getConferenciasAsistencia();
+  const actual = _mesConferenciaActual();
+  let i = lista.findIndex(c=>c.mes===_asisSel);
+  if(i<0) i = lista.findIndex(c=>c.mes===actual);
+  if(i<0) i = lista.length-1;
+  return { lista, act:lista[i], ant:i>0 ? lista[i-1] : null };
+}
+function _filasAsistencia(act, ant){
+  const filas = ASIS_REUNIONES.map(([k,nombre])=>{
+    const a = _valoresAsistencia(act, k), b = _valoresAsistencia(ant, k);
+    return {k, nombre, act:a, ant:b, pAct:_pctAsistencia(a), pAnt:_pctAsistencia(b)};
+  });
+  // Total: solo las reuniones cargadas en las dos conferencias, para comparar lo mismo
+  const comparables = filas.filter(f=>f.pAnt!==null && f.pAct!==null);
+  const sumar = lado => comparables.reduce((s,f)=>({inv:s.inv+f[lado].inv, asis:s.asis+f[lado].asis}), {inv:0, asis:0});
+  const tAct = comparables.length ? sumar('act') : {inv:null, asis:null};
+  const tAnt = comparables.length ? sumar('ant') : {inv:null, asis:null};
+  const total = {k:'total', nombre:'Total de las reuniones', act:tAct, ant:tAnt, pAct:_pctAsistencia(tAct), pAnt:_pctAsistencia(tAnt),
+    parcial: comparables.length && comparables.length<filas.length ? comparables.map(f=>ASIS_CORTO[f.k]) : null};
+  return {filas, total};
+}
+
+/* Informe escrito de una reunión: qué pasó, cuánto cambió y por qué cambió el porcentaje */
+function _informeAsistencia(f, act, ant, filas){
+  const tAct = act.titulo, tAnt = ant ? ant.titulo : '';
+  const res = {situacion:[], cambios:[], lectura:[], sugerencia:''};
+  if(f.pAct===null){
+    res.situacion.push(f.act.inv===null ? `Todavía no se cargaron los invitados ni la asistencia de ${tAct}.` : `Todavía no se cargó cuántos asistieron en ${tAct}.`);
+  } else {
+    res.situacion.push(`En ${tAct} asistieron ${_numAR(f.act.asis)} de ${_numAR(f.act.inv)} invitados (${f.pAct}%).`);
+  }
+  if(f.parcial) res.situacion.push(`Solo suma las reuniones cargadas en las dos conferencias: ${f.parcial.join(', ')}.`);
+  if(!ant){ res.lectura.push('No hay una conferencia anterior en el historial para comparar.'); return res; }
+  if(f.pAnt===null){ res.lectura.push(`No hay datos de esta reunión en ${tAnt} para comparar.`); return res; }
+  res.situacion.push(`En ${tAnt} habían asistido ${_numAR(f.ant.asis)} de ${_numAR(f.ant.inv)} (${f.pAnt}%).`);
+  if(f.pAct===null) return res;
+
+  const dA = f.act.asis - f.ant.asis, dI = f.act.inv - f.ant.inv, dP = f.pAct - f.pAnt;
+  const rA = f.ant.asis ? dA/f.ant.asis*100 : null, rI = f.ant.inv ? dI/f.ant.inv*100 : null;
+  const rel = r => r===null ? '' : ` (${_conSigno(r,'%')})`;
+  res.cambios.push(['Asistentes', dA===0 ? 'igual cantidad' : `${_conSigno(dA)} personas${rel(rA)}`]);
+  res.cambios.push(['Invitados', dI===0 ? 'la misma lista' : `${_conSigno(dI)}${rel(rI)}`]);
+  res.cambios.push(['Porcentaje de asistencia', dP===0 ? 'sin cambios' : `${_conSigno(dP)} punto${Math.abs(dP)===1?'':'s'}`]);
+
+  const fmt = r => _conSigno(r,'%');
+  if(dP>0){
+    if(dA>0 && dI<=0) res.lectura.push('Vinieron más personas y la lista de invitados no creció: la mejora es real.');
+    else if(dA>0) res.lectura.push(`La asistencia creció más rápido que la lista de invitados (${fmt(rA)} contra ${fmt(rI)}), por eso subió el porcentaje.`);
+    else res.lectura.push('El porcentaje sube porque la lista de invitados se achicó, no porque haya venido más gente. Conviene mirar también la cantidad de asistentes.');
+  } else if(dP<0){
+    if(dA<0 && dI<=0) res.lectura.push('Vinieron menos personas aunque la lista de invitados no creció: la asistencia bajó de verdad.');
+    else if(dA<0) res.lectura.push('Vinieron menos personas y además la lista de invitados creció; las dos cosas bajan el porcentaje.');
+    else res.lectura.push(`${dA>0?`Vinieron ${_numAR(dA)} personas más`:'Vino la misma cantidad de personas'}, pero la lista de invitados creció más rápido (${fmt(rI)}), por eso el porcentaje bajó.`);
+    const necesarios = Math.ceil(f.pAnt*f.act.inv/100) - f.act.asis;
+    if(necesarios>0) res.lectura.push(`Para igualar el ${f.pAnt}% de ${tAnt} habrían hecho falta ${_numAR(necesarios)} asistente${necesarios===1?'':'s'} más.`);
+  } else {
+    res.lectura.push(dA===0 ? 'La asistencia se mantuvo igual.' : `El porcentaje se mantuvo: la asistencia y la lista de invitados cambiaron en una proporción parecida.`);
+  }
+  if(f.k==='total' && filas){
+    const conDif = filas.filter(x=>x.pAct!==null && x.pAnt!==null && x.pAct!==x.pAnt)
+      .sort((a,b)=>Math.abs(b.pAct-b.pAnt)-Math.abs(a.pAct-a.pAnt));
+    if(conDif.length){
+      const m = conDif[0], d = m.pAct-m.pAnt;
+      res.lectura.push(`La reunión que más cambió fue ${ASIS_CORTO[m.k]} (${_conSigno(d)} punto${Math.abs(d)===1?'':'s'}).`);
+    }
+  }
+  const unPunto = Math.ceil(f.act.inv/100);
+  if(unPunto>1) res.sugerencia = `Con ${_numAR(f.act.inv)} invitados, cada punto de asistencia equivale a unas ${_numAR(unPunto)} personas.`;
+  return res;
+}
+
+function renderAsistencia(){
+  const cont = document.getElementById('asistencia-panel');
+  if(!cont) return;
+  const {lista, act, ant} = _paresAsistencia();
+  const actual = _mesConferenciaActual();
+  const tabla = (conf, cual) => `<div class="asis-conf asis-${cual}">
+    <div class="asis-conf-titulo"><span class="asis-muestra" aria-hidden="true"></span>
+      <input type="text" value="${esc(conf.titulo)}" aria-label="Nombre de la conferencia" onchange="cambiarTituloConferencia('${conf.mes}',this.value)">
+      <input type="month" class="asis-mes" value="${conf.mes}" aria-label="Mes de la conferencia" title="Mes de la conferencia (ordena el historial)" onchange="cambiarMesConferencia('${conf.mes}',this.value)">
+      ${conf.mes!==actual ? `<button type="button" class="asis-borrar" onclick="eliminarConferenciaAsistencia('${conf.mes}')" title="Borrar este informe" aria-label="Borrar este informe">✕</button>` : ''}
+    </div>
+    <table class="asis-tabla">
+      <thead><tr><th>Reunión</th><th>Invitados</th><th>Asistieron</th><th>%</th></tr></thead>
+      <tbody>${ASIS_REUNIONES.map(([k,nombre,nota])=>{
+        const v = _valoresAsistencia(conf, k);
+        const pct = _pctAsistencia(v);
+        const conFicha = conf.mes===actual && _fichaAsistencia(k);
+        return `<tr>
+          <th scope="row">${nombre}${nota?`<small>${nota}</small>`:''}</th>
+          <td><input type="number" min="0" inputmode="numeric" value="${v.inv??''}" aria-label="${nombre}: invitados" onchange="cambiarAsistencia('${conf.mes}','${k}','invitados',this.value)"></td>
+          <td><input type="number" min="0" inputmode="numeric" value="${v.asis??''}" aria-label="${nombre}: asistieron" onchange="cambiarAsistencia('${conf.mes}','${k}','asistieron',this.value)"${conFicha?' title="Es el mismo total de la ficha de Asistencia de esta sesión"':''}></td>
+          <td class="asis-pct" id="asis-pct-${conf.mes}-${k}">${pct===null?'—':pct+'%'}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>
+  </div>`;
+
+  cont.innerHTML = `
+    <div class="otros-documento-head">
+      <div>
+        <h3 id="asistencia-title">Asistencia de la conferencia</h3>
+        <p>Cada conferencia queda guardada en el historial y se compara con la anterior. Anotá los invitados según figuran en el sistema y cuántos asistieron. Limpiar el registro no borra estos informes.</p>
+      </div>
+      <div class="asis-acciones">
+        <label class="asis-ver">Ver
+          <select onchange="verConferenciaAsistencia(this.value)" aria-label="Conferencia a ver">
+            ${lista.slice().reverse().map(c=>`<option value="${c.mes}"${c.mes===act.mes?' selected':''}>${esc(c.titulo)}${c.mes===actual?' (actual)':''}</option>`).join('')}
+          </select>
+        </label>
+        <button type="button" class="btn-reg-exp" onclick="copiarInformeAsistencia()">Copiar informe</button>
+      </div>
+    </div>
+    <div class="asis-datos">${ant ? tabla(ant,'anterior') : `<div class="asis-conf asis-sin-anterior"><p>No hay una conferencia anterior en el historial.</p><button type="button" class="btn-reg-exp" onclick="agregarConferenciaAsistencia()">+ Cargar conferencia anterior</button></div>`}${tabla(act,'actual')}</div>
+    ${ant && lista[0]===ant ? `<button type="button" class="asis-agregar" onclick="agregarConferenciaAsistencia()">+ Cargar una conferencia más antigua</button>` : ''}
+    <div id="asis-resultados"></div>`;
+  _renderResultadosAsistencia();
+}
+
+function _renderResultadosAsistencia(){
+  const cont = document.getElementById('asis-resultados');
+  if(!cont) return;
+  const {lista, act, ant} = _paresAsistencia();
+  const {filas, total} = _filasAsistencia(act, ant);
+  const tAct = act.titulo, tAnt = ant ? ant.titulo : 'la anterior';
+
+  const variacion = f => {
+    if(f.pAct===null || f.pAnt===null) return '';
+    const d = f.pAct - f.pAnt, pts = `${Math.abs(d)} pt${Math.abs(d)===1?'':'s'}`;
+    return d===0 ? `<span class="asis-delta igual">= Igual que antes</span>`
+      : d>0 ? `<span class="asis-delta sube">▲ ${pts}</span>` : `<span class="asis-delta baja">▼ ${pts}</span>`;
+  };
+  const personas = f => {
+    if(f.act.asis===null) return 'Falta cargar la asistencia';
+    if(f.ant.asis===null) return `${_numAR(f.act.asis)} asistentes`;
+    const d = f.act.asis - f.ant.asis;
+    return `${_numAR(f.act.asis)} asistentes · ${d===0?'igual':_conSigno(d)} que antes`;
+  };
+  const tarjeta = f => `<button type="button" class="asis-kpi${f.k==='total'?' total':''}${_asisDetalle===f.k?' abierta':''}" onclick="verInformeAsistencia('${f.k}')" aria-expanded="${_asisDetalle===f.k}">
+    <span class="asis-kpi-lbl">${ASIS_CORTO[f.k]}${f.parcial?` (${f.parcial.length} de ${filas.length})`:''}</span>
+    <span class="asis-kpi-n">${f.pAct===null?'—':f.pAct+'%'}</span>
+    <span class="asis-kpi-ant">${f.pAnt===null?'Sin dato anterior':`Antes: ${f.pAnt}%`} ${variacion(f)}</span>
+    <span class="asis-kpi-pers">${personas(f)}</span>
+    <span class="asis-kpi-ver">${_asisDetalle===f.k?'Cerrar informe':'Ver informe'}</span>
+  </button>`;
+
+  let informe = '';
+  const sel = _asisDetalle==='total' ? total : filas.find(f=>f.k===_asisDetalle);
+  if(sel){
+    const inf = _informeAsistencia(sel, act, ant, filas);
+    const notaAnt = ant && ant.notas && ant.notas[sel.k];
+    informe = `<section class="asis-informe" id="asis-informe" aria-label="Informe de ${ASIS_CORTO[sel.k]}">
+      <div class="asis-informe-head">
+        <h5>${sel.k==='total' ? 'Total de las reuniones' : ASIS_REUNIONES.find(([k])=>k===sel.k)[1]}</h5>
+        <button type="button" class="asis-cerrar" onclick="verInformeAsistencia('${sel.k}')" aria-label="Cerrar informe">✕</button>
+      </div>
+      ${inf.situacion.map(t=>`<p>${esc(t)}</p>`).join('')}
+      ${inf.cambios.length ? `<dl class="asis-cambios">${inf.cambios.map(([a,b])=>`<div><dt>${a}</dt><dd>${esc(b)}</dd></div>`).join('')}</dl>` : ''}
+      ${inf.lectura.length ? `<div class="asis-lectura"><strong>Lectura</strong>${inf.lectura.map(t=>`<p>${esc(t)}</p>`).join('')}</div>` : ''}
+      ${inf.sugerencia ? `<p class="asis-sugerencia">${esc(inf.sugerencia)}</p>` : ''}
+      <label class="asis-notas">Observaciones de ${esc(tAct)}
+        <textarea rows="3" placeholder="Clima, horarios, actividades que coincidieron, cambios en la lista de invitados…" onchange="cambiarNotaAsistencia('${act.mes}','${sel.k}',this.value)">${esc((act.notas||{})[sel.k]||'')}</textarea>
+      </label>
+      ${notaAnt ? `<p class="asis-nota-ant"><strong>Observaciones de ${esc(ant.titulo)}:</strong> ${esc(notaAnt)}</p>` : ''}
+    </section>`;
+  }
+
+  const barra = (cual, titulo, v, p) => p===null
+    ? `<div class="asis-barra-fila ${cual}"><span class="asis-barra-vacia">Sin datos</span></div>`
+    : `<div class="asis-barra-fila ${cual}" title="${esc(titulo)}: ${_numAR(v.asis)} de ${_numAR(v.inv)} (${p}%)">
+        <span class="asis-barra" style="width:${Math.min(p,100)}%"></span><span class="asis-barra-val">${p}%</span>
+      </div>`;
+
+  // Historial: el porcentaje de cada reunión en todas las conferencias cargadas
+  const historial = lista.length>2 ? `<details class="asis-historial">
+    <summary>Historial de todas las conferencias</summary>
+    <div class="asis-historial-scroll"><table class="asis-tabla">
+      <thead><tr><th>Conferencia</th>${ASIS_REUNIONES.map(([k])=>`<th>${ASIS_CORTO[k]}</th>`).join('')}</tr></thead>
+      <tbody>${lista.slice().reverse().map(c=>`<tr${c.mes===act.mes?' class="sel"':''}><th scope="row">${esc(c.titulo)}</th>${ASIS_REUNIONES.map(([k])=>{
+        const v = _valoresAsistencia(c, k), p = _pctAsistencia(v);
+        return `<td title="${v.asis===null?'Sin datos':`${_numAR(v.asis)} de ${_numAR(v.inv)}`}">${p===null?'—':p+'%'}</td>`;
+      }).join('')}</tr>`).join('')}</tbody>
+    </table></div>
+  </details>` : '';
+
+  cont.innerHTML = `
+    <h4 class="asis-subtitulo">${esc(tAct)}${ant?` comparada con ${esc(tAnt)}`:''}</h4>
+    <p class="asis-ayuda">Tocá una tarjeta para ver el informe de la comparación.</p>
+    <div class="asis-kpis">${filas.map(tarjeta).join('')}${tarjeta(total)}</div>
+    ${informe}
+    <figure class="asis-grafico">
+      <figcaption>
+        <span>Porcentaje de asistencia por reunión</span>
+        <span class="asis-leyenda">${ant?`<span class="anterior">${esc(tAnt)}</span>`:''}<span class="actual">${esc(tAct)}</span></span>
+      </figcaption>
+      <div class="asis-escala" aria-hidden="true"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+      ${filas.map(f=>`<div class="asis-grupo">
+        <div class="asis-grupo-lbl">${ASIS_CORTO[f.k]}</div>
+        <div class="asis-grupo-barras">
+          ${ant ? barra('anterior', tAnt, f.ant, f.pAnt) : ''}
+          ${barra('actual', tAct, f.act, f.pAct)}
+        </div>
+      </div>`).join('')}
+    </figure>
+    ${historial}`;
+}
+
+// Texto del informe completo, listo para pegar en un mensaje o un documento
+async function copiarInformeAsistencia(){
+  const {act, ant} = _paresAsistencia();
+  const {filas, total} = _filasAsistencia(act, ant);
+  const lineas = [`ASISTENCIA · ${act.titulo}${ant?` comparada con ${ant.titulo}`:''}`, ''];
+  for(const f of [...filas, total]){
+    const inf = _informeAsistencia(f, act, ant, filas);
+    lineas.push(`▪ ${f.k==='total' ? 'Total de las reuniones' : ASIS_REUNIONES.find(([k])=>k===f.k)[1]}`);
+    inf.situacion.forEach(t=>lineas.push(t));
+    inf.cambios.forEach(([a,b])=>lineas.push(`  - ${a}: ${b}`));
+    inf.lectura.forEach(t=>lineas.push(t));
+    const nota = (act.notas||{})[f.k];
+    if(nota) lineas.push(`Observaciones: ${nota}`);
+    lineas.push('');
+  }
+  const texto = lineas.join('\n').trim();
+  try {
+    await navigator.clipboard.writeText(texto);
+    alert('Informe copiado. Ya lo podés pegar en un mensaje o documento.');
+  } catch(e){
+    prompt('Copiá el informe:', texto);
+  }
 }
 
 function esCartaEspecialGuardada(entry){
@@ -3488,10 +3981,12 @@ let _regVista = 'conferencia';
 function setRegVista(vista){
   _regVista = vista;
   document.querySelectorAll('.reg-view-btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.view===vista));
-  document.getElementById('horarios-cfg').classList.toggle('hidden', vista==='otros');
-  document.getElementById('fechas-cfg').classList.toggle('hidden', vista==='otros');
+  const sinConfig = vista==='otros' || vista==='asistencia';
+  document.getElementById('horarios-cfg').classList.toggle('hidden', sinConfig);
+  document.getElementById('fechas-cfg').classList.toggle('hidden', sinConfig);
   document.getElementById('cartas-barrios-form').classList.toggle('hidden', vista!=='otros');
   document.getElementById('rel-sost-form').classList.toggle('hidden', vista!=='otros');
+  document.getElementById('asistencia-panel').classList.toggle('hidden', vista!=='asistencia');
   renderRegistro();
   document.getElementById('reg-view-nav')?.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
@@ -3728,6 +4223,15 @@ function renderRegistro(){
   if(countOtrosEl) countOtrosEl.textContent = countOtros;
   if(countOperacionesEl) countOperacionesEl.textContent = countOperaciones;
   document.querySelectorAll('.reg-view-btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.view===_regVista));
+  // La vista de asistencia tiene su propio panel: no lleva estadísticas, buscador ni lista
+  const enAsistencia = _regVista==='asistencia';
+  document.getElementById('reg-stats').classList.toggle('hidden', enAsistencia);
+  document.getElementById('reg-buscar').classList.toggle('hidden', enAsistencia);
+  if(enAsistencia){
+    document.getElementById('reg-tabla').innerHTML = '';
+    renderAsistencia();
+    return;
+  }
   const _pCount = r => {
     if(INFORMATIVAS_ASIG.includes(r.asig) || !r.nombre) return 0;
     const ayudantes = OPERACIONES_ASIG.includes(r.asig) && r.ayudantes
@@ -3802,7 +4306,10 @@ function renderRegistro(){
         const hace = dias===null ? '' : dias===0 ? ' · avisado hoy' : ` · avisado hace ${dias} día${dias===1?'':'s'}`;
         aviso = [dias!==null && dias>=3 ? 'atencion' : 'espera', 'Sin confirmar'+hace];
       }
-      else if(r.confirmado===true && r.reconfirmado!==true && dLeft!==null && dLeft<=7) aviso = ['info','Falta reconfirmar'];
+      else if(r.reconfirmado===true) aviso = ['listo','✓ Reconfirmado · todo listo'];
+      else if(r.confirmado===true) aviso = dLeft!==null && dLeft<=7
+        ? ['info','✓ Confirmado · falta reconfirmar']
+        : ['ok','✓ Confirmado · reconfirmar la semana previa'];
     }
     if(!temaHTML && !aviso) return '<div class="ac-info"></div>';
     return `<div class="ac-info">${temaHTML}${aviso?`<span class="ac-aviso ${aviso[0]}">${aviso[1]}</span>`:''}</div>`;
@@ -5003,8 +5510,8 @@ async function _sincronizarRegistro(){
 /* Vuelve a dibujar sin interrumpir a quien está escribiendo en la tabla */
 function _refrescarVistas(){
   const activo = document.activeElement;
-  const tabla = document.getElementById('reg-tabla');
-  if(tabla && activo && tabla.contains(activo) && /^(INPUT|TEXTAREA|SELECT)$/.test(activo.tagName)){
+  const escribiendo = ['reg-tabla','asistencia-panel'].some(id=>_focoDentro(id));
+  if(escribiendo && activo && /^(INPUT|TEXTAREA|SELECT)$/.test(activo.tagName)){
     _renderPendiente = true;
   } else {
     _renderPendiente = false;
@@ -5114,6 +5621,12 @@ async function _iniciarSincronizacion(){
       _actualizarListaHimnos();
       return cambio;
     }, ()=>{}),
+    _escucharDoc('asistencia', data=>{
+      const nuevo = data || null;
+      const cambio = _estable(nuevo) !== _estable(_asistenciaCache);
+      _asistenciaCache = nuevo;
+      return cambio;
+    }, ()=>{ if(_regVista==='asistencia' && !_focoDentro('asistencia-panel')) renderAsistencia(); }),
     _escucharDoc('relevos-sostenimientos', data=>{
       const nuevo = data && Array.isArray(data.bloques) ? data.bloques : (_relevosCache || crearRelSostInicial());
       const cambio = _estable(nuevo) !== _estable(_relevosCache);
