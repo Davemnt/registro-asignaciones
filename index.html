@@ -833,6 +833,11 @@ input:focus, select:focus, textarea:focus { border-color:var(--wine); box-shadow
 .asis-borrar:hover, .asis-cerrar:hover { background:#f3efe7; color:#a32020; }
 .asis-sin-anterior { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:10px; color:#69727d; font-size:12.5px; }
 .asis-agregar { margin-top:8px; padding:4px 0; border:0; background:transparent; color:var(--wine); font:700 11.5px 'DM Sans',sans-serif; cursor:pointer; }
+.asis-conf-nombre { flex:1 1 160px; min-width:0; padding:0 8px; font:600 14px 'Lora',serif; color:var(--ink); }
+.asis-cerrada-etq { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:999px; background:#f0ece5; color:#59626e; font:700 10.5px 'DM Sans',sans-serif; letter-spacing:.3px; text-transform:uppercase; }
+.asis-corregir { height:30px; padding:0 10px; border:1px solid var(--line); border-radius:4px; background:#fff; color:var(--navy); font:700 11px 'DM Sans',sans-serif; cursor:pointer; }
+.asis-corregir:hover { border-color:var(--wine); color:var(--wine); }
+.asis-tabla td.asis-num { padding-right:10px; text-align:right; font-weight:600; font-variant-numeric:tabular-nums; }
 .asis-ayuda { margin:-4px 0 10px; color:#69727d; font-size:11.5px; }
 .asis-informe { margin-top:12px; padding:16px 18px; border:1px solid #e3d7da; border-left:3px solid var(--asis-act); border-radius:6px; background:#fffefb; color:var(--ink); font-size:13px; line-height:1.55; }
 .asis-informe-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:6px; }
@@ -3499,11 +3504,26 @@ function getConferenciasAsistencia(){
   if(actual && !lista.some(c=>c.mes===actual)) lista.push({mes:actual, titulo:_tituloMes(actual)});
   return lista.sort((a,b)=>a.mes.localeCompare(b.mes));
 }
+/* Las conferencias pasadas quedan cerradas: no se editan, no se mueven ni se borran.
+   Para corregir una hay que escribir el PIN, y vale solo hasta recargar la página. */
+const _asisAbiertas = new Set();  // meses pasados habilitados para corregir
+let _asistenciaLista = false;     // ya llegó el historial guardado (antes no se escribe nada)
+function _conferenciaCerrada(mes){
+  const actual = _mesConferenciaActual() || new Date().toISOString().slice(0,7);
+  return mes < actual && !_asisAbiertas.has(mes);
+}
 function _guardarConferencias(lista){
-  _asistenciaCache = {conferencias: JSON.parse(JSON.stringify(lista))};
+  if(!_asistenciaLista) return;
+  // Lo cerrado se guarda tal como estaba guardado, aunque la lista venga de una copia vieja
+  const guardadas = Array.isArray(_asistenciaCache?.conferencias) ? _asistenciaCache.conferencias : [];
+  const final = lista.map(c=>_conferenciaCerrada(c.mes) && guardadas.find(g=>g.mes===c.mes) || c);
+  guardadas.forEach(g=>{ if(_conferenciaCerrada(g.mes) && !final.some(c=>c.mes===g.mes)) final.push(g); });
+  final.sort((a,b)=>a.mes.localeCompare(b.mes));
+  _asistenciaCache = {conferencias: JSON.parse(JSON.stringify(final))};
   _saveFs('asistencia', _asistenciaCache);
 }
 function _editarConferencia(mes, cambiar){
+  if(!_asistenciaLista || _conferenciaCerrada(mes)) return null;
   const lista = getConferenciasAsistencia();
   const conf = lista.find(c=>c.mes===mes);
   if(!conf) return null;
@@ -3547,6 +3567,7 @@ function cambiarAsistencia(mes, k, campo, val){
     c[k] = {...(c[k]||{})};
     if(valido) c[k][campo] = n; else delete c[k][campo];
   });
+  if(!conf){ renderAsistencia(); return; }
   // En la conferencia actual, la ficha de Asistencia de la sesión muestra el mismo número
   const ficha = campo==='asistieron' && mes===_mesConferenciaActual() ? _fichaAsistencia(k) : null;
   if(ficha){
@@ -3564,12 +3585,13 @@ function cambiarTituloConferencia(mes, val){
   renderAsistencia();
 }
 function cambiarMesConferencia(mes, nuevo){
-  if(!/^\d{4}-\d{2}$/.test(nuevo) || nuevo===mes){ renderAsistencia(); return; }
+  if(!/^\d{4}-\d{2}$/.test(nuevo) || nuevo===mes || !_asistenciaLista || _conferenciaCerrada(mes)){ renderAsistencia(); return; }
   const lista = getConferenciasAsistencia();
   if(lista.some(c=>c.mes===nuevo)){ alert('Ya hay una conferencia cargada en ese mes.'); renderAsistencia(); return; }
   const conf = lista.find(c=>c.mes===mes);
   if(conf.titulo===_tituloMes(mes)) conf.titulo = _tituloMes(nuevo);
   conf.mes = nuevo;
+  if(_asisAbiertas.has(mes)) _asisAbiertas.add(nuevo);
   _guardarConferencias(lista);
   if(_asisSel===mes) _asisSel = nuevo;
   renderAsistencia();
@@ -3582,17 +3604,42 @@ function cambiarNotaAsistencia(mes, k, val){
 }
 function verConferenciaAsistencia(mes){ _asisSel = mes; _asisDetalle = null; renderAsistencia(); }
 function agregarConferenciaAsistencia(){
+  if(!_asistenciaLista){ alert('Todavía se está cargando el historial. Probá de nuevo en unos segundos.'); return; }
   const lista = getConferenciasAsistencia();
   const mes = _mesDesplazado(lista.length ? lista[0].mes : new Date().toISOString().slice(0,7), -6);
-  lista.push({mes, titulo:_tituloMes(mes)});
+  const actual = _mesConferenciaActual();
+  // La anterior a la actual arranca con el informe que se presentó
+  const base = actual && mes===_mesDesplazado(actual,-6) ? JSON.parse(JSON.stringify(_ASIS_SEMILLA)) : {};
+  lista.push({...base, mes, titulo:_tituloMes(mes)});
+  _asisAbiertas.add(mes);  // recién cargada: se puede completar hasta recargar la página
   _guardarConferencias(lista);
   _asisSel = _mesDesplazado(mes, 6);
   renderAsistencia();
 }
-function eliminarConferenciaAsistencia(mes){
+async function corregirConferenciaAsistencia(mes){
+  const conf = getConferenciasAsistencia().find(c=>c.mes===mes);
+  if(!conf) return;
+  const pin = prompt(`"${conf.titulo}" ya pasó y está cerrada para que nadie la cambie por error.\n\nPara corregirla, escribí el PIN:`);
+  if(pin === null) return;
+  try {
+    const cred = firebase.auth.EmailAuthProvider.credential(EMAIL_COORDINACION, pin.trim());
+    await _auth.currentUser.reauthenticateWithCredential(cred);
+  } catch(e){
+    console.error('Corregir conferencia:', e);
+    alert(_mensajeErrorAuth(e));
+    return;
+  }
+  _asisAbiertas.add(mes);
+  renderAsistencia();
+}
+function cerrarConferenciaAsistencia(mes){ _asisAbiertas.delete(mes); renderAsistencia(); }
+async function eliminarConferenciaAsistencia(mes){
+  if(_conferenciaCerrada(mes)) return;
   const lista = getConferenciasAsistencia();
   const conf = lista.find(c=>c.mes===mes);
   if(!conf || !confirm(`¿Borrar el informe de asistencia de "${conf.titulo}"?`)) return;
+  await _crearRespaldo(`Antes de borrar el informe de asistencia de ${conf.titulo}`);
+  _asisAbiertas.delete(mes);
   _guardarConferencias(lista.filter(c=>c.mes!==mes));
   if(_asisSel===mes) _asisSel = null;
   renderAsistencia();
@@ -3681,11 +3728,19 @@ function renderAsistencia(){
   if(!cont) return;
   const {lista, act, ant} = _paresAsistencia();
   const actual = _mesConferenciaActual();
-  const tabla = (conf, cual) => `<div class="asis-conf asis-${cual}">
+  const tabla = (conf, cual) => {
+    const cerrada = _conferenciaCerrada(conf.mes);
+    const titulo = cerrada
+      ? `<span class="asis-conf-nombre">${esc(conf.titulo)}</span>
+        <span class="asis-cerrada-etq" title="Conferencia pasada: sus datos no se pueden modificar">🔒 Cerrada</span>
+        <button type="button" class="asis-corregir" onclick="corregirConferenciaAsistencia('${conf.mes}')" title="Pide el PIN">Corregir</button>`
+      : `<input type="text" value="${esc(conf.titulo)}" aria-label="Nombre de la conferencia" onchange="cambiarTituloConferencia('${conf.mes}',this.value)">
+        <input type="month" class="asis-mes" value="${conf.mes}" aria-label="Mes de la conferencia" title="Mes de la conferencia (ordena el historial)" onchange="cambiarMesConferencia('${conf.mes}',this.value)">
+        ${conf.mes!==actual ? `<button type="button" class="asis-borrar" onclick="eliminarConferenciaAsistencia('${conf.mes}')" title="Borrar este informe" aria-label="Borrar este informe">✕</button>` : ''}
+        ${_asisAbiertas.has(conf.mes) ? `<button type="button" class="asis-corregir" onclick="cerrarConferenciaAsistencia('${conf.mes}')" title="Volver a cerrar esta conferencia">🔒 Cerrar</button>` : ''}`;
+    return `<div class="asis-conf asis-${cual}${cerrada?' cerrada':''}">
     <div class="asis-conf-titulo"><span class="asis-muestra" aria-hidden="true"></span>
-      <input type="text" value="${esc(conf.titulo)}" aria-label="Nombre de la conferencia" onchange="cambiarTituloConferencia('${conf.mes}',this.value)">
-      <input type="month" class="asis-mes" value="${conf.mes}" aria-label="Mes de la conferencia" title="Mes de la conferencia (ordena el historial)" onchange="cambiarMesConferencia('${conf.mes}',this.value)">
-      ${conf.mes!==actual ? `<button type="button" class="asis-borrar" onclick="eliminarConferenciaAsistencia('${conf.mes}')" title="Borrar este informe" aria-label="Borrar este informe">✕</button>` : ''}
+      ${titulo}
     </div>
     <table class="asis-tabla">
       <thead><tr><th>Reunión</th><th>Invitados</th><th>Asistieron</th><th>%</th></tr></thead>
@@ -3693,6 +3748,11 @@ function renderAsistencia(){
         const v = _valoresAsistencia(conf, k);
         const pct = _pctAsistencia(v);
         const conFicha = conf.mes===actual && _fichaAsistencia(k);
+        if(cerrada) return `<tr>
+          <th scope="row">${nombre}${nota?`<small>${nota}</small>`:''}</th>
+          <td class="asis-num">${_numAR(v.inv)}</td><td class="asis-num">${_numAR(v.asis)}</td>
+          <td class="asis-pct">${pct===null?'—':pct+'%'}</td>
+        </tr>`;
         return `<tr>
           <th scope="row">${nombre}${nota?`<small>${nota}</small>`:''}</th>
           <td><input type="number" min="0" inputmode="numeric" value="${v.inv??''}" aria-label="${nombre}: invitados" onchange="cambiarAsistencia('${conf.mes}','${k}','invitados',this.value)"></td>
@@ -3702,6 +3762,7 @@ function renderAsistencia(){
       }).join('')}</tbody>
     </table>
   </div>`;
+  };
 
   cont.innerHTML = `
     <div class="otros-documento-head">
@@ -3765,9 +3826,11 @@ function _renderResultadosAsistencia(){
       ${inf.cambios.length ? `<dl class="asis-cambios">${inf.cambios.map(([a,b])=>`<div><dt>${a}</dt><dd>${esc(b)}</dd></div>`).join('')}</dl>` : ''}
       ${inf.lectura.length ? `<div class="asis-lectura"><strong>Lectura</strong>${inf.lectura.map(t=>`<p>${esc(t)}</p>`).join('')}</div>` : ''}
       ${inf.sugerencia ? `<p class="asis-sugerencia">${esc(inf.sugerencia)}</p>` : ''}
-      <label class="asis-notas">Observaciones de ${esc(tAct)}
+      ${_conferenciaCerrada(act.mes)
+        ? ((act.notas||{})[sel.k] ? `<p class="asis-nota-ant"><strong>Observaciones de ${esc(tAct)}:</strong> ${esc(act.notas[sel.k])}</p>` : '')
+        : `<label class="asis-notas">Observaciones de ${esc(tAct)}
         <textarea rows="3" placeholder="Clima, horarios, actividades que coincidieron, cambios en la lista de invitados…" onchange="cambiarNotaAsistencia('${act.mes}','${sel.k}',this.value)">${esc((act.notas||{})[sel.k]||'')}</textarea>
-      </label>
+      </label>`}
       ${notaAnt ? `<p class="asis-nota-ant"><strong>Observaciones de ${esc(ant.titulo)}:</strong> ${esc(notaAnt)}</p>` : ''}
     </section>`;
   }
@@ -5589,7 +5652,7 @@ function _escucharDoc(docId, aplicar, alCambiar){
       if(aplicar(data)) alCambiar();
     }, err=>{
       console.error('Firestore '+docId+':', err);
-      if(primero){ primero = false; aplicar(null); resolve(); }
+      if(primero){ primero = false; aplicar(null, err); resolve(); }
     });
   });
 }
@@ -5621,7 +5684,9 @@ async function _iniciarSincronizacion(){
       _actualizarListaHimnos();
       return cambio;
     }, ()=>{}),
-    _escucharDoc('asistencia', data=>{
+    _escucharDoc('asistencia', (data, err)=>{
+      // Si no se pudo leer, no se guarda nada: se pisaría el historial con datos vacíos
+      if(!err) _asistenciaLista = true;
       const nuevo = data || null;
       const cambio = _estable(nuevo) !== _estable(_asistenciaCache);
       _asistenciaCache = nuevo;
@@ -5685,7 +5750,8 @@ function _datosParaRespaldo(registro, incluirCartas=false){
     registro: items,
     horarios: getHorarios(),
     fechas: getFechas(),
-    relevos: getRelSost()
+    relevos: getRelSost(),
+    asistencia: _asistenciaCache || undefined
   });
 }
 
@@ -5785,6 +5851,16 @@ async function _restaurarDatos(datos, origen){
   if(datos.horarios){ _horariosCache = datos.horarios; _saveFs('horarios', datos.horarios); loadHorariosUI(); }
   if(datos.fechas){ _fechasCache = datos.fechas; _saveFs('fechas', datos.fechas); loadFechasUI(); }
   if(Array.isArray(datos.relevos)){ _relevosCache = datos.relevos; saveRelSost(); renderRelSostForm(); }
+  // Asistencia: solo se recuperan las conferencias que faltan; las que están no se pisan
+  if(_asistenciaLista && Array.isArray(datos.asistencia?.conferencias)){
+    const lista = getConferenciasAsistencia();
+    const faltan = datos.asistencia.conferencias.filter(c=>c && c.mes && !lista.some(x=>x.mes===c.mes));
+    if(faltan.length){
+      _asistenciaCache = {conferencias: [...lista, ...faltan].sort((a,b)=>a.mes.localeCompare(b.mes))};
+      _saveFs('asistencia', _asistenciaCache);
+      if(_regVista==='asistencia') renderAsistencia();
+    }
+  }
   renderRegistro();
   cerrarRespaldos();
   _toastMensaje('Respaldo restaurado');
