@@ -3284,6 +3284,8 @@ function addToRegistro({nombre,asig,asigLabel,sesion,fechaEvento,genero,tema,gui
   const clean = Object.fromEntries(Object.entries(extra).filter(([,v])=>v!=null&&v!==undefined));
 
   if(idx>=0){
+    // Fila vacía que se vuelve a usar: no hereda el seguimiento de quien estaba antes
+    if(!(reg[idx].nombre||'').trim()) _reiniciarSeguimiento(reg[idx]);
     reg[idx].nombre = nombre;
     reg[idx].fechaEvento = fechaEvento;
     reg[idx].fechaGenerada = now;
@@ -3291,9 +3293,10 @@ function addToRegistro({nombre,asig,asigLabel,sesion,fechaEvento,genero,tema,gui
     if(asig==='mensaje' && !guia) delete reg[idx].guia;
     Object.assign(reg[idx], clean);
   } else {
-    reg.push({id:'extra_'+Date.now(),nombre,asig,asigLabel,sesion,fechaEvento,fechaGenerada:now,...clean,cartaAviso:null,cartaEnviada:null,confirmado:null,reconfirmado:null});
+    const nueva = _insertarEnPrograma(reg, {id:'extra_'+Date.now(),nombre,asig,asigLabel,sesion,fechaEvento,fechaGenerada:now,...clean,cartaAviso:null,cartaEnviada:null,confirmado:null,reconfirmado:null});
+    idx = reg.indexOf(nueva);
   }
-  if(['director','pianista'].includes(asig)) sincronizarHimnosDesdeMusico(reg, reg[idx>=0 ? idx : reg.length-1]);
+  if(['director','pianista'].includes(asig)) sincronizarHimnosDesdeMusico(reg, reg[idx]);
   saveRegistro(reg);
   // Re-render si el registro est\u00e1 visible
   if(!document.getElementById('tab-registro').classList.contains('hidden')) renderRegistro();
@@ -3372,9 +3375,35 @@ function quitarElementoMinuta(editor,indice){
   [...document.querySelectorAll('.minuta-list-input')].find(campo=>campo.dataset.recordId===id)?.focus();
 }
 
+/* ===== SEGUIMIENTO AL CAMBIAR DE PERSONA =====
+   Si en una fila se pone a otra persona, el aviso, la confirmación y la reconfirmación
+   eran de la anterior: se vuelven a "sin marcar". Corregir mayúsculas, acentos o espacios
+   no cuenta como cambio; ante cualquier otra diferencia se pregunta si es otra persona. */
+const CAMPOS_SEGUIMIENTO = ['cartaAviso','cartaEnviada','confirmado','reconfirmado'];
+function _normNombre(n){
+  return String(n||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ').trim().toLowerCase();
+}
+function _tieneSeguimiento(x){
+  return CAMPOS_SEGUIMIENTO.some(c=>x[c]===true || x[c]===false) || !!x.fechaGenerada;
+}
+function _reiniciarSeguimiento(x){
+  CAMPOS_SEGUIMIENTO.forEach(c=>{ x[c]=null; delete x[c+'Date']; });
+  delete x.fechaGenerada;
+}
+function _seguimientoAlCambiarNombre(x, anterior, nuevo){
+  if(INFORMATIVAS_ASIG.includes(x.asig) || !_tieneSeguimiento(x)) return;
+  if(_normNombre(anterior)===_normNombre(nuevo)) return;
+  const otraPersona = !String(anterior||'').trim() || !String(nuevo||'').trim() || confirm(
+    `Cambiaste "${String(anterior).trim()}" por "${String(nuevo).trim()}".\n\n`+
+    `¿Es otra persona? Se reinicia el seguimiento de la fila (avisado, confirmado y reconfirmado).\n\n`+
+    `Aceptar: es otra persona.\nCancelar: solo corrijo cómo está escrito el nombre.`);
+  if(otraPersona) _reiniciarSeguimiento(x);
+}
+
 function updateNombre(id, val){
   const r=getRegistro(); const x=r.find(e=>e.id===id);
   if(x){
+    _seguimientoAlCambiarNombre(x, x.nombre, val);
     x.nombre=val;
     const campoHimno = HIMNO_CAMPO[x.asig];
     if(campoHimno){
@@ -4769,8 +4798,46 @@ function guardarAddModal(){
     nueva.duracionIndividual = 7;
     nueva.duracion = 15;
   }
-  reg.push(nueva);
+  _insertarEnPrograma(reg, nueva);
   saveRegistro(reg); cerrarAddModal(); renderRegistro();
+}
+
+/* ===== POSICIÓN DE UNA ASIGNACIÓN NUEVA =====
+   Ubica la fila en el lugar que le corresponde dentro del programa de su sesión,
+   en vez de dejarla al final (después del himno y la oración final):
+   - Mensajes, testimonios, capacitaciones y otras: antes del cierre de la sesión
+     (el "Mensaje final" si lo hay, o el himno final).
+   - Director/a y pianista: junto a los músicos.
+   - Oración inicial / final: después del himno inicial / final.
+   - Operaciones: junto a las de su mismo tipo. */
+function _esCierreDeSesion(r){
+  return r.asig==='himno_final' || (!INFORMATIVAS_ASIG.includes(r.asig) && r.asig!=='oracion_final' && /\bfinal\b/i.test(r.asigLabel||''));
+}
+function _indiceEnPrograma(reg, nueva){
+  const enSesion = reg.map((r,i)=>[r,i]).filter(([r])=>r.sesion===nueva.sesion && r!==nueva);
+  if(!enSesion.length) return reg.length;
+  const ultimo  = pred => { const m = enSesion.filter(([r])=>pred(r)); return m.length ? m[m.length-1][1] : -1; };
+  const primero = pred => { const m = enSesion.find(([r])=>pred(r)); return m ? m[1] : -1; };
+  const despues = i => i>=0 ? i+1 : -1;
+  let idx;
+  if(OPERACIONES_ASIG.includes(nueva.asig)){
+    idx = despues(ultimo(r=>r.asig===nueva.asig));
+  } else if(['director','pianista'].includes(nueva.asig)){
+    idx = despues(ultimo(r=>['director','pianista'].includes(r.asig)));
+    if(idx<0) idx = primero(r=>['reconocimientos','himno_inicial'].includes(r.asig));
+  } else if(nueva.asig==='oracion_inicial'){
+    idx = despues(ultimo(r=>['himno_inicial','oracion_inicial'].includes(r.asig)));
+  } else if(nueva.asig==='oracion_final'){
+    idx = despues(ultimo(r=>['himno_final','oracion_final'].includes(r.asig)));
+  } else {
+    // Si la nueva es la que cierra (ej. "Mensaje final"), va justo antes del himno final
+    idx = _esCierreDeSesion(nueva) ? primero(r=>r.asig==='himno_final') : primero(_esCierreDeSesion);
+  }
+  return idx>=0 ? idx : ultimo(()=>true)+1;
+}
+function _insertarEnPrograma(reg, nueva){
+  reg.splice(_indiceEnPrograma(reg, nueva), 0, nueva);
+  return nueva;
 }
 function guardarEditModal(){
   if(!_editId) return;
@@ -4780,9 +4847,12 @@ function guardarEditModal(){
   const selected = select.selectedOptions[0];
   const nuevaLabel = document.getElementById('edit-asig-label').value.trim();
   if(isNew && !nuevaLabel){ alert('Ingresá el nombre de la nueva asignación.'); return; }
+  const antes = {sesion:x.sesion, asig:x.asig};
   x.asig = isNew ? 'extra' : (selected.dataset.asig || x.asig);
   x.asigLabel = isNew ? nuevaLabel : (selected.dataset.label || x.asigLabel);
-  x.nombre      = document.getElementById('edit-nombre').value.trim();
+  const nombreNuevo = document.getElementById('edit-nombre').value.trim();
+  _seguimientoAlCambiarNombre(x, x.nombre, nombreNuevo);
+  x.nombre      = nombreNuevo;
   const ayudantes = [...document.querySelectorAll('#edit-ayudantes-list .edit-ayudante')].map(input=>input.value.trim()).filter(Boolean).join('\n');
   if(OPERACIONES_ASIG.includes(x.asig) && ayudantes) x.ayudantes = ayudantes;
   else delete x.ayudantes;
@@ -4850,7 +4920,7 @@ function guardarEditModal(){
       } else {
         // La fila no existe ? crearla
         const contraLabel = contraAsig === 'director' ? 'Director/a de Música' : 'Pianista';
-        r.push({
+        _insertarEnPrograma(r, {
           id: 'extra_'+Date.now(), sesion: x.sesion, asig: contraAsig, asigLabel: contraLabel,
           nombre: x.acompanante, genero: x.acompananteGenero,
           fechaEvento: x.fechaEvento || '',
@@ -4858,6 +4928,11 @@ function guardarEditModal(){
         });
       }
     }
+  }
+  // Si pasó a otra sesión o a otro tipo de asignación, se ubica en su lugar del programa
+  if(x.sesion!==antes.sesion || x.asig!==antes.asig){
+    r.splice(r.indexOf(x), 1);
+    _insertarEnPrograma(r, x);
   }
   saveRegistro(r); cerrarEditModal(); renderRegistro();
 }
