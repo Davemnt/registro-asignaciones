@@ -183,9 +183,20 @@ textarea { resize: vertical; min-height: 52px; }
 .name-filled-input:focus { background:#f0fdf9; border-radius:5px; padding:3px 6px; }
 .operation-team { display:flex; flex-direction:column; align-items:stretch; width:100%; gap:5px; }
 .operation-principal { display:flex; align-items:center; gap:5px; }
-.operation-helpers { display:flex; align-items:center; flex-wrap:wrap; gap:5px 8px; padding:5px 7px; color:#64748B; background:#F8FAFC; border-left:3px solid #94A3B8; font-size:10.5px; line-height:1.4; }
-.operation-helper-edit { margin-left:auto; padding:3px 7px; border:1px solid #CBD5E1; border-radius:4px; background:#fff; color:#475569; font:600 10px inherit; cursor:pointer; white-space:nowrap; }
-.operation-helper-edit:hover { color:#0F766E; border-color:#0F766E; }
+.op-equipo { margin-top:2px; }
+.op-equipo-head { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+.op-equipo-tit { color:#69727d; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+.op-equipo-n { min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:#ebe7df; color:#4d5763; font-size:10px; font-weight:700; line-height:18px; text-align:center; }
+.op-equipo-edit, .op-equipo-vacio { display:inline-flex; align-items:center; gap:5px; border-radius:4px; font:700 11px 'DM Sans',sans-serif; cursor:pointer; }
+.op-equipo-edit { margin-left:auto; min-height:28px; padding:0 8px; border:0; background:transparent; color:#7b293f; }
+.op-equipo-edit:hover { background:#f6f0f1; }
+.op-equipo-edit svg, .op-equipo-vacio svg { width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.op-chips { display:flex; flex-wrap:wrap; gap:6px; margin:0; padding:0; list-style:none; }
+.op-chips li { display:inline-flex; align-items:center; gap:6px; max-width:100%; padding:3px 10px 3px 3px; border:1px solid #e6e0d6; border-radius:999px; background:#faf8f4; color:#202833; font-size:12px; font-weight:600; }
+.op-ini { display:grid; place-items:center; flex-shrink:0; width:22px; height:22px; border-radius:50%; background:#e3e8ef; color:#29384a; font-size:9.5px; font-weight:800; letter-spacing:.2px; }
+.op-chip-nombre { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.op-equipo-vacio { align-self:flex-start; min-height:32px; padding:0 12px; border:1px dashed #cfc8bd; background:transparent; color:#69727d; }
+.op-equipo-vacio:hover { border-color:#7b293f; color:#7b293f; background:#fffefb; }
 .helper-list { display:flex; flex-direction:column; gap:7px; }
 .helper-row { display:grid; grid-template-columns:minmax(0,1fr) 34px; gap:7px; align-items:center; }
 .helper-row input { min-width:0; }
@@ -4294,6 +4305,26 @@ function etiquetaAsignacionMinuta(r, reg=getRegistro()){
  return `${ordinal.charAt(0).toUpperCase() + ordinal.slice(1)} ${base}`;
 }
 
+/* Equipo de apoyo de una operación: cada integrante como etiqueta con sus iniciales */
+function _inicialesNombre(nombre){
+  const palabras = nombre.split(/\s+/).filter(p=>/^[A-ZÁÉÍÓÚÑ0-9]/.test(p));
+  const usar = palabras.length ? palabras : nombre.split(/\s+/);
+  return usar.slice(0,2).map(p=>p[0]).join('').toUpperCase();
+}
+function _equipoApoyoHTML(r){
+  const nombres = (r.ayudantes||'').split(/[\n,]+/).map(n=>n.trim()).filter(Boolean);
+  if(!nombres.length){
+    return `<button type="button" class="op-equipo-vacio" onclick="abrirEditModal('${r.id}')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Agregar equipo de apoyo</button>`;
+  }
+  return `<div class="op-equipo">
+    <div class="op-equipo-head">
+      <span class="op-equipo-tit">Equipo de apoyo</span><span class="op-equipo-n">${nombres.length}</span>
+      <button type="button" class="op-equipo-edit" onclick="abrirEditModal('${r.id}')" title="Editar el equipo de apoyo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Editar</button>
+    </div>
+    <ul class="op-chips">${nombres.map(n=>`<li title="${esc(n)}"><span class="op-ini" aria-hidden="true">${esc(_inicialesNombre(n))}</span><span class="op-chip-nombre">${esc(n)}</span></li>`).join('')}</ul>
+  </div>`;
+}
+
 function renderRegistro(){
   const reg = getRegistro();
   const _conflictos = _detectarConflictos(reg);
@@ -4500,7 +4531,7 @@ function renderRegistro(){
             : `<span>${aLbl}</span>`}${durBadge}${!isFilled?'':!r.cartaAviso?'<span class="ac-sin-avisar">Sin avisar</span>':''}</div>
           <div class="ac-nombre">${isFilled
             ? isOperacion
-              ? `<div class="operation-team"><div class="operation-principal"><span title="Coordinador">★</span><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${_badgeConflicto(_conflictos, r.id)}${cartaIco}${r.nota?`<span class="nota-ico" title="${esc(r.nota)}" onclick="event.stopPropagation();abrirEditModal('${r.id}')">📝</span>`:''}</div><div class="operation-helpers"><span><strong>Equipo de apoyo:</strong> ${r.ayudantes?esc(r.ayudantes).replace(/\n/g,', '):'Sin asignar'}</span><button type="button" class="operation-helper-edit" onclick="abrirEditModal('${r.id}')">${r.ayudantes?'Editar':'Agregar'}</button></div></div>`
+              ? `<div class="operation-team"><div class="operation-principal"><span title="Coordinador">★</span><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${_badgeConflicto(_conflictos, r.id)}${cartaIco}${r.nota?`<span class="nota-ico" title="${esc(r.nota)}" onclick="event.stopPropagation();abrirEditModal('${r.id}')">📝</span>`:''}</div>${_equipoApoyoHTML(r)}</div>`
               : `<div style="display:flex;align-items:center;gap:4px;"><input type="text" value="${esc(r.nombre)}" onchange="updateNombre('${r.id}',this.value)" class="name-filled-input">${_badgeConflicto(_conflictos, r.id)}${r.esMatrimonio && !['director','pianista','oracion_inicial','oracion_final'].includes(r.asig)?'<span class="badge-matrimonio">👫 Matrimonio</span>':''}${cartaIco}${r.nota?`<span class="nota-ico" title="${esc(r.nota)}" onclick="event.stopPropagation();abrirEditModal('${r.id}')">📝</span>`:''}</div>`
             : `<button type="button" class="name-assign" onclick="abrirEditModal('${r.id}',true)" title="Extender asignación" aria-label="Extender asignación: ${esc(aLbl)}"><span style="font-size:13px;flex-shrink:0" aria-hidden="true">👤</span><span class="name-assign-input name-assign-placeholder">${isOperacion?'Asignar coordinador...':'Asignar encargado...'}</span><span class="name-assign-plus" aria-hidden="true">+</span></button>`
           }</div>
